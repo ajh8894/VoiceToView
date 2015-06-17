@@ -1,0 +1,11 @@
+VoiceToViewServer/.settings/
+VoiceToViewServer/build/
+VoiceToViewServer/.classpath
+VoiceToViewServer/.project
+VoiceToViewServer/bin/
+
+VoiceToViewApp/.settings/
+VoiceToViewApp/build/
+VoiceToViewApp/.classpath
+VoiceToViewApp/.project
+VoiceToViewApp/bin/

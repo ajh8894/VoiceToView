@@ -9,7 +9,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 
 import com.swmem.voicetoview.R;
-import com.swmem.voicetoview.util.Database;
+import com.swmem.voicetoview.data.Database;
 
 public class MainActivity extends Activity implements OnCheckedChangeListener {
 	private static final String LOG_TAG = MainActivity.class.getName();

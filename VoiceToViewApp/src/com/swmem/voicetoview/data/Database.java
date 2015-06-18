@@ -1,4 +1,4 @@
-package com.swmem.voicetoview.util;
+package com.swmem.voicetoview.data;
 
 import android.content.Context;
 import android.database.Cursor;

@@ -1,4 +1,4 @@
-package com.swmem.voicetoview.util;
+package com.swmem.voicetoview.data;
 
 public class User {
 	private int mode;

@@ -1,7 +1,5 @@
 package com.swmem.voicetoview.service;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import android.app.Service;
@@ -11,9 +9,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.renderscript.Sampler;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.swmem.voicetoview.R;
 import com.swmem.voicetoview.audio.AudioPauser;
 import com.swmem.voicetoview.audio.RawAudioRecorder;
 import com.swmem.voicetoview.audio.RawAudioRecorder.State;
@@ -30,6 +29,7 @@ public class VoiceToViewService extends Service {
 	private RawAudioRecorder mRecorder;
 	private long mStartTime = 0;
 	private int mMaxRecordingTime = 1000;
+	
 	private int sapmleRate;
 
 	private SpeechRecognition mSpeechRecognition;
@@ -42,21 +42,12 @@ public class VoiceToViewService extends Service {
 			if (isActivated) {
 				if (mMaxRecordingTime < (SystemClock.elapsedRealtime() - mStartTime)) {
 					Log.i(LOG_TAG, "Max recording time exceeded");
-					mRecorder.stop();
-					mSpeechRecognition.getTranscription(mRecorder.consumeRecordingAndTruncate(), sapmleRate);
-					mRecorder.start();
-					mStartTime = SystemClock.elapsedRealtime();
-					mStopHandler.postDelayed(this, 1000);
+					repeatRecoding();
 				} else if (mRecorder.isPausing()) {
 					Log.i(LOG_TAG, "Speaker finished speaking");
-					mRecorder.stop();
-					mSpeechRecognition.getTranscription(mRecorder.consumeRecordingAndTruncate(), sapmleRate);
-					mRecorder.start();
-					mStartTime = SystemClock.elapsedRealtime();
-					mStopHandler.postDelayed(this, 1000);
-				} else {
-					mStopHandler.postDelayed(this, 1000);
+					repeatRecoding();
 				}
+				mStopHandler.postDelayed(this, 1000);
 			}
 		}
 	};
@@ -130,5 +121,18 @@ public class VoiceToViewService extends Service {
 		if (mAudioPauser != null) {
 			mAudioPauser.resume();
 		}
+	}
+	
+	private void repeatRecoding() {
+		if(mRecorder.getState() == State.RECORDING)
+			mRecorder.stop();
+		
+		mSpeechRecognition.getTranscription(mRecorder.consumeRecordingAndTruncate());
+		//mRecorder.consumeRecordingAndTruncate();
+		mRecorder.release();
+		
+		mRecorder = new RawAudioRecorder();
+		mRecorder.start();
+		mStartTime = SystemClock.elapsedRealtime();
 	}
 }

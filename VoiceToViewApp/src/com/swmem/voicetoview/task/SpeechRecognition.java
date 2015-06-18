@@ -1,10 +1,15 @@
 package com.swmem.voicetoview.task;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -27,8 +32,7 @@ public class SpeechRecognition {
 	private String root = "https://www.google.com/speech-api/full-duplex/v1/";
 	private String dwn = "down?maxresults=1&pair=";
 	private String API_DOWN_URL = root + dwn;
-	private String up_p1 = "up?lang=" + language
-			+ "&lm=dictation&client=chromium&pair=";
+	private String up_p1 = "up?lang=" + language + "&lm=dictation&client=chromium&pair=";
 	private String up_p2 = "&key=";
 
 	private int sampleRate;
@@ -89,11 +93,7 @@ public class SpeechRecognition {
 	 * Method related to Google Voice Recognition
 	 **/
 
-	public void getTranscription(byte[] fileName, int sampleRate) {
-		/*File myfil = new File(fileName);
-		if (!myfil.canRead())
-			Log.d("ParseStarter", "FATAL no read access");*/
-
+	public void getTranscription(byte[] pcm) {
 		// first is a GET for the speech-api DOWNSTREAM
 		// then a future exec for the UPSTREAM / chunked encoding used so as not
 		// to limit
@@ -103,43 +103,22 @@ public class SpeechRecognition {
 		// DOWN URL just like in curl full-duplex example plus the handler
 		downChannel(API_DOWN_URL + PAIR, messageHandler);
 
-		// UP chan, process the audio byteStream for interface to UrlConnection
-		// using 'chunked-encoding'
-/*		FileInputStream fis;
-		try {
-			fis = new FileInputStream(myfil);
-			FileChannel fc = fis.getChannel(); // Get the file's size and then
-												// map it into memory
-			int sz = (int) fc.size();
-			MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, sz);
-			byte[] data2 = new byte[bb.remaining()];
-			Log.d("ParseStarter", "mapfil " + sz + " " + bb.remaining());
-			bb.get(data2);
 			// conform to the interface from the curl examples on full-duplex
 			// calls
 			// see curl examples full-duplex for more on 'PAIR'. Just a globally
 			// uniq value typ=long->String.
 			// API KEY value is part of value in UP_URL_p2
-			upChannel(root + up_p1 + PAIR + up_p2 + api_key, messageHandler2, data2);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		upChannel(root + up_p1 + PAIR + up_p2 + api_key, messageHandler2, fileName);
+		upChannel(root + up_p1 + PAIR + up_p2 + api_key, messageHandler2, pcm);
 	}
 
 	private void downChannel(String urlStr, final Handler messageHandler) {
-
 		final String url = urlStr;
 
 		new Thread() {
 			Bundle b;
 
 			public void run() {
-				String response = "NAO FOI";
+				//String response = "NAO FOI";
 				Message msg = Message.obtain();
 				msg.what = 1;
 				// handler for DOWN channel http response stream - httpsUrlConn
@@ -168,9 +147,9 @@ public class SpeechRecognition {
 		}.start();
 	}
 
-	private void upChannel(String urlStr, final Handler messageHandler, byte[] arg3) {
+	private void upChannel(String urlStr, final Handler messageHandler, byte[] pcm) {
 		final String murl = urlStr;
-		final byte[] mdata = arg3;
+		final byte[] mdata = pcm;
 		Log.d("ParseStarter", "upChan " + mdata.length);
 		new Thread() {
 			public void run() {
@@ -183,6 +162,7 @@ public class SpeechRecognition {
 				while (inStream.hasNextLine()) {
 					response += (inStream.nextLine());
 					Log.d("ParseStarter", "POST resp " + response.length());
+					
 				}
 				Bundle b = new Bundle();
 				b.putString("post", response);
@@ -231,9 +211,9 @@ public class SpeechRecognition {
 	}
 
 	// GET for UPSTREAM
-	private Scanner openHttpsPostConnection(String urlStr, byte[] data) {
+	private Scanner openHttpsPostConnection(String urlStr, byte[] pcm) {
 		//InputStream in = null;
-		byte[] mextrad = data;
+		byte[] mextrad = pcm;
 		int resCode = -1;
 		OutputStream out = null;
 		// int http_status;
@@ -251,8 +231,7 @@ public class SpeechRecognition {
 			httpConn.setRequestMethod("POST");
 			httpConn.setDoOutput(true);
 			httpConn.setChunkedStreamingMode(0);
-			httpConn.setRequestProperty("Content-Type", "audio/l16; rate="
-					+ sampleRate);
+			httpConn.setRequestProperty("Content-Type", "audio/l16; rate=" + sampleRate);
 			httpConn.connect();
 
 			try {
@@ -274,8 +253,7 @@ public class SpeechRecognition {
 				// NOW you can look at the status.
 				resCode = httpConn.getResponseCode();
 
-				Log.d("ParseStarter", "POST OK resp "
-						+ httpConn.getResponseMessage().getBytes().toString());
+				Log.d("ParseStarter", "POST OK resp " + httpConn.getResponseMessage().getBytes().toString());
 
 				if (resCode / 100 != 2) {
 					Log.d("ParseStarter", "POST bad io ");

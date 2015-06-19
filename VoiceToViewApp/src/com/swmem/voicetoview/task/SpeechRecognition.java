@@ -1,18 +1,17 @@
 package com.swmem.voicetoview.task;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,7 +23,7 @@ public class SpeechRecognition {
 	// Obs: It requires Google codes: English(en_us), Portuguese(pt_br), Spanish
 	// (es_es), etc
 	private String language = "ko_kr";
-	
+
 	// Key obtained through Google Developer group
 	private String api_key = "AIzaSyBgnC5fljMTmCFeilkgLsOKBvvnx6CBS0M";
 
@@ -32,20 +31,21 @@ public class SpeechRecognition {
 	private String root = "https://www.google.com/speech-api/full-duplex/v1/";
 	private String dwn = "down?maxresults=1&pair=";
 	private String API_DOWN_URL = root + dwn;
-	private String up_p1 = "up?lang=" + language + "&lm=dictation&client=chromium&pair=";
+	private String up_p1 = "up?lang=" + language
+			+ "&lm=dictation&client=chromium&pair=";
 	private String up_p2 = "&key=";
 
 	private int sampleRate;
-	
+
 	// Variables used to establish return code
 	private static final long MIN = 10000000;
 	private static final long MAX = 900000009999999L;
 	long PAIR;
-	
+
 	public SpeechRecognition(int sampleRate) {
 		this.sampleRate = sampleRate;
 	}
-	
+
 	// DOWN handler
 	Handler messageHandler = new Handler() {
 
@@ -56,15 +56,31 @@ public class SpeechRecognition {
 				String mtxt = msg.getData().getString("text");
 				if (mtxt.length() > 20) {
 					final String f_msg = mtxt;
+					
+					try {
+						JSONObject jsonObj = new JSONObject(f_msg);
+						JSONObject result = (JSONObject) jsonObj.getJSONArray("result").get(0);
+						JSONArray alternative = result.getJSONArray("alternative");
+						JSONObject transcripts = (JSONObject) alternative.get(0);
+						String transcript = transcripts.getString("transcript");
+						//JSONArray transcript = alternative.optJSONArray("transcript");
+						//String text = ((JSONObject) transcript.get(0)).get("transcript");
+						Log.d("test", result.toString());
+						Log.d("test1", alternative.toString());
+						Log.d("test2", transcripts.toString());
+						Log.d("test3", transcript);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					Log.i("text", f_msg);
-/*					handler.post(new Runnable() { // This thread runs in the UI
-						// TREATMENT FOR GOOGLE RESPONSE
-						@Override
-						public void run() {
-							System.out.println(f_msg);
-							txtView.setText(f_msg);
-						}
-					});*/
+					/*
+					 * handler.post(new Runnable() { // This thread runs in the
+					 * UI // TREATMENT FOR GOOGLE RESPONSE
+					 * 
+					 * @Override public void run() { System.out.println(f_msg);
+					 * txtView.setText(f_msg); } });
+					 */
 				}
 				break;
 			case 2:
@@ -88,7 +104,7 @@ public class SpeechRecognition {
 
 		}
 	}; // UPstream handler end
-	
+
 	/**************************************************************************************************************
 	 * Method related to Google Voice Recognition
 	 **/
@@ -103,11 +119,11 @@ public class SpeechRecognition {
 		// DOWN URL just like in curl full-duplex example plus the handler
 		downChannel(API_DOWN_URL + PAIR, messageHandler);
 
-			// conform to the interface from the curl examples on full-duplex
-			// calls
-			// see curl examples full-duplex for more on 'PAIR'. Just a globally
-			// uniq value typ=long->String.
-			// API KEY value is part of value in UP_URL_p2
+		// conform to the interface from the curl examples on full-duplex
+		// calls
+		// see curl examples full-duplex for more on 'PAIR'. Just a globally
+		// uniq value typ=long->String.
+		// API KEY value is part of value in UP_URL_p2
 		upChannel(root + up_p1 + PAIR + up_p2 + api_key, messageHandler2, pcm);
 	}
 
@@ -118,7 +134,7 @@ public class SpeechRecognition {
 			Bundle b;
 
 			public void run() {
-				//String response = "NAO FOI";
+				// String response = "NAO FOI";
 				Message msg = Message.obtain();
 				msg.what = 1;
 				// handler for DOWN channel http response stream - httpsUrlConn
@@ -134,11 +150,15 @@ public class SpeechRecognition {
 				// The mechanics of the TLS session should be transparent. Just
 				// use
 				// httpsUrlConn and allow it enough time to do its work.
-				Scanner inStream = openHttpsConnection(url);
+				Scanner downStream = openHttpsConnection(url);
+				if(downStream != null) 
+					Log.d("downStream", "not null");
+				else 
+					Log.d("downStream", "null");
 				// process the stream and store it in StringBuilder
-				while (inStream.hasNextLine()) {
+				while (downStream.hasNextLine()) {
 					b = new Bundle();
-					b.putString("text", inStream.nextLine());
+					b.putString("text", downStream.nextLine());
 					msg.setData(b);
 					messageHandler.dispatchMessage(msg);
 				}
@@ -147,7 +167,8 @@ public class SpeechRecognition {
 		}.start();
 	}
 
-	private void upChannel(String urlStr, final Handler messageHandler, byte[] pcm) {
+	private void upChannel(String urlStr, final Handler messageHandler,
+			byte[] pcm) {
 		final String murl = urlStr;
 		final byte[] mdata = pcm;
 		Log.d("ParseStarter", "upChan " + mdata.length);
@@ -156,20 +177,19 @@ public class SpeechRecognition {
 				String response = "NAO FOI";
 				Message msg = Message.obtain();
 				msg.what = 2;
-				Scanner inStream = openHttpsPostConnection(murl, mdata);
-				inStream.hasNext();
+				Scanner upStream = openHttpsPostConnection(murl, mdata);
+				upStream.hasNext();
 				// process the stream and store it in StringBuilder
-				while (inStream.hasNextLine()) {
-					response += (inStream.nextLine());
+				while (upStream.hasNextLine()) {
+					response += (upStream.nextLine());
 					Log.d("ParseStarter", "POST resp " + response.length());
-					
+
 				}
-				Bundle b = new Bundle();
+/*				Bundle b = new Bundle();
 				b.putString("post", response);
 				msg.setData(b);
 				// in.close(); // mind the resources
-				messageHandler.sendMessage(msg);
-
+				messageHandler.sendMessage(msg);*/
 			}
 		}.start();
 
@@ -177,7 +197,7 @@ public class SpeechRecognition {
 
 	// GET for DOWNSTREAM
 	private Scanner openHttpsConnection(String urlStr) {
-		//InputStream in = null;
+		// InputStream in = null;
 		int resCode = -1;
 		Log.d("ParseStarter", "dwnURL " + urlStr);
 
@@ -212,7 +232,7 @@ public class SpeechRecognition {
 
 	// GET for UPSTREAM
 	private Scanner openHttpsPostConnection(String urlStr, byte[] pcm) {
-		//InputStream in = null;
+		// InputStream in = null;
 		byte[] mextrad = pcm;
 		int resCode = -1;
 		OutputStream out = null;
@@ -253,7 +273,8 @@ public class SpeechRecognition {
 				// NOW you can look at the status.
 				resCode = httpConn.getResponseCode();
 
-				Log.d("ParseStarter", "POST OK resp " + httpConn.getResponseMessage().getBytes().toString());
+				Log.d("ParseStarter", "POST OK resp "
+						+ httpConn.getResponseMessage().getBytes().toString());
 
 				if (resCode / 100 != 2) {
 					Log.d("ParseStarter", "POST bad io ");

@@ -1,6 +1,7 @@
 package com.swmem.voicetoview.service;
 
-import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import android.app.Service;
 import android.content.Intent;
@@ -9,13 +10,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.renderscript.Sampler;
 import android.util.Log;
 
-import com.swmem.voicetoview.R;
 import com.swmem.voicetoview.audio.AudioPauser;
 import com.swmem.voicetoview.audio.RawAudioRecorder;
 import com.swmem.voicetoview.audio.RawAudioRecorder.State;
+import com.swmem.voicetoview.data.Chunk;
 import com.swmem.voicetoview.task.SpeechRecognition;
 
 public class VoiceToViewService extends Service {
@@ -24,6 +24,9 @@ public class VoiceToViewService extends Service {
 
 	private boolean isActivated;
 
+	private BlockingQueue<Chunk> mSenderQueue;
+	private BlockingQueue<Chunk> mReceiverQueue;
+		
 	// Recorder instance
 	private AudioPauser mAudioPauser;
 	private RawAudioRecorder mRecorder;
@@ -102,6 +105,9 @@ public class VoiceToViewService extends Service {
 		mSpeechRecognition = new SpeechRecognition(sapmleRate);
 
 		mStopHandler = new Handler();
+		
+		mSenderQueue = new ArrayBlockingQueue<Chunk>(1024);
+		mReceiverQueue = new ArrayBlockingQueue<Chunk>(1024);
 	}
 
 	private void startAllTasks() {
@@ -128,7 +134,8 @@ public class VoiceToViewService extends Service {
 			mRecorder.stop();
 		
 		mSpeechRecognition.getTranscription(mRecorder.consumeRecordingAndTruncate());
-		//mRecorder.consumeRecordingAndTruncate();
+		//Test t = new Test(mRecorder.consumeRecordingAndTruncate());
+		//t.start();
 		mRecorder.release();
 		
 		mRecorder = new RawAudioRecorder();

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
@@ -22,6 +23,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		Database.openOrCreateDB(getApplicationContext());
 		//set UI
 		Switch mode = (Switch) findViewById(R.id.switch_stt);
+		
 		mode.setOnCheckedChangeListener(this);
 		Intent i = new Intent("com.swmem.voicetoview.service.VoiceToViewService");
 		i.putExtra("activate", true);

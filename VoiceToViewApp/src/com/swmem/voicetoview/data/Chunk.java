@@ -3,6 +3,7 @@ package com.swmem.voicetoview.data;
 import java.io.Serializable;
 
 public class Chunk implements Serializable {
+	private String phoneNumber;
 	private String ip;
 	private String text;
 	private String emotion;

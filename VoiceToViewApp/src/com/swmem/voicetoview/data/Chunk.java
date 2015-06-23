@@ -3,9 +3,12 @@ package com.swmem.voicetoview.data;
 import java.io.Serializable;
 
 public class Chunk implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String phoneNumber;
+	private String gcmId;
 	private String ip;
 	private String text;
+	private double[] features;
 	private String emotion;
 	private boolean completed;
 	
@@ -20,6 +23,12 @@ public class Chunk implements Serializable {
 	}
 	public void setText(String text) {
 		this.text = text;
+	}
+	public double[] getFeatures() {
+		return features;
+	}
+	public void setFeatures(double[] features) {
+		this.features = features;
 	}
 	public String getEmotion() {
 		return emotion;

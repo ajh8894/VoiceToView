@@ -4,26 +4,40 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
+import android.graphics.PixelFormat;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.RemoteCallbackList;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
 
+import com.swmem.voicetoview.R;
 import com.swmem.voicetoview.audio.AudioPauser;
 import com.swmem.voicetoview.audio.RawAudioRecorder;
 import com.swmem.voicetoview.audio.RawAudioRecorder.State;
 import com.swmem.voicetoview.data.Chunk;
-import com.swmem.voicetoview.task.SpeechRecognition;
+import com.swmem.voicetoview.task.Consumer;
+import com.swmem.voicetoview.task.Producer;
 
 public class VoiceToViewService extends Service {
 	private static final String LOG_TAG = VoiceToViewService.class.getName();
-	private final IBinder mBinder = new VoiceToViewServiceBinder();
-
+	private final RemoteCallbackList<IRemoteServiceCallback> mCallbacks = new RemoteCallbackList<IRemoteServiceCallback>();
 	private boolean isActivated;
-
+	private int mode;
+	private final int STT_OFF = 0;
+	private final int STT_ON = 1;
+	
+	private WindowManager mWindowManager;
+	private View mHideView, mAssistView;
+	
 	private BlockingQueue<Chunk> mSenderQueue;
 	private BlockingQueue<Chunk> mReceiverQueue;
 		
@@ -32,11 +46,7 @@ public class VoiceToViewService extends Service {
 	private RawAudioRecorder mRecorder;
 	private long mStartTime = 0;
 	private int mMaxRecordingTime = 1000;
-	
-	private int sapmleRate;
 
-	private SpeechRecognition mSpeechRecognition;
-	
 	String fileName = Environment.getExternalStorageDirectory()	+ "/recording";
 	
 	private Handler mStopHandler;
@@ -55,19 +65,56 @@ public class VoiceToViewService extends Service {
 		}
 	};
 
-	public class VoiceToViewServiceBinder extends Binder {
-		public VoiceToViewService getService() {
-			return VoiceToViewService.this;
+	private final IRemoteService.Stub mBinder = new IRemoteService.Stub() {
+		@Override
+		public void unregisterCallback(IRemoteServiceCallback callback)
+				throws RemoteException {
+			if(callback != null) {
+				mCallbacks.register(callback);
+			}
+			
 		}
+
+		@Override
+		public void registerCallback(IRemoteServiceCallback callback)
+				throws RemoteException {
+			if(callback != null) {
+				mCallbacks.unregister(callback);
+			}	
+		}
+
+		@Override
+		public void getChunkList() throws RemoteException {
+			// TODO Auto-generated method stub
+			
+		}
+	};
+	
+	private void sendMessageCallback(int msg) {
+		final int N = mCallbacks.beginBroadcast();
+		for(int i = 0; i < N; i++) {
+			try {
+				mCallbacks.getBroadcastItem(i).messageCallback(msg);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		mCallbacks.finishBroadcast();
 	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
 		Log.i(LOG_TAG, "onBind");
-		isActivated = intent.getBooleanExtra("activate", false);
-		return mBinder;
+		//isActivated = intent.getBooleanExtra("activate", false);
+		//mode = intent.getIntExtra("mode", STT_OFF);
+		if(IRemoteService.class.getName().equals(intent.getAction())) {
+			return mBinder;
+		}
+		return null;
 	}
+	
 
+	
 	@Override
 	public void onCreate() {
 		Log.i(LOG_TAG, "onCreate");
@@ -80,10 +127,17 @@ public class VoiceToViewService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "onStartCommand");
 		isActivated = intent.getBooleanExtra("activate", true);
-		
+	
 		mRecorder.start();
 		mStartTime = SystemClock.elapsedRealtime();
 		startAllTasks();
+		
+		if (mode == STT_ON) {
+
+		} else if(mode == STT_OFF) {
+		
+		}
+
 		
 		return super.onStartCommand(intent, flags, startId);
 	}
@@ -98,16 +152,53 @@ public class VoiceToViewService extends Service {
 	private void init() {
 		// 30 second, sampleRate 16000 setting
 		mMaxRecordingTime *= 30;
-		sapmleRate = 16000;
-
+		//sapmleRate = 16000;
+		
 		mAudioPauser = new AudioPauser(this);
 		mRecorder = new RawAudioRecorder();
-		mSpeechRecognition = new SpeechRecognition(sapmleRate);
-
 		mStopHandler = new Handler();
-		
+
 		mSenderQueue = new ArrayBlockingQueue<Chunk>(1024);
 		mReceiverQueue = new ArrayBlockingQueue<Chunk>(1024);
+		
+		
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+		mHideView = (View) inflater.inflate(R.layout.activity_hide, null);
+		mAssistView = (View) inflater.inflate(R.layout.activity_assistant, null);
+		WindowManager.LayoutParams aParams = new WindowManager.LayoutParams
+		(
+			WindowManager.LayoutParams.TYPE_PHONE,
+			WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,		
+																		
+			PixelFormat.TRANSLUCENT
+		);		
+		
+		WindowManager.LayoutParams hParams = new WindowManager.LayoutParams
+		(
+			WindowManager.LayoutParams.WRAP_CONTENT,
+			WindowManager.LayoutParams.WRAP_CONTENT,
+			WindowManager.LayoutParams.TYPE_PHONE,
+			WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,		
+			
+			PixelFormat.TRANSLUCENT
+		);
+		hParams.gravity = Gravity.TOP | Gravity.RIGHT;
+		
+		mWindowManager.addView(mAssistView, aParams);
+		mWindowManager.addView(mHideView, hParams);
+		
+		mAssistView.setVisibility(View.VISIBLE);
+		mHideView.setVisibility(View.GONE);
+		
+		if (mode == STT_ON) {
+
+		} else if(mode == STT_OFF) {
+			/*
+			Intent intent = new Intent(getApplicationContext(), AssistantActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent);*/	
+		}
 	}
 
 	private void startAllTasks() {
@@ -133,9 +224,12 @@ public class VoiceToViewService extends Service {
 		if(mRecorder.getState() == State.RECORDING)
 			mRecorder.stop();
 		
-		mSpeechRecognition.getTranscription(mRecorder.consumeRecordingAndTruncate());
-		//Test t = new Test(mRecorder.consumeRecordingAndTruncate());
-		//t.start();
+		Producer producer = new Producer(mSenderQueue, mRecorder.consumeRecordingAndTruncate());
+		Consumer consumer = new Consumer(mSenderQueue);
+	
+		new Thread(producer).start();
+		new Thread(consumer).start();
+		
 		mRecorder.release();
 		
 		mRecorder = new RawAudioRecorder();

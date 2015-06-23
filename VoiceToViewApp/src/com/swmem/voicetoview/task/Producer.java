@@ -1,6 +1,7 @@
 package com.swmem.voicetoview.task;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -20,11 +21,27 @@ public class Producer implements Runnable {
 	
 	@Override
 	public void run() {
-		Future<String> future = executor.submit(new CallableImpl());
+		Future<String> fSpeech = executor.submit(new SpeechRecognition(pcm)); //speech task
+		Future<double[]> fEmotion = executor.submit(new EmotionRecognition(pcm)); //emotion task
 		
-		Chunk senderChunk = new Chunk();
-		senderChunk.setText(future.get()); // speech is Completed
-		queue.add(senderChunk);
+		String text = null;
+		double[] features = null;
+		try {
+			text = fSpeech.get();
+			features = fEmotion.get();
+			
+			if(text != null /*&& features != null*/) {
+				Chunk senderChunk = new Chunk();
+				senderChunk.setText(text);
+				senderChunk.setFeatures(features);
+				queue.add(senderChunk);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} 
+		
 	}
 
 }

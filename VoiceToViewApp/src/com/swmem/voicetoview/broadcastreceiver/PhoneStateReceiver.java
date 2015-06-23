@@ -1,17 +1,15 @@
 package com.swmem.voicetoview.broadcastreceiver;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.swmem.voicetoview.data.Database;
+import com.swmem.voicetoview.data.User;
 import com.swmem.voicetoview.service.VoiceToViewService;
-import com.swmem.voicetoview.service.VoiceToViewService.VoiceToViewServiceBinder;
 import com.swmem.voicetoview.util.CallLog;
 
 public class PhoneStateReceiver extends BroadcastReceiver {
@@ -24,24 +22,15 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 
 	private VoiceToViewService mService;
 	
-	private ServiceConnection mConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			Log.i(LOG_TAG, "Service connected");
-			mService = ((VoiceToViewServiceBinder) service).getService();
-		}
-		public void onServiceDisconnected(ComponentName className) {
-			Log.i(LOG_TAG, "Service disconnected");
-			mService = null;
-		}
-	};
-	
 	public void onReceive(Context context, final Intent intent) {
 		final Context c = context;
+		Database.openOrCreateDB(c);
+		final User option = Database.selectUser();
 		TelephonyManager telManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
 		telManager.listen(new PhoneStateListener() {
 			public void onCallStateChanged(int state, String incomingNumber) {
+				
 				if (state != pState) {
 					if (state == TelephonyManager.CALL_STATE_IDLE) {
 						Log.i(LOG_TAG, "IDLE");
@@ -49,11 +38,15 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 							cLog.setEndDate(System.currentTimeMillis());
 							Log.i("LOG_TAG", ""+cLog.toString());
 							cLog = null;
-							
-							Intent i = new Intent("com.swmem.voicetoview.service.VoiceToViewService");
-							i.putExtra("activate", false);
-							c.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-							c.stopService(i);
+
+							if (option.getMode() == 1) {
+								Intent i = new Intent("com.swmem.voicetoview.service.VoiceToViewService");
+								i.putExtra("activate", false);
+								//c.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+								c.stopService(i);
+							} else {
+
+							}
 						}
 					} else if (state == TelephonyManager.CALL_STATE_RINGING) {
 						Log.i(LOG_TAG, "RINGING");
@@ -63,10 +56,14 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 						Log.i(LOG_TAG, "OFFHOOK");
 						cLog.setStartDate(System.currentTimeMillis());
 						
-						Intent i = new Intent("com.swmem.voicetoview.service.VoiceToViewService");
-						i.putExtra("activate", true);
-						c.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-						c.startService(i);
+						if (option.getMode() == 1) {
+							Intent i = new Intent("com.swmem.voicetoview.service.VoiceToViewService");
+							i.putExtra("activate", true);
+							//c.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+							c.startService(i);
+						} else {
+							
+						}
 					}
 
 					pState = state;
@@ -78,6 +75,12 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 			Log.i("LOG_TAG", "out");
 			cLog = new CallLog(intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER),LogKind.KIND_SEND);
 			cLog.setRingingDate(System.currentTimeMillis());
+			
+			if (option.getMode() == 0) {
+
+			} else {
+				
+			}
 		}
 	}
 }

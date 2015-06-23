@@ -1,11 +1,13 @@
 package com.swmem.voicetoview.task;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Scanner;
+import java.util.concurrent.Callable;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -13,232 +15,38 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
-public class SpeechRecognition {
-	// Language spoken
-	// Obs: It requires Google codes: English(en_us), Portuguese(pt_br), Spanish
-	// (es_es), etc
-	private String language = "ko_kr";
+public class SpeechRecognition implements Callable<String> {
+	private byte[] pcm;
 
 	// Key obtained through Google Developer group
 	private String api_key = "AIzaSyBgnC5fljMTmCFeilkgLsOKBvvnx6CBS0M";
 
 	// URL for Google API
 	private String root = "https://www.google.com/speech-api/full-duplex/v1/";
-	private String dwn = "down?maxresults=1&pair=";
-	private String API_DOWN_URL = root + dwn;
-	private String up_p1 = "up?lang=" + language
-			+ "&lm=dictation&client=chromium&pair=";
+	private String up_p1 = "up?lang=ko_kr&lm=dictation&client=chromium&pair=";
 	private String up_p2 = "&key=";
-
-	private int sampleRate;
-
+	
 	// Variables used to establish return code
-	private static final long MIN = 10000000;
-	private static final long MAX = 900000009999999L;
-	long PAIR;
-
-	public SpeechRecognition(int sampleRate) {
-		this.sampleRate = sampleRate;
+	private final long MIN = 10000000;
+	private final long MAX = 900000009999999L;
+	private long PAIR;
+	
+	public SpeechRecognition(byte[] pcm) {
+		this.pcm = pcm;
 	}
-
-	// DOWN handler
-	Handler messageHandler = new Handler() {
-
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			switch (msg.what) {
-			case 1: // GET DOWNSTREAM json id="@+id/comment"
-				String mtxt = msg.getData().getString("text");
-				if (mtxt.length() > 20) {
-					final String f_msg = mtxt;
-					
-					try {
-						JSONObject jsonObj = new JSONObject(f_msg);
-						JSONObject result = (JSONObject) jsonObj.getJSONArray("result").get(0);
-						JSONArray alternative = result.getJSONArray("alternative");
-						JSONObject transcripts = (JSONObject) alternative.get(0);
-						String transcript = transcripts.getString("transcript");
-						//JSONArray transcript = alternative.optJSONArray("transcript");
-						//String text = ((JSONObject) transcript.get(0)).get("transcript");
-						Log.d("test", result.toString());
-						Log.d("test1", alternative.toString());
-						Log.d("test2", transcripts.toString());
-						Log.d("test3", transcript);
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					Log.i("text", f_msg);
-					/*
-					 * handler.post(new Runnable() { // This thread runs in the
-					 * UI // TREATMENT FOR GOOGLE RESPONSE
-					 * 
-					 * @Override public void run() { System.out.println(f_msg);
-					 * txtView.setText(f_msg); } });
-					 */
-				}
-				break;
-			case 2:
-				break;
-			}
-		}
-	}; // doDOWNSTRM Handler end
-
-	// UPSTREAM channel. its servicing a thread and should have its own handler
-	Handler messageHandler2 = new Handler() {
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			switch (msg.what) {
-			case 1: // GET DOWNSTREAM json
-				Log.d("ParseStarter", msg.getData().getString("post"));
-				break;
-			case 2:
-				Log.d("ParseStarter", msg.getData().getString("post"));
-				break;
-			}
-
-		}
-	}; // UPstream handler end
-
-	/**************************************************************************************************************
-	 * Method related to Google Voice Recognition
-	 **/
-
-	public void getTranscription(byte[] pcm) {
-		// first is a GET for the speech-api DOWNSTREAM
-		// then a future exec for the UPSTREAM / chunked encoding used so as not
-		// to limit
-		// the POST body sz
-
+	
+	
+	@Override
+	public String call() throws Exception {
 		PAIR = MIN + (long) (Math.random() * ((MAX - MIN) + 1L));
-		// DOWN URL just like in curl full-duplex example plus the handler
-		downChannel(API_DOWN_URL + PAIR, messageHandler);
-
-		// conform to the interface from the curl examples on full-duplex
-		// calls
-		// see curl examples full-duplex for more on 'PAIR'. Just a globally
-		// uniq value typ=long->String.
-		// API KEY value is part of value in UP_URL_p2
-		upChannel(root + up_p1 + PAIR + up_p2 + api_key, messageHandler2, pcm);
-	}
-
-	private void downChannel(String urlStr, final Handler messageHandler) {
-		final String url = urlStr;
-
-		new Thread() {
-			Bundle b;
-
-			public void run() {
-				// String response = "NAO FOI";
-				Message msg = Message.obtain();
-				msg.what = 1;
-				// handler for DOWN channel http response stream - httpsUrlConn
-				// response handler should manage the connection.... ??
-				// assign a TIMEOUT Value that exceeds by a safe factor
-				// the amount of time that it will take to write the bytes
-				// to the UPChannel in a fashion that mimics a liveStream
-				// of the audio at the applicable Bitrate. BR=sampleRate * bits
-				// per sample
-				// Note that the TLS session uses
-				// "* SSLv3, TLS alert, Client hello (1): "
-				// to wake up the listener when there are additional bytes.
-				// The mechanics of the TLS session should be transparent. Just
-				// use
-				// httpsUrlConn and allow it enough time to do its work.
-				Scanner downStream = openHttpsConnection(url);
-				if(downStream != null) 
-					Log.d("downStream", "not null");
-				else 
-					Log.d("downStream", "null");
-				// process the stream and store it in StringBuilder
-				while (downStream.hasNextLine()) {
-					b = new Bundle();
-					b.putString("text", downStream.nextLine());
-					msg.setData(b);
-					messageHandler.dispatchMessage(msg);
-				}
-
-			}
-		}.start();
-	}
-
-	private void upChannel(String urlStr, final Handler messageHandler,
-			byte[] pcm) {
-		final String murl = urlStr;
-		final byte[] mdata = pcm;
-		Log.d("ParseStarter", "upChan " + mdata.length);
-		new Thread() {
-			public void run() {
-				String response = "NAO FOI";
-				Message msg = Message.obtain();
-				msg.what = 2;
-				Scanner upStream = openHttpsPostConnection(murl, mdata);
-				upStream.hasNext();
-				// process the stream and store it in StringBuilder
-				while (upStream.hasNextLine()) {
-					response += (upStream.nextLine());
-					Log.d("ParseStarter", "POST resp " + response.length());
-
-				}
-/*				Bundle b = new Bundle();
-				b.putString("post", response);
-				msg.setData(b);
-				// in.close(); // mind the resources
-				messageHandler.sendMessage(msg);*/
-			}
-		}.start();
-
-	}
-
-	// GET for DOWNSTREAM
-	private Scanner openHttpsConnection(String urlStr) {
 		// InputStream in = null;
 		int resCode = -1;
-		Log.d("ParseStarter", "dwnURL " + urlStr);
-
-		try {
-			URL url = new URL(urlStr);
-			URLConnection urlConn = url.openConnection();
-
-			if (!(urlConn instanceof HttpsURLConnection)) {
-				throw new IOException("URL is not an Https URL");
-			}
-
-			HttpsURLConnection httpConn = (HttpsURLConnection) urlConn;
-			httpConn.setAllowUserInteraction(false);
-			// TIMEOUT is required
-			httpConn.setInstanceFollowRedirects(true);
-			httpConn.setRequestMethod("GET");
-
-			httpConn.connect();
-
-			resCode = httpConn.getResponseCode();
-			if (resCode == HttpsURLConnection.HTTP_OK) {
-				return new Scanner(httpConn.getInputStream());
-			}
-
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	// GET for UPSTREAM
-	private Scanner openHttpsPostConnection(String urlStr, byte[] pcm) {
-		// InputStream in = null;
-		byte[] mextrad = pcm;
-		int resCode = -1;
-		OutputStream out = null;
+		
 		// int http_status;
 		try {
-			URL url = new URL(urlStr);
+			URL url = new URL(root + up_p1 + PAIR + up_p2 + api_key);
 			URLConnection urlConn = url.openConnection();
 
 			if (!(urlConn instanceof HttpsURLConnection)) {
@@ -251,30 +59,19 @@ public class SpeechRecognition {
 			httpConn.setRequestMethod("POST");
 			httpConn.setDoOutput(true);
 			httpConn.setChunkedStreamingMode(0);
-			httpConn.setRequestProperty("Content-Type", "audio/l16; rate=" + sampleRate);
+			httpConn.setRequestProperty("Content-Type", "audio/l16; rate=" + 16000);
 			httpConn.connect();
 
 			try {
-				// this opens a connection, then sends POST & headers.
-				out = httpConn.getOutputStream();
-				// Note : if the audio is more than 15 seconds
-				// dont write it to UrlConnInputStream all in one block as this
-				// sample does.
-				// Rather, segment the byteArray and on intermittently, sleeping
-				// thread
-				// supply bytes to the urlConn Stream at a rate that approaches
-				// the bitrate ( =30K per sec. in this instance ).
+				OutputStream out = httpConn.getOutputStream();
+
 				Log.d("ParseStarter", "IO beg on data");
-				out.write(mextrad); // one big block supplied instantly to the
-									// underlying chunker wont work for duration
-									// > 15 s.
+				out.write(pcm); 	
 				Log.d("ParseStarter", "IO fin on data");
-				// do you need the trailer?
-				// NOW you can look at the status.
+
 				resCode = httpConn.getResponseCode();
 
-				Log.d("ParseStarter", "POST OK resp "
-						+ httpConn.getResponseMessage().getBytes().toString());
+				Log.d("ParseStarter", "POST OK resp " + httpConn.getResponseMessage().getBytes().toString());
 
 				if (resCode / 100 != 2) {
 					Log.d("ParseStarter", "POST bad io ");
@@ -282,18 +79,46 @@ public class SpeechRecognition {
 
 			} catch (IOException e) {
 				Log.d("ParseStarter", "FATAL " + e);
-
 			}
 
 			if (resCode == HttpsURLConnection.HTTP_OK) {
 				Log.d("ParseStarter", "OK RESP to POST return scanner ");
-				return new Scanner(httpConn.getInputStream());
+				System.out.println("\nSending 'POST' request to URL : " + url);
+				System.out.println("Response Code : " + resCode);
+
+				BufferedReader in = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
+				String inputLine;
+				StringBuffer response = new StringBuffer();
+				while ((inputLine = in.readLine()) != null) {
+					//Ignore the first response, it's always empty
+					Log.d("response", inputLine);
+					try {
+						JSONObject jsonObj = new JSONObject(inputLine);
+						JSONObject result = (JSONObject) jsonObj.getJSONArray("result").get(0);
+						JSONArray alternative = result.getJSONArray("alternative");
+						JSONObject transcripts = (JSONObject) alternative.get(0);
+						String transcript = transcripts.getString("transcript");
+						
+						/*Log.d("result", result.toString());
+						Log.d("alternative", alternative.toString());
+						Log.d("transcripts", transcripts.toString());
+						Log.d("transcript", transcript);*/
+						return transcript;
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					response.append(inputLine);
+				}
+				in.close();
+				System.out.println(response.toString());
+
 			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		return null;
 	}
 }

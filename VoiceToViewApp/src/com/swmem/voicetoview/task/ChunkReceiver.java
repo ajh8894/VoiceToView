@@ -1,49 +1,80 @@
 package com.swmem.voicetoview.task;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.InetAddress;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.concurrent.BlockingQueue;
 
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.swmem.voicetoview.data.Chunk;
+import com.swmem.voicetoview.data.ConnectionInfo;
+import com.swmem.voicetoview.data.Constants;
 
-public class ChunkReceiver implements Runnable {
-	private BlockingQueue<Chunk> queue;
-	private Handler handler;
-	
-	public ChunkReceiver(BlockingQueue<Chunk> queue, Handler handler) {
-		this.queue = queue;
-		this.handler = handler;
+public class ChunkReceiver extends Thread {
+	private BlockingQueue<Chunk> receiverQueue;
+	private Handler receiverHandler;
+	private Socket socket;
+	private ObjectOutputStream oos;
+	private ObjectInputStream ois;
+
+	public ChunkReceiver(BlockingQueue<Chunk> receiverQueue, Handler receiverHandler) {
+		this.receiverQueue = receiverQueue;
+		this.receiverHandler = receiverHandler;
 	}
-	
-	@Override
-	public void run() {
-		try {
-			InetAddress serverAddr = InetAddress.getByName("211.189.127.200");
 
-			Log.d("TCP", "C: Connecting...");
-			Socket socket = new Socket(serverAddr, 8080);
-			socket.setSoTimeout(3000);
-			try {
-				ObjectInputStream iops = new ObjectInputStream(socket.getInputStream());
-				Chunk c = (Chunk) iops.readObject();
-				queue.put(c);
-				// queue.
-				Log.d("TCP", "C: Receive.");
-				Log.d("TCP", "C: Done.");
-				// iops.reset();
-				iops.close();
-			} catch (Exception e) {
-				Log.e("TCP", "S: Error", e);
-			} finally {
+	public void close() {
+		try {
+			if (oos != null)
+				oos.close();
+			if (ois != null)
+				ois.close();
+			if (socket != null) {
 				socket.close();
 			}
-		} catch (Exception e) {
-			Log.e("TCP", "C: Error", e);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+	}
 
+	@Override
+	public void run() {
+		super.run();
+		Message msg = null;
+		try {
+			if (socket == null || !socket.isConnected()) {
+				socket = new Socket(Constants.SERVER_IP, Constants.SERVER_PORT);
+				if(oos == null) {
+					oos = new ObjectOutputStream(socket.getOutputStream());
+					oos.writeObject(ConnectionInfo.header);
+					oos.flush();
+					Log.d("Receiver", "is Connected true");
+				}
+			}
+			while(socket.isConnected() && !socket.isClosed()) {
+				if(ois == null) {
+					ois = new ObjectInputStream(socket.getInputStream());
+				}
+				Log.d("Receiver", "read");
+				Chunk c = (Chunk) ois.readObject();
+				Log.d("receive", c.getText());
+				receiverQueue.put(c);
+				receiverHandler.sendEmptyMessage(Constants.REFRESH);
+			}
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		Log.d("Receiver", "destroy");
+		close();
 	}
 }

@@ -16,6 +16,7 @@ public class AudioPauser {
 		mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
 		mAfChangeListener = new OnAudioFocusChangeListener() {
+			@Override
 			public void onAudioFocusChange(int focusChange) {
 				Log.i("onAudioFocusChange", "" + focusChange);
 			}

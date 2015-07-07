@@ -1,104 +1,206 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/RelativeLayout1"
+<?xml version="1.0"?>
+<LinearLayout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    tools:context=".MainActivity" >
+    android:orientation="vertical"
+    tools:context="com.example.sttprojectui.START_UI_MAIN" >
 
     <LinearLayout
+        android:id="@+id/category_page"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/layoutMargin2"
-        android:baselineAligned="true"
-        android:gravity="center"
         android:orientation="vertical" >
 
         <LinearLayout
+            android:id="@+id/category_buttons"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_margin="@dimen/layoutMargin2" >
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:orientation="vertical" >
 
-            <ImageView
-                android:id="@+id/imageView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/stt_icon" />
+            <!-- 첫번째 줄 카테고리 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/menu_stt"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                <!-- 1번 카테고리 [ON/OFF] -->
+                <LinearLayout
+                    android:id="@+id/onoff_layout"
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:orientation="vertical" >
 
-            <Switch
-                android:id="@+id/stt_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end" />
-        </LinearLayout>
+                    <ImageView
+                        android:id="@+id/onoffimg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:src="@drawable/category_icon_off" />
 
-        <LinearLayout
-            android:id="@+id/text_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/layoutMargin2" >
+                    <TextView
+                        android:id="@+id/onofftext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OFF"
+                        android:textColor="#747474"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/text_icon" />
+                <!-- 2번 카테고리 [Gender] -->
+                <LinearLayout
+                    android:id="@+id/gender_layout"
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/menu_style"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </LinearLayout>
+                    <ImageView
+                        android:id="@+id/genderimg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:src="@drawable/category_icon_gender_man" />
 
-        <LinearLayout
-            android:id="@+id/animation_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/layoutMargin2" >
+                    <TextView
+                        android:id="@+id/gendertext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MAN"
+                        android:textColor="#747474"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
 
-            <ImageView
-                android:id="@+id/imageView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/animation_icon" />
+            <!-- 두번째 줄 카테고리 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/menu_animation"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </LinearLayout>
+                <!-- 3번 카테고리 [Animation] -->
+                <LinearLayout
+                    android:id="@+id/animation_layout"
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:orientation="vertical" >
 
-        <LinearLayout
-            android:id="@+id/storage_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/layoutMargin2" >
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:src="@drawable/category_icon_animation" />
 
-            <ImageView
-                android:id="@+id/imageView5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/stroage_icon" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Animation"
+                        android:textColor="#747474"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/menu_storage"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                <!-- 4번 카테고리 [Theme] -->
+                <LinearLayout
+                    android:id="@+id/theme_layout"
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:orientation="vertical" >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:src="@drawable/category_icon_theme" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Theme"
+                        android:textColor="#747474"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 세번째 줄 카테고리 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
+
+                <!-- 5번 카테고리 [Data] -->
+                <LinearLayout
+                    android:id="@+id/data_layout"
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:orientation="vertical" >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:src="@drawable/category_icon_data" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Data"
+                        android:textColor="#747474"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- 6번 카테고리 [Help] -->
+                <LinearLayout
+                    android:id="@+id/help_layout"
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:orientation="vertical" >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:src="@drawable/category_icon_help" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Help"
+                        android:textColor="#747474"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

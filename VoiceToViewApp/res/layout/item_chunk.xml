@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="top"
+    android:padding="15dp" >
+
+    <ImageView
+        android:id="@+id/iv_emotion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/category_icon_circle"
+        android:src="@drawable/user_icon" />
+
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_toRightOf="@+id/emotion_iv"
+        android:background="@drawable/categroy_icon_boom"
+        android:textStyle="bold"
+        android:textSize="14dp"
+        android:textColor="#000000"
+        android:text="msg" />
+
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/message_tv"
+        android:layout_toRightOf="@+id/message_tv"
+        android:background="#8FBC8F"
+        android:textStyle="bold"
+        android:textSize="13dp"
+        android:textColor="#FFFFFF"
+        android:text="date" />
+
+</RelativeLayout>

@@ -7,80 +7,68 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.swmem.voicetoview.data.ConnectionInfo;
+import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Database;
 import com.swmem.voicetoview.data.User;
-import com.swmem.voicetoview.service.VoiceToViewService;
-import com.swmem.voicetoview.util.CallLog;
 
 public class PhoneStateReceiver extends BroadcastReceiver {
 	private final String LOG_TAG = PhoneStateReceiver.class.getName();
-	private int pState = TelephonyManager.CALL_STATE_IDLE;
-	private CallLog cLog;
-	public enum LogKind {
-		KIND_RECEIVE, KIND_SEND
-	}
+    private static int pState = TelephonyManager.CALL_STATE_IDLE;
 
-	private VoiceToViewService mService;
-	
+    @Override
 	public void onReceive(Context context, final Intent intent) {
-		final Context c = context;
-		Database.openOrCreateDB(c);
+    	Database.openOrCreateDB(context);
 		final User option = Database.selectUser();
-		TelephonyManager telManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		final Context c = context;
+		
+		final TelephonyManager telManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        
+        telManager.listen(new PhoneStateListener(){
+            @Override
+			public void onCallStateChanged(int state, String incomingNumber){
+                if(state != pState){
+                    if(state == TelephonyManager.CALL_STATE_IDLE){
+                        Log.i("Phone","IDLE");
+                        if(ConnectionInfo.header != null){
+                        	ConnectionInfo.header = null;
 
-		telManager.listen(new PhoneStateListener() {
-			public void onCallStateChanged(int state, String incomingNumber) {
-				
-				if (state != pState) {
-					if (state == TelephonyManager.CALL_STATE_IDLE) {
-						Log.i(LOG_TAG, "IDLE");
-						if (cLog != null) {
-							cLog.setEndDate(System.currentTimeMillis());
-							Log.i("LOG_TAG", ""+cLog.toString());
-							cLog = null;
+                        	//Intent serviceIntent = new Intent(c, VoiceToViewService.class); 명시적 인텐트, 롤리팝
+                        	Intent serviceIntent = new Intent(Constants.SERVICE_ACTION);
+                            c.stopService(serviceIntent);
+                        }
+                    }
+                    else if(state == TelephonyManager.CALL_STATE_RINGING){
+                        Log.i("Phone","RINGING");
+                        ConnectionInfo.header = new String[3];
+                        ConnectionInfo.call = Constants.KIND_CALL_RECEIVER;
+                        ConnectionInfo.header[1] = incomingNumber;
+                        ConnectionInfo.header[2] = telManager.getLine1Number();
+                    }
+                    else if(state == TelephonyManager.CALL_STATE_OFFHOOK){
+                        Log.i(LOG_TAG, "OFFHOOK " + ConnectionInfo.header[0] + " " + ConnectionInfo.header[1] + " " + ConnectionInfo.header[2]);
+                        
+						if (option.getMode() == Constants.STT_ON)
+							ConnectionInfo.header[0] = Constants.KIND_SEND;
+						else
+							ConnectionInfo.header[1] = Constants.KIND_RECEIVE;
 
-							if (option.getMode() == 1) {
-								Intent i = new Intent("com.swmem.voicetoview.service.VoiceToViewService");
-								i.putExtra("activate", false);
-								//c.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-								c.stopService(i);
-							} else {
-
-							}
-						}
-					} else if (state == TelephonyManager.CALL_STATE_RINGING) {
-						Log.i(LOG_TAG, "RINGING");
-						cLog = new CallLog(incomingNumber, LogKind.KIND_RECEIVE);
-						cLog.setRingingDate(System.currentTimeMillis());
-					} else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
-						Log.i(LOG_TAG, "OFFHOOK");
-						cLog.setStartDate(System.currentTimeMillis());
-						
-						if (option.getMode() == 1) {
-							Intent i = new Intent("com.swmem.voicetoview.service.VoiceToViewService");
-							i.putExtra("activate", true);
-							//c.bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-							c.startService(i);
-						} else {
-							
-						}
-					}
-
-					pState = state;
-				}
-			}
-		}, PhoneStateListener.LISTEN_CALL_STATE);
-
-		if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
-			Log.i("LOG_TAG", "out");
-			cLog = new CallLog(intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER),LogKind.KIND_SEND);
-			cLog.setRingingDate(System.currentTimeMillis());
-			
-			if (option.getMode() == 0) {
-
-			} else {
-				
-			}
-		}
-	}
+                        Intent serviceIntent = new Intent(Constants.SERVICE_ACTION);
+						c.startService(serviceIntent);
+                    }
+                     
+                    pState = state;
+                }
+            }
+        }, PhoneStateListener.LISTEN_CALL_STATE);
+         
+        if(intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)){
+            Log.i("Phone","OUT");
+            ConnectionInfo.header = new String[3];
+            ConnectionInfo.call = Constants.KIND_CALL_SENDER;
+            ConnectionInfo.header[1] = telManager.getLine1Number();
+            ConnectionInfo.header[2] = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+            Log.i(LOG_TAG, "OFFHOOK " + ConnectionInfo.header[0] + " " + ConnectionInfo.header[1] + " " + ConnectionInfo.header[2]);
+        }
+    }
 }

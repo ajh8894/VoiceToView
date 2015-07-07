@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="svmTEST.java|SubTest.java|Test.java|VoiceToViewServerMain.java" kind="src" path="src"/>
+	<classpathentry excluding="svmTEST.java|SubTest.java|VoiceToViewServerMain.java|com/swmem/voicetoview/data/Client.java|Server.java|Test1.java|ClientProcessor.java|Option.java|Test.java|ClientAcceptor_t.java|ClientProcessor_t.java" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="C:/Users/swssm/workspace/VoiceToView/VoiceToViewServer/libsvm.jar"/>
 	<classpathentry kind="output" path="bin"/>

@@ -1,6 +1,6 @@
 package com.swmem.voicetoview.view;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,19 +10,21 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.swmem.voicetoview.R;
 import com.swmem.voicetoview.data.Chunk;
 
 public class ChunkListAdapter extends BaseAdapter {
 	private LayoutInflater mInflater;
 	private int mLayout;
-	private ArrayList<Chunk> mItemList;
+	private List<Chunk> mItemList;
 	
 	private class ViewHolder {
 		public ImageView emotion;
-		public TextView text;
+		public TextView message;
+		public TextView date;
 	}
 	
-	public ChunkListAdapter(Context context, int layout, ArrayList<Chunk> itemList) {
+	public ChunkListAdapter(Context context, int layout, List<Chunk> itemList) {
 		this.mInflater = LayoutInflater.from(context);
 		this.mLayout = layout;
 		this.mItemList = itemList;
@@ -55,6 +57,8 @@ public class ChunkListAdapter extends BaseAdapter {
 			
 			
 			//viewHolder.icon = (ImageView) convertView.findViewById(R.id.iconImage);
+			viewHolder.message = (TextView) convertView.findViewById(R.id.tv_message);
+			viewHolder.date = (TextView) convertView.findViewById(R.id.tv_date);
 /*			switch (item.getEmotion()) {
 			
 			}*/
@@ -65,7 +69,11 @@ public class ChunkListAdapter extends BaseAdapter {
 		/*viewHolder.name.setText(mItemList.get(position).getName());
 	    viewHolder.address.setText(mItemList.get(position).getAddress());
 	    viewHolder.phone.setText(mItemList.get(position).getPhone());*/
-		
+		viewHolder.message.setText(item.getText());
 		return convertView;
+	}
+	public void reflesh(List<Chunk> list) {
+		this.mItemList = list;
+		notifyDataSetChanged();
 	}
 }

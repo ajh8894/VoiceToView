@@ -387,6 +387,7 @@ public class RawAudioRecorder {
 			if (mRecorder.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
 				setState(State.RECORDING);
 				new Thread() {
+					@Override
 					public void run() {
 						while (mRecorder != null && mRecorder.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
 							int status = read(mRecorder);

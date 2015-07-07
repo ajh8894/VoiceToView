@@ -66,10 +66,9 @@ public class ChunkListAdapter extends BaseAdapter {
 		} else {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
-		/*viewHolder.name.setText(mItemList.get(position).getName());
-	    viewHolder.address.setText(mItemList.get(position).getAddress());
-	    viewHolder.phone.setText(mItemList.get(position).getPhone());*/
+
 		viewHolder.message.setText(item.getText());
+		viewHolder.date.setText(item.getDate());
 		return convertView;
 	}
 	public void reflesh(List<Chunk> list) {

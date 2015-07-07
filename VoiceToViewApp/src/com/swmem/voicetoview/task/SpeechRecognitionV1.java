@@ -20,11 +20,11 @@ import com.swmem.voicetoview.data.Constants;
 
 import android.util.Log;
 
-public class SpeechRecognition implements Callable<String> {
+public class SpeechRecognitionV1 implements Callable<String> {
 	private byte[] pcm;
 	private long PAIR;
 	
-	public SpeechRecognition(byte[] pcm) {
+	public SpeechRecognitionV1(byte[] pcm) {
 		this.pcm = pcm;
 	}
 	
@@ -36,7 +36,7 @@ public class SpeechRecognition implements Callable<String> {
 		
 		// int http_status;
 		try {
-			URL url = new URL(Constants.ROOT + Constants.UP_P1 + PAIR + Constants.UP_P2 + Constants.API_KEY);
+			URL url = new URL(Constants.ROOT + Constants.UP_P1 + PAIR + Constants.UP_P2 + Constants.V1_API_KEY);
 			URLConnection urlConn = url.openConnection();
 
 			if (!(urlConn instanceof HttpsURLConnection)) {
@@ -82,8 +82,9 @@ public class SpeechRecognition implements Callable<String> {
 				
 				while ((stringReadLine = in.readLine()) != null) {
 					// Ignore the first response, it's always empty
-					// Log.d("response", stringReadLine);
+					
 					if (stringReadLine.length() > 20) {
+						Log.d("JSON result: ", stringReadLine);
 						try {
 							JSONObject jsonObj = new JSONObject(stringReadLine);
 							JSONObject result = (JSONObject) jsonObj.getJSONArray("result").get(0);

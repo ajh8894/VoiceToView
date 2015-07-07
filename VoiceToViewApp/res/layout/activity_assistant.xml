@@ -190,7 +190,7 @@
             android:orientation="vertical" >
 
             <Button
-		        android:id="@+id/bhide"
+		        android:id="@+id/btn_hide"
 		        style="?android:attr/buttonStyleSmall"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
@@ -216,7 +216,7 @@
             android:orientation="vertical" >
 
             <ListView
-                android:id="@+id/chunk_lv"
+                android:id="@+id/lv_chunk"
                 android:layout_width="match_parent"
                 android:layout_height="0dip"
                 android:layout_weight="1"

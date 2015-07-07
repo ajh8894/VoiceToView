@@ -9,5 +9,6 @@ public class Constants {
 	// server
 	public static final String SERVER_IP = "211.189.127.200";
 	public static final int SERVER_PORT = 8080;
-	public static final int TIMEOUT = 60000;
+	public static final int RECEIVER_TIMEOUT = 60000;
+	public static final int SENDER_TIMEOUT = 60000;
 }

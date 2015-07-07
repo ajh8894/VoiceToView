@@ -1,6 +1,5 @@
 package com.swmem.voicetoview.service;
 
-import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -38,7 +37,6 @@ public class VoiceToViewService extends Service {
 	private boolean mVisible;
 	private HideView mHideView;
 	private AssistantView mAssistantView;
-	private ArrayList<Chunk> mViewList;
 
 	// Recorder instance
 	private boolean isActivated;
@@ -52,10 +50,10 @@ public class VoiceToViewService extends Service {
 		public void run() {
 			if (isActivated) {
 				if (mMaxRecordingTime < (SystemClock.elapsedRealtime() - mStartTime)) {
-					Log.i(LOG_TAG, "Max recording time exceeded");
+					Log.d(LOG_TAG, "Max recording time exceeded");
 					repeatRecoding();
 				} else if (mRecorder.isPausing()) {
-					Log.i(LOG_TAG, "Speaker finished speaking");
+					Log.d(LOG_TAG, "Speaker finished speaking");
 					repeatRecoding();
 				}
 				mStopHandler.postDelayed(this, 1000);
@@ -73,13 +71,15 @@ public class VoiceToViewService extends Service {
 			case Constants.REFRESH:
 				try {
 					mAssistantView.getChunkList().add(mReceiverQueue.take());
-					mAssistantView.getListAdapter().reflesh(
-							mAssistantView.getChunkList());
+					mAssistantView.getListAdapter().reflesh(mAssistantView.getChunkList());
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 				break;
 			case Constants.RECONNECT:
+				post(mChunkReceiver);
+				//mChunkReceiver = new ChunkReceiver(mReceiverQueue, this);
+				//mChunkReceiver.start();
 				break;
 			case Constants.SWAP:
 				if (mVisible) {
@@ -105,10 +105,12 @@ public class VoiceToViewService extends Service {
 				isActivated = true;
 				mRecorder.start();
 				mStartTime = SystemClock.elapsedRealtime();
-				mStopHandler.postDelayed(mStopRunnable,
-						Constants.TASK_DELAY_STOP);
+				mStopHandler.postDelayed(mStopRunnable, Constants.TASK_DELAY_STOP);
 				break;
 			case Constants.RECONNECT:
+				post(mChunkConsumer);
+				//mChunkConsumer = new ChunkConsumer(mSenderQueue, this, (Chunk) msg.obj);
+				//mChunkConsumer.start();
 				break;
 			default:
 				break;
@@ -137,18 +139,20 @@ public class VoiceToViewService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "onStartCommand");
-
-		/*
-		 * ConnectionInfo.header = new String[3]; ConnectionInfo.header[0] =
-		 * "sender"; // 종류 ConnectionInfo.header[1] = "01086048894"; // from
-		 * ConnectionInfo.header[2] = "01067108898"; // to ConnectionInfo.call =
-		 * Constants.KIND_CALL_SENDER;
-		 */
-
+		ConnectionInfo.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
+		ConnectionInfo.call = intent.getIntExtra(Constants.SERVICE_EXTRA_KIND_CALL, -1);
+		
 		ConnectionInfo.header = new String[3];
+/*		
+		ConnectionInfo.header[0] = "sender"; // 종류
+		ConnectionInfo.header[1] = "01086048894"; // from
+		ConnectionInfo.header[2] = "01067108898"; // to
+	*/
 		ConnectionInfo.header[0] = "receiver"; // 종류
 		ConnectionInfo.header[1] = "01067108898"; // from
 		ConnectionInfo.header[2] = "01086048894"; // to
+		
+		//ConnectionInfo.call = Constants.KIND_CALL_SENDER;
 		ConnectionInfo.call = Constants.KIND_CALL_RECEIVER;
 
 		startAllTasks();
@@ -165,7 +169,6 @@ public class VoiceToViewService extends Service {
 	private void init() {
 		mSenderQueue = new ArrayBlockingQueue<Chunk>(1024);
 		mReceiverQueue = new ArrayBlockingQueue<Chunk>(1024);
-		mViewList = new ArrayList<Chunk>();
 
 		mAudioPauser = new AudioPauser(this);
 		mRecorder = new RawAudioRecorder();
@@ -176,14 +179,12 @@ public class VoiceToViewService extends Service {
 
 	private void startAllTasks() {
 		mAudioPauser.pause();
+
+		Log.i(LOG_TAG, ConnectionInfo.header[0] + " " + ConnectionInfo.header[1] + " " + ConnectionInfo.header[2]);
 		if (ConnectionInfo.header[0].equals(Constants.KIND_RECEIVE)) { // STT_OFF
 			mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-			mAssistantView = new AssistantView(getApplicationContext(),
-					mWindowManager, mReceiverHandler);
-			mHideView = new HideView(getApplicationContext(), mWindowManager,
-					mReceiverHandler);
-			mAssistantView.getView().setVisibility(View.VISIBLE);
-			mHideView.getView().setVisibility(View.GONE);
+			mAssistantView = new AssistantView(getApplicationContext(), mWindowManager, mReceiverHandler);
+			mHideView = new HideView(getApplicationContext(), mWindowManager, mReceiverHandler);
 			mVisible = true;
 			mChunkReceiver = new ChunkReceiver(mReceiverQueue, mReceiverHandler);
 			mChunkReceiver.start();
@@ -194,8 +195,7 @@ public class VoiceToViewService extends Service {
 				isActivated = true;
 				mRecorder.start();
 				mStartTime = SystemClock.elapsedRealtime();
-				mStopHandler.postDelayed(mStopRunnable,
-						Constants.TASK_DELAY_STOP);
+				mStopHandler.postDelayed(mStopRunnable, Constants.TASK_DELAY_STOP);
 			}
 		}
 
@@ -204,8 +204,7 @@ public class VoiceToViewService extends Service {
 	private void stopAllTasks() {
 		isActivated = false;
 
-		if (mRecorder.getState() == State.READY
-				|| mRecorder.getState() == State.RECORDING)
+		if (mRecorder.getState() == State.READY || mRecorder.getState() == State.RECORDING)
 			mRecorder.stop();
 		mRecorder.release();
 
@@ -214,12 +213,14 @@ public class VoiceToViewService extends Service {
 		}
 
 		if (mReceiverHandler != null) {
+			mReceiverHandler.removeMessages(Constants.SWAP);
 			mReceiverHandler.removeMessages(Constants.RECONNECT);
 			mReceiverHandler.removeMessages(Constants.REFRESH);
 		}
 
 		if (mSenderHandler != null) {
 			mSenderHandler.removeMessages(Constants.RECONNECT);
+			mSenderHandler.removeMessages(Constants.CONNECT);
 		}
 
 		if (mChunkReceiver != null) {
@@ -253,8 +254,7 @@ public class VoiceToViewService extends Service {
 		if (mRecorder.getState() == State.RECORDING)
 			mRecorder.stop();
 
-		ChunkProducer aChunkProducer = new ChunkProducer(mSenderQueue,
-				mRecorder.consumeRecordingAndTruncate());
+		ChunkProducer aChunkProducer = new ChunkProducer(mSenderQueue, mRecorder.consumeRecordingAndTruncate());
 		new Thread(aChunkProducer).start();
 
 		mRecorder.release();

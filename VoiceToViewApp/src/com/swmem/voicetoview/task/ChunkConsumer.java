@@ -35,6 +35,7 @@ public class ChunkConsumer extends Thread {
 		this.senderQueue = senderQueue;
 		this.senderHandler = senderHandler;
 		this.reChunk = reChunk;
+		this.isActivated = true;
 	}
 
 	public boolean isActivated() {
@@ -46,6 +47,7 @@ public class ChunkConsumer extends Thread {
 	}
 
 	public void close() {
+		isActivated = false;
 		try {
 			if(ois != null)
 				ois.close();
@@ -78,13 +80,13 @@ public class ChunkConsumer extends Thread {
 					
 					boolean response = ois.readBoolean();
 					Log.d("Consumer", "response is " + response);
-					if (response && ConnectionInfo.call == Constants.KIND_CALL_SENDER) {
-						senderHandler.sendEmptyMessage(Constants.CONNECT);
+					if (response) {
+						if (reChunk == null && ConnectionInfo.call == Constants.KIND_CALL_SENDER)
+							senderHandler.sendEmptyMessage(Constants.CONNECT);
 					} else {
 						break;
 					}
 				}
-				//oops = new ObjectOutputStream(socket.getOutputStream());
 				if(reChunk == null)
 					reChunk = senderQueue.take();
 				
@@ -96,15 +98,22 @@ public class ChunkConsumer extends Thread {
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
-			//handler
+			if (reChunk != null) {
+				msg.what = Constants.RECONNECT;
+				msg.obj = reChunk;
+				senderHandler.sendMessage(msg);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			/*msg.what = Constants.RECONNECT;
-			msg.obj = curChunk;
-			handler.sendMessage(msg);*/
+			if (reChunk != null) {
+				msg.what = Constants.RECONNECT;
+				msg.obj = reChunk;
+				senderHandler.sendMessage(msg);
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} finally {
+			Log.d("Consumer", "Consumer close");
 			close();
 		}
 	}

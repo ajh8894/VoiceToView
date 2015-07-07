@@ -14,7 +14,6 @@ import com.swmem.voicetoview.data.Database;
 import com.swmem.voicetoview.data.User;
 
 public class MainActivity extends Activity implements OnClickListener {
-	private static final String LOG_TAG = MainActivity.class.getName();
 	private User option;
 	LinearLayout onoffLayout;
 	
@@ -40,22 +39,17 @@ public class MainActivity extends Activity implements OnClickListener {
 		// DB create
 		Database.openOrCreateDB(getApplicationContext());
 		option = Database.selectUser();
-		
-		if(option.getMode() == Constants.STT_OFF) {
-			//onoffLayout.setSelected(false);
-		} else {
-			//onoffLayout.setSelected(true);
-		}
+		Database.updateUser(option);
+
 		
 /*		textLayout.setOnClickListener(this);
 		animationLayout.setOnClickListener(this);
 		storageLayout.setOnClickListener(this);*/
 	
 		
-		Log.d("Main", "" + option.getMode());
-/*		
+		
     	Intent serviceIntent = new Intent(Constants.SERVICE_ACTION);
-        startService(serviceIntent);*/
+        startService(serviceIntent);
 	}
 
 	@Override
@@ -83,18 +77,15 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch(v.getId()) {
 		case R.id.onoff_layout:
-/*			Log.d("onoff_layout", "" + onoffLayout.isPressed());
-			Log.d("onoff_layout",
-					"" + option.getMode() + " " + onoffLayout.isSelected());
-			if(onoffLayout.isPressed()) {
-
-				option.setMode(Constants.STT_OFF);
-				onoffLayout.setPressed(false);
-			} else {
+			if(option.getMode() == Constants.STT_OFF) {
 				option.setMode(Constants.STT_ON);
-				onoffLayout.setPressed(true);
-			}*/
-			Database.updateUser(option);
+				Database.updateUser(option);
+			} else {
+				option.setMode(Constants.STT_OFF);
+				Database.updateUser(option);
+			}
+
+			Log.d("Main", "" + option.getMode());
 			break;
 		case R.id.gender_layout:
 			break;

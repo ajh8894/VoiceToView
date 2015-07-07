@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.swmem.voicetoview.R;
@@ -28,11 +28,11 @@ public class AssistantView implements OnClickListener {
 		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.view = inflater.inflate(R.layout.activity_assistant, null);
 		this.handler = handler;
-		this.listView = (ListView) view.findViewById(R.id.chunk_lv);
+		this.listView = (ListView) view.findViewById(R.id.lv_chunk);
 		this.chunkList = new ArrayList<Chunk>();
 		this.listAdapter = new ChunkListAdapter(c, R.layout.item_chunk, chunkList);
 		this.listView.setAdapter(listAdapter);
-		ImageButton hideBtn = (ImageButton) view.findViewById(R.id.btn_hide);
+		Button hideBtn = (Button) view.findViewById(R.id.btn_hide);
 		hideBtn.setOnClickListener(this);
 		WindowManager.LayoutParams mParams = new WindowManager.LayoutParams
 		(

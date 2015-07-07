@@ -33,7 +33,7 @@ public class Constants {
     public static final int SWAP = 203;
     
 	// Key obtained through Google Developer group
-    public static final String API_KEY = "AIzaSyBgnC5fljMTmCFeilkgLsOKBvvnx6CBS0M";
+    public static final String V1_API_KEY = "AIzaSyBgnC5fljMTmCFeilkgLsOKBvvnx6CBS0M";
 	// URL for Google API
     public static final String ROOT = "https://www.google.com/speech-api/full-duplex/v1/";
     public static final String UP_P1 = "up?lang=ko_kr&lm=dictation&client=chromium&pair=";

@@ -9,7 +9,7 @@ public class ChunkSender extends Thread {
 			try {
 				Chunk c = ServerData.senderQueue.take();
 				if (ServerData.clients.containsKey(c.getTo())) {
-					ServerData.clients.get(c.getTo()).putSenderQueue(c);
+					ServerData.clients.get(c.getTo()).putSenderDeque(c);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();

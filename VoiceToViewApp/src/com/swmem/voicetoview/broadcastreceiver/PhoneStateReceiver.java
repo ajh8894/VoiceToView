@@ -16,6 +16,8 @@ import com.swmem.voicetoview.service.VoiceToViewService;
 public class PhoneStateReceiver extends BroadcastReceiver {
 	private final String LOG_TAG = PhoneStateReceiver.class.getName();
     private static int pState = TelephonyManager.CALL_STATE_IDLE;
+    private static String[] header;
+    private static int call;
 
     @Override
 	public void onReceive(Context context, final Intent intent) {
@@ -31,8 +33,8 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                 if(state != pState){
                     if(state == TelephonyManager.CALL_STATE_IDLE){
                         Log.i("Phone","IDLE");
-                        if(ConnectionInfo.header != null){
-                        	ConnectionInfo.header = null;
+                        if(header != null){
+                        	header = null;
 
                         	Intent serviceIntent = new Intent(c, VoiceToViewService.class); //명시적 인텐트, 롤리팝
                             c.stopService(serviceIntent);
@@ -40,21 +42,21 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                     }
                     else if(state == TelephonyManager.CALL_STATE_RINGING){
                         Log.i("Phone","RINGING");
-                        ConnectionInfo.header = new String[3];
-                        ConnectionInfo.header[1] = telManager.getLine1Number();
-                        ConnectionInfo.header[2] = incomingNumber;
-                        ConnectionInfo.call = Constants.KIND_CALL_RECEIVER;
-                        Log.i(LOG_TAG, "RINGING " + ConnectionInfo.header[0] + " " + ConnectionInfo.header[1] + " " + ConnectionInfo.header[2]);
+                        header = new String[3];
+                        header[1] = telManager.getLine1Number();
+                        header[2] = incomingNumber;
+                        call = Constants.KIND_CALL_RECEIVER;
+                        Log.i(LOG_TAG, "RINGING " + header[0] + " " + header[1] + " " + header[2]);
                     }
                     else if(state == TelephonyManager.CALL_STATE_OFFHOOK){
 						if (option.getMode() == Constants.STT_ON)
-							ConnectionInfo.header[0] = Constants.KIND_SEND;
+							header[0] = Constants.KIND_SEND;
 						else
-							ConnectionInfo.header[0] = Constants.KIND_RECEIVE;
-						 Log.i(LOG_TAG, "OFFHOOK " + ConnectionInfo.header[0] + " " + ConnectionInfo.header[1] + " " + ConnectionInfo.header[2]);
+							header[0] = Constants.KIND_RECEIVE;
+						 Log.i(LOG_TAG, "OFFHOOK " + header[0] + " " + header[1] + " " + header[2]);
 						Intent serviceIntent = new Intent(c, VoiceToViewService.class);
-						serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, ConnectionInfo.header);
-						serviceIntent.putExtra(Constants.SERVICE_EXTRA_KIND_CALL, ConnectionInfo.call);
+						serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, header);
+						serviceIntent.putExtra(Constants.SERVICE_EXTRA_KIND_CALL, call);
 						c.startService(serviceIntent);
                     }
                      
@@ -65,10 +67,10 @@ public class PhoneStateReceiver extends BroadcastReceiver {
          
         if(intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)){
             Log.i("Phone","OUT");
-            ConnectionInfo.header = new String[3];
-            ConnectionInfo.header[1] = telManager.getLine1Number();
-            ConnectionInfo.header[2] = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-            ConnectionInfo.call = Constants.KIND_CALL_SENDER;
+            header = new String[3];
+            header[1] = telManager.getLine1Number();
+            header[2] = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+            call = Constants.KIND_CALL_SENDER;
         }
     }
 }

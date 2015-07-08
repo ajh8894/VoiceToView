@@ -77,9 +77,8 @@ public class VoiceToViewService extends Service {
 				}
 				break;
 			case Constants.RECONNECT:
-				post(mChunkReceiver);
-				//mChunkReceiver = new ChunkReceiver(mReceiverQueue, this);
-				//mChunkReceiver.start();
+				mChunkReceiver = new ChunkReceiver(mReceiverQueue, this);
+				mChunkReceiver.start();
 				break;
 			case Constants.SWAP:
 				if (mVisible) {
@@ -108,9 +107,8 @@ public class VoiceToViewService extends Service {
 				mStopHandler.postDelayed(mStopRunnable, Constants.TASK_DELAY_STOP);
 				break;
 			case Constants.RECONNECT:
-				post(mChunkConsumer);
-				//mChunkConsumer = new ChunkConsumer(mSenderQueue, this, (Chunk) msg.obj);
-				//mChunkConsumer.start();
+				mChunkConsumer = new ChunkConsumer(mSenderQueue, this, (Chunk) msg.obj);
+				mChunkConsumer.start();
 				break;
 			default:
 				break;
@@ -141,19 +139,19 @@ public class VoiceToViewService extends Service {
 		Log.i(LOG_TAG, "onStartCommand");
 		ConnectionInfo.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
 		ConnectionInfo.call = intent.getIntExtra(Constants.SERVICE_EXTRA_KIND_CALL, -1);
-		
-		ConnectionInfo.header = new String[3];
 /*		
+		ConnectionInfo.header = new String[3];
+		
 		ConnectionInfo.header[0] = "sender"; // 종류
 		ConnectionInfo.header[1] = "01086048894"; // from
 		ConnectionInfo.header[2] = "01067108898"; // to
-	*/
+	
 		ConnectionInfo.header[0] = "receiver"; // 종류
 		ConnectionInfo.header[1] = "01067108898"; // from
 		ConnectionInfo.header[2] = "01086048894"; // to
 		
 		//ConnectionInfo.call = Constants.KIND_CALL_SENDER;
-		ConnectionInfo.call = Constants.KIND_CALL_RECEIVER;
+		ConnectionInfo.call = Constants.KIND_CALL_RECEIVER;*/
 
 		startAllTasks();
 		return super.onStartCommand(intent, flags, startId);

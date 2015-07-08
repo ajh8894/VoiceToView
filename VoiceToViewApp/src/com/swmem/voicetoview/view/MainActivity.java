@@ -47,12 +47,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		storageLayout.setOnClickListener(this);*/
 	
 		
-		
+/*		
     	Intent serviceIntent = new Intent(Constants.SERVICE_ACTION);
-        startService(serviceIntent);
+        startService(serviceIntent);*/
 	}
 
-	@Override
+/*	@Override
 	protected void onPause() {
 		super.onPause();
     	Intent serviceIntent = new Intent(Constants.SERVICE_ACTION);
@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements OnClickListener {
     	Intent serviceIntent = new Intent(Constants.SERVICE_ACTION);
         stopService(serviceIntent);
 	}
-
+*/
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()) {

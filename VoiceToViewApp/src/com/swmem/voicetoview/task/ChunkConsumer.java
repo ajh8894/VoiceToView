@@ -101,14 +101,14 @@ public class ChunkConsumer extends Thread {
 			if (reChunk != null) {
 				msg.what = Constants.RECONNECT;
 				msg.obj = reChunk;
-				senderHandler.sendMessage(msg);
+				senderHandler.sendMessageDelayed(msg, Constants.TASK_DELAY_STOP);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			if (reChunk != null) {
 				msg.what = Constants.RECONNECT;
 				msg.obj = reChunk;
-				senderHandler.sendMessage(msg);
+				senderHandler.sendMessageDelayed(msg, Constants.TASK_DELAY_STOP);
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();

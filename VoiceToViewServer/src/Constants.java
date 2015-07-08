@@ -1,6 +1,5 @@
 public class Constants {
 	// header
-	public static final String SERVICE_ACTION = "com.swmem.voicetoview.service.VoiceToViewService";
 	public static final String SERVICE_EXTRA_MODE = "mode";
 	public static final String SERVICE_EXTRA_HEADER = "header";
 	public static final String KIND_RECEIVE = "receiver";

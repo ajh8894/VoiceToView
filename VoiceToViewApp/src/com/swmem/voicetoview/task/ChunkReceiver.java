@@ -81,11 +81,11 @@ public class ChunkReceiver extends Thread {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			if(isActivated)
-				receiverHandler.sendEmptyMessage(Constants.RECONNECT);
+				receiverHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_STOP);
 		} catch (IOException e) {
 			e.printStackTrace();
 			if(isActivated)
-				receiverHandler.sendEmptyMessage(Constants.RECONNECT);
+				receiverHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_STOP);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

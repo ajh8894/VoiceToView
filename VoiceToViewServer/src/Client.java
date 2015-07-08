@@ -9,13 +9,13 @@ import java.util.concurrent.TimeUnit;
 import com.swmem.voicetoview.data.Chunk;
 
 public class Client implements Runnable {
+	private boolean isActivated;
 	private Socket socket;
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	private BlockingDeque<Chunk> senderDeque = new LinkedBlockingDeque<Chunk>(512);
 	private String type;
 	private String from, to;
-	private boolean isActivated;
 
 	public Client(Socket socket) {
 		this.socket = socket;
@@ -28,20 +28,16 @@ public class Client implements Runnable {
 		}
 	}
 
-	public Socket getSocket() {
-		return socket;
+	public boolean isActivated() {
+		return isActivated;
 	}
 
-	public void setSocket(Socket socket) {
-		this.socket = socket;
+	public void setActivated(boolean isActivated) {
+		this.isActivated = isActivated;
 	}
 
 	public BlockingDeque<Chunk> getSenderQueue() {
 		return senderDeque;
-	}
-
-	public void setSenderDeque(BlockingDeque<Chunk> senderQueue) {
-		this.senderDeque = senderQueue;
 	}
 
 	public void putSenderDeque(Chunk c) {
@@ -50,14 +46,6 @@ public class Client implements Runnable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public boolean isActivated() {
-		return isActivated;
-	}
-
-	public void setActivated(boolean isActivated) {
-		this.isActivated = isActivated;
 	}
 
 	public void close() {
@@ -70,8 +58,6 @@ public class Client implements Runnable {
 				oos.close();
 			if (socket != null)
 				socket.close();
-			if (senderDeque.isEmpty())
-				ServerData.clients.remove(from);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -86,15 +72,20 @@ public class Client implements Runnable {
 			type = header[0];
 			from = header[1];
 			to = header[2];
-			System.out.println(type + " " + from + " " + to);
+			System.out.println("user: " + type + " " + from + " " + to);
 			
 			// client 최초, 재접속 확인
 			if (ServerData.clients.containsKey(from)) {
 				Client client = ServerData.clients.get(from);
-				if (!client.getSenderQueue().isEmpty()) {
-					senderDeque.addAll(client.getSenderQueue());
-					client.close();
+				client.setActivated(false);
+				synchronized (client) {
+					client.notify();
+					if (!client.getSenderQueue().isEmpty()) {
+						//client.getSenderQueue().notify();
+						senderDeque.addAll(client.getSenderQueue());
+					}
 				}
+
 
 				System.out.println("replace!!");
 				ServerData.clients.replace(from, this);
@@ -108,28 +99,29 @@ public class Client implements Runnable {
 				if (!ServerData.clients.containsKey(to)) {
 					synchronized (this) {
 						System.out.println("wait!!");
-						wait(Constants.SENDER_TIMEOUT);
-						System.out.println("wake up!");
+						wait(Constants.SENDER_TIMEOUT); //block
+						System.out.println("wake up!!");
 					}
 				}
 				while (isActivated && socket.isConnected() && !socket.isClosed()) {
 					oos.reset();
 					oos.writeBoolean(true);
 					oos.flush();
-					Chunk c = (Chunk) ois.readObject();
+					Chunk c = (Chunk) ois.readObject(); //block
 					System.out.println("receive " + c.getFrom() + " " + c.getTo() + " " + c.getText());
 					ServerData.receiverQueue.put(c);
 				}
 			} else if (type.equals(Constants.KIND_RECEIVE)) { // stt off
 				if (ServerData.clients.containsKey(to)) {
-					synchronized (ServerData.clients.get(to)) {
-						if(ServerData.clients.get(to) != null && ServerData.clients.get(to).isActivated())
+					Client client = ServerData.clients.get(to);
+					synchronized (client) {
+						if (client.isActivated())
 							System.out.println("notify!!");
-							ServerData.clients.get(to).notify();
+						client.notify();
 					}
 				}
 				while (isActivated && socket.isConnected() && !socket.isClosed()) {
-					sendChunk = senderDeque.poll(Constants.RECEIVER_TIMEOUT, TimeUnit.MILLISECONDS);
+					sendChunk = senderDeque.poll(Constants.RECEIVER_TIMEOUT, TimeUnit.MILLISECONDS); //block
 					
 					if (sendChunk == null) {
 						System.out.println("TIMEOUT");
@@ -144,15 +136,16 @@ public class Client implements Runnable {
 
 				}
 			}
-		} catch (ClassNotFoundException | IOException | InterruptedException e) {
+		} 
+		catch (ClassNotFoundException | IOException | InterruptedException e) {
 			e.printStackTrace();
 			if(sendChunk != null) {
+				System.out.println("recover");
 				senderDeque.addFirst(sendChunk);
 			}
 		} finally {
 			close();
 		}
-
 	}
 
 }

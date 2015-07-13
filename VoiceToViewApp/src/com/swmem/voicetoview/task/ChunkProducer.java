@@ -9,14 +9,14 @@ import java.util.concurrent.Future;
 import android.util.Log;
 
 import com.swmem.voicetoview.data.Chunk;
-import com.swmem.voicetoview.data.ConnectionInfo;
+import com.swmem.voicetoview.data.Connection;
 
 public class ChunkProducer implements Runnable {
-	private BlockingQueue<Chunk> queue;
+	private BlockingQueue<Chunk> senderQueue;
 	private byte[] pcm;
 	
-	public ChunkProducer(BlockingQueue<Chunk> queue, byte[] pcm) {
-		this.queue = queue;
+	public ChunkProducer(BlockingQueue<Chunk> senderQueue, byte[] pcm) {
+		this.senderQueue = senderQueue;
 		this.pcm = pcm;
 	}
 
@@ -37,7 +37,7 @@ public class ChunkProducer implements Runnable {
 				//senderChunk.setText(text);
 				//senderChunk.setFeatures(features);
 				Log.d("result", text);
-				queue.put(new Chunk(ConnectionInfo.header[1], ConnectionInfo.header[2], text)); // block
+				senderQueue.put(new Chunk(Connection.header[1], Connection.header[2], text)); // block
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();

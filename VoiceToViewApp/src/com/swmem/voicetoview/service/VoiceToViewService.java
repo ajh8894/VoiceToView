@@ -18,21 +18,23 @@ import com.swmem.voicetoview.audio.AudioPauser;
 import com.swmem.voicetoview.audio.RawAudioRecorder;
 import com.swmem.voicetoview.audio.RawAudioRecorder.State;
 import com.swmem.voicetoview.data.Chunk;
-import com.swmem.voicetoview.data.ConnectionInfo;
+import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.task.ChunkConsumer;
-import com.swmem.voicetoview.task.ChunkProducer;
 import com.swmem.voicetoview.task.ChunkReceiver;
+import com.swmem.voicetoview.task.TaskOperator;
 import com.swmem.voicetoview.view.AssistantView;
 import com.swmem.voicetoview.view.HideView;
 
 public class VoiceToViewService extends Service {
 	private static final String LOG_TAG = VoiceToViewService.class.getName();
 	private final IBinder mBinder = new VoiceToViewBinder();
-	// Data instance
+	
+	// DataQueue instance
 	private BlockingQueue<Chunk> mSenderQueue;
 	private BlockingQueue<Chunk> mReceiverQueue;
 
+	// View instance
 	private WindowManager mWindowManager;
 	private boolean mVisible;
 	private HideView mHideView;
@@ -62,23 +64,32 @@ public class VoiceToViewService extends Service {
 	};
 
 	// Http, Tcp/Ip instance
+	private TaskOperator mOperator;
 	private ChunkReceiver mChunkReceiver;
 	private ChunkConsumer mChunkConsumer;
 	private Handler mReceiverHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
+			Log.d("receiverHandler", String.valueOf(msg.what));
 			switch (msg.what) {
-			case Constants.REFRESH:
-				try {
-					mAssistantView.getChunkList().add(mReceiverQueue.take());
-					mAssistantView.getListAdapter().reflesh(mAssistantView.getChunkList());
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			case Constants.CONNECT:
+				mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+				mAssistantView = new AssistantView(getApplicationContext(), mWindowManager, mReceiverHandler);
+				mHideView = new HideView(getApplicationContext(), mWindowManager, mReceiverHandler);
+				mVisible = true;
+				mChunkReceiver = new ChunkReceiver(mReceiverQueue, mReceiverHandler);
+				mChunkReceiver.start();
 				break;
 			case Constants.RECONNECT:
 				mChunkReceiver = new ChunkReceiver(mReceiverQueue, this);
 				mChunkReceiver.start();
+				break;
+			case Constants.REFRESH:
+				try {
+					mAssistantView.chunkListAdd(mReceiverQueue.take());
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				break;
 			case Constants.SWAP:
 				if (mVisible) {
@@ -99,16 +110,27 @@ public class VoiceToViewService extends Service {
 	private Handler mSenderHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
+			Log.d("senderHandler", String.valueOf(msg.what));
 			switch (msg.what) {
+			case Constants.CONNECT_INIT:
+				mOperator = new TaskOperator(Constants.CONNECT_INIT, mSenderHandler, mReceiverHandler);
+				mOperator.start();
+				break;
 			case Constants.CONNECT:
 				isActivated = true;
 				mRecorder.start();
 				mStartTime = SystemClock.elapsedRealtime();
 				mStopHandler.postDelayed(mStopRunnable, Constants.TASK_DELAY_STOP);
+				mChunkConsumer = new ChunkConsumer(mSenderQueue, this, (Chunk) msg.obj);
+				mChunkConsumer.start();
 				break;
 			case Constants.RECONNECT:
 				mChunkConsumer = new ChunkConsumer(mSenderQueue, this, (Chunk) msg.obj);
 				mChunkConsumer.start();
+				break;
+			case Constants.DISCONNECT:
+				mOperator = new TaskOperator(Constants.DISCONNECT, mSenderHandler, mReceiverHandler);
+				mOperator.start();
 				break;
 			default:
 				break;
@@ -137,23 +159,16 @@ public class VoiceToViewService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "onStartCommand");
-		ConnectionInfo.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
-		ConnectionInfo.call = intent.getIntExtra(Constants.SERVICE_EXTRA_KIND_CALL, -1);
-/*		
-		ConnectionInfo.header = new String[3];
-		
-		ConnectionInfo.header[0] = "sender"; // 종류
-		ConnectionInfo.header[1] = "01086048894"; // from
-		ConnectionInfo.header[2] = "01067108898"; // to
-	
-		ConnectionInfo.header[0] = "receiver"; // 종류
-		ConnectionInfo.header[1] = "01067108898"; // from
-		ConnectionInfo.header[2] = "01086048894"; // to
-		
-		//ConnectionInfo.call = Constants.KIND_CALL_SENDER;
-		ConnectionInfo.call = Constants.KIND_CALL_RECEIVER;*/
-
+		Connection.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
 		startAllTasks();
+		
+/*		TEST
+ 		Test test = new Test(mTestQueue);
+		test.start();
+		isActivated = true;
+		mRecorder.start();
+		mStartTime = SystemClock.elapsedRealtime();
+		mStopHandler.postDelayed(mStopRunnable, Constants.TASK_DELAY_STOP);*/
 		return super.onStartCommand(intent, flags, startId);
 	}
 
@@ -173,35 +188,20 @@ public class VoiceToViewService extends Service {
 		// 30 second, sampleRate 16000 setting
 		mMaxRecordingTime *= Constants.MAX_RECORD_TIME;
 		mStopHandler = new Handler();
+		
+		mOperator = new TaskOperator(Constants.CONNECT_INIT, mSenderHandler, mReceiverHandler);
 	}
 
 	private void startAllTasks() {
 		mAudioPauser.pause();
 
-		Log.i(LOG_TAG, ConnectionInfo.header[0] + " " + ConnectionInfo.header[1] + " " + ConnectionInfo.header[2]);
-		if (ConnectionInfo.header[0].equals(Constants.KIND_RECEIVE)) { // STT_OFF
-			mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-			mAssistantView = new AssistantView(getApplicationContext(), mWindowManager, mReceiverHandler);
-			mHideView = new HideView(getApplicationContext(), mWindowManager, mReceiverHandler);
-			mVisible = true;
-			mChunkReceiver = new ChunkReceiver(mReceiverQueue, mReceiverHandler);
-			mChunkReceiver.start();
-		} else if (ConnectionInfo.header[0].equals(Constants.KIND_SEND)) { // STT_ON
-			mChunkConsumer = new ChunkConsumer(mSenderQueue, mSenderHandler);
-			mChunkConsumer.start();
-			if (ConnectionInfo.call == Constants.KIND_CALL_RECEIVER) {
-				isActivated = true;
-				mRecorder.start();
-				mStartTime = SystemClock.elapsedRealtime();
-				mStopHandler.postDelayed(mStopRunnable, Constants.TASK_DELAY_STOP);
-			}
-		}
-
+		Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2]);
+		mOperator.start();
 	}
 
 	private void stopAllTasks() {
 		isActivated = false;
-
+		
 		if (mRecorder.getState() == State.READY || mRecorder.getState() == State.RECORDING)
 			mRecorder.stop();
 		mRecorder.release();
@@ -209,26 +209,34 @@ public class VoiceToViewService extends Service {
 		if (mStopHandler != null) {
 			mStopHandler.removeCallbacks(mStopRunnable);
 		}
-
-		if (mReceiverHandler != null) {
-			mReceiverHandler.removeMessages(Constants.SWAP);
+		
+		if (mOperator != null) {
+			if (mOperator.isAlive())
+				mOperator.interrupt();
+		}
+		
+		mOperator = new TaskOperator(Constants.DISCONNECT, mSenderHandler, mReceiverHandler);
+		mOperator.start();
+/*		if (mReceiverHandler != null) {
+			mReceiverHandler.removeMessages(Constants.CONNECT);
 			mReceiverHandler.removeMessages(Constants.RECONNECT);
 			mReceiverHandler.removeMessages(Constants.REFRESH);
+			mReceiverHandler.removeMessages(Constants.SWAP);
 		}
 
 		if (mSenderHandler != null) {
-			mSenderHandler.removeMessages(Constants.RECONNECT);
+			mSenderHandler.removeMessages(Constants.CONNECT_INIT);
 			mSenderHandler.removeMessages(Constants.CONNECT);
+			mSenderHandler.removeMessages(Constants.RECONNECT);
 		}
-
+*/
 		if (mChunkReceiver != null) {
-			mChunkReceiver.close();
+			mChunkReceiver.setActivated(false);
 			if (mChunkReceiver.isAlive())
 				mChunkReceiver.interrupt();
 		}
 		if (mChunkConsumer != null) {
 			mChunkConsumer.setActivated(false);
-			mChunkConsumer.close();
 			if (mChunkConsumer.isAlive())
 				mChunkConsumer.interrupt();
 		}
@@ -252,9 +260,17 @@ public class VoiceToViewService extends Service {
 		if (mRecorder.getState() == State.RECORDING)
 			mRecorder.stop();
 
-		ChunkProducer aChunkProducer = new ChunkProducer(mSenderQueue, mRecorder.consumeRecordingAndTruncate());
-		new Thread(aChunkProducer).start();
+		//ChunkProducer aChunkProducer = new ChunkProducer(mSenderQueue, mRecorder.consumeRecordingAndTruncate());
+		//new Thread(aChunkProducer).start();
 
+/*		test
+  		try {
+			mTestQueue.put(new Model(mRecorder.consumeRecordingAndTruncate()));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
 		mRecorder.release();
 
 		mRecorder = new RawAudioRecorder();

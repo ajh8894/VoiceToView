@@ -4,16 +4,5 @@
     <string name="app_name">VoiceToView</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <!-- SERVICE -->
-    <string name="errorCantCreateRecorder">ERROR: Failed to create an audio recorder</string>
-
-    <!-- UI -->
-    <string name="menu_stt">STT</string>
-    <string name="menu_style">글씨</string>
-    <string name="menu_color">컬러</string>
-    <string name="menu_animation">애니메이션</string>
-    <string name="menu_storage">저장소</string>
-    <string name="title_activity_assistant">AssistantActivity</string>
-    <string name="title_activity_hide">HideActivity</string>
 
 </resources>

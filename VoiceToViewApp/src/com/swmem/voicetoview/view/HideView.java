@@ -18,7 +18,7 @@ public class HideView implements OnClickListener {
 	private Handler handler;
 	public HideView(Context c, WindowManager wManager, Handler handler) {
 		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		this.view = inflater.inflate(R.layout.activity_hide, null);
+		this.view = inflater.inflate(R.layout.view_hide, null);
 		this.handler = handler;
 		Button hideBtn = (Button) view.findViewById(R.id.btn_hide);
 		hideBtn.setOnClickListener(this);

@@ -4,7 +4,7 @@ public class Constants {
 	public static final String SERVICE_EXTRA_HEADER = "header";
 	public static final String KIND_RECEIVE = "receiver";
 	public static final String KIND_SEND = "sender";
-	public static final int KIND_CONNECTION  = 200;
+	public static final String KIND_END = "disconnect";
 	// server
 	public static final String SERVER_IP = "211.189.127.200";
 	public static final int SERVER_PORT = 8080;

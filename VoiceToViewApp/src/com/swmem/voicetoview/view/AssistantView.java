@@ -26,7 +26,7 @@ public class AssistantView implements OnClickListener {
 	
 	public AssistantView(Context c, WindowManager wManager, Handler handler) {
 		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		this.view = inflater.inflate(R.layout.activity_assistant, null);
+		this.view = inflater.inflate(R.layout.view_assistant, null);
 		this.handler = handler;
 		this.listView = (ListView) view.findViewById(R.id.lv_chunk);
 		this.chunkList = new ArrayList<Chunk>();
@@ -49,18 +49,11 @@ public class AssistantView implements OnClickListener {
     	return view;
     }
     
-    public List<Chunk> getChunkList() {
-		return chunkList;
-	}
-
-	public void setChunkList(List<Chunk> chunkList) {
-		this.chunkList = chunkList;
-	}
-
-	public ChunkListAdapter getListAdapter() {
-		return listAdapter;
-	}
-
+    public void chunkListAdd(Chunk c) {
+    	chunkList.add(c);
+    	listAdapter.reflesh(chunkList);
+    }
+    
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()) {

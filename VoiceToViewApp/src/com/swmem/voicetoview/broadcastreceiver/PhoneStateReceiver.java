@@ -7,7 +7,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.swmem.voicetoview.data.ConnectionInfo;
+import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Database;
 import com.swmem.voicetoview.data.User;
@@ -17,7 +17,6 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 	private final String LOG_TAG = PhoneStateReceiver.class.getName();
     private static int pState = TelephonyManager.CALL_STATE_IDLE;
     private static String[] header;
-    private static int call;
 
     @Override
 	public void onReceive(Context context, final Intent intent) {
@@ -45,18 +44,16 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                         header = new String[3];
                         header[1] = telManager.getLine1Number();
                         header[2] = incomingNumber;
-                        call = Constants.KIND_CALL_RECEIVER;
                         Log.i(LOG_TAG, "RINGING " + header[0] + " " + header[1] + " " + header[2]);
                     }
                     else if(state == TelephonyManager.CALL_STATE_OFFHOOK){
-						if (option.getMode() == Constants.STT_ON)
-							header[0] = Constants.KIND_SEND;
-						else
+						if (option.getMode() == Constants.VIEW_ON)
 							header[0] = Constants.KIND_RECEIVE;
-						 Log.i(LOG_TAG, "OFFHOOK " + header[0] + " " + header[1] + " " + header[2]);
+						else
+							header[0] = Constants.KIND_SEND;
+						Log.i(LOG_TAG, "OFFHOOK " + header[0] + " " + header[1] + " " + header[2]);
 						Intent serviceIntent = new Intent(c, VoiceToViewService.class);
 						serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, header);
-						serviceIntent.putExtra(Constants.SERVICE_EXTRA_KIND_CALL, call);
 						c.startService(serviceIntent);
                     }
                      
@@ -70,7 +67,6 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             header = new String[3];
             header[1] = telManager.getLine1Number();
             header[2] = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-            call = Constants.KIND_CALL_SENDER;
         }
     }
 }

@@ -4,28 +4,36 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 
 import com.swmem.voicetoview.data.Chunk;
 
 public class Client implements Runnable {
-	private boolean isActivated;
 	private Socket socket;
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
-	private BlockingDeque<Chunk> senderDeque = new LinkedBlockingDeque<Chunk>(512);
 	private String type;
 	private String from, to;
+	private boolean isActivated;
+	private BlockingDeque<Chunk> senderDeque;
+	private ClientWriter clientWriter;
 
 	public Client(Socket socket) {
+		this.isActivated = false;
 		this.socket = socket;
-		this.isActivated = true;
 		try {
 			this.oos = new ObjectOutputStream(socket.getOutputStream());
 			this.ois = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public String getType() {
+		return type;
 	}
 
 	public boolean isActivated() {
@@ -36,21 +44,26 @@ public class Client implements Runnable {
 		this.isActivated = isActivated;
 	}
 
-	public BlockingDeque<Chunk> getSenderQueue() {
+	/*synchronized */public BlockingDeque<Chunk> getSenderDeque() {
 		return senderDeque;
 	}
 
-	public void putSenderDeque(Chunk c) {
+	/*synchronized */public void putSenderDeque(Chunk c) {
 		try {
 			this.senderDeque.put(c);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	/*synchronized */public void sendToClient(Chunk c) throws IOException {
+		oos.reset();
+		oos.writeObject(c);
+		oos.flush();
+	}
 
-	public void close() {
+	synchronized public void close() {
 		System.out.println(from + " Bye Bye");
-		isActivated = false;
 		try {
 			if (ois != null)
 				ois.close();
@@ -60,92 +73,125 @@ public class Client implements Runnable {
 				socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			ois = null;
+			oos = null;
+			socket = null;
 		}
 	}
 
+	private void checkEachOther(boolean target, boolean mode) throws IOException {
+		if(target) {
+			if (mode) {
+				System.out.println(target + " "	+ Constants.KIND_RECEIVE);
+				oos.writeBoolean(true);
+				oos.flush();
+			} else {
+				System.out.println(target + " "	+ Constants.KIND_SEND);
+				oos.writeBoolean(false);
+				oos.flush();
+			}
+			isActivated = ois.readBoolean();
+		} else {
+			isActivated = false;
+		}
+	}
+	
 	@Override
 	public void run() {
-		Chunk sendChunk = null;
 		try {
-			System.out.println("RUN");
 			String[] header = (String[]) ois.readObject();
 			type = header[0];
 			from = header[1];
 			to = header[2];
 			System.out.println("user: " + type + " " + from + " " + to);
 			
-			// client 최초, 재접속 확인
-			if (ServerData.clients.containsKey(from)) {
-				Client client = ServerData.clients.get(from);
-				client.setActivated(false);
-				synchronized (client) {
-					client.notify();
-					if (!client.getSenderQueue().isEmpty()) {
-						//client.getSenderQueue().notify();
-						senderDeque.addAll(client.getSenderQueue());
+			//client disconnect
+			if(header[0].equals(Constants.KIND_END)) {
+				if(ServerData.clients.containsKey(from)) {
+					Client client = ServerData.clients.get(from);
+					client.setActivated(false);
+					client.close();
+					ServerData.clients.remove(from, client);
+					if(client.getType().equals(Constants.KIND_RECEIVE)) {
+						if(clientWriter != null) {
+							if(clientWriter.isAlive()) {
+								clientWriter.interrupt();
+							}
+						}
 					}
+					close();
+					//Thread.currentThread().interrupt();
+					return;
 				}
-
-
-				System.out.println("replace!!");
-				ServerData.clients.replace(from, this);
-			} else {
-				System.out.println("put!!");
+			}
+			// client connect, reconnect distinguish
+			if (!ServerData.clients.containsKey(from)) { // connect
+				System.out.println("client connect");
 				ServerData.clients.put(from, this);
-			}
-
-			// client 발신자, 수신자 구분
-			if (type.equals(Constants.KIND_SEND)) { // stt on
-				if (!ServerData.clients.containsKey(to)) {
+				
+				if (!ServerData.clients.containsKey(to)) { //call sender flow
 					synchronized (this) {
-						System.out.println("wait!!");
+						System.out.println(from + " wait!!");
 						wait(Constants.SENDER_TIMEOUT); //block
-						System.out.println("wake up!!");
+						System.out.println(from + " wake up!!");
 					}
-				}
-				while (isActivated && socket.isConnected() && !socket.isClosed()) {
-					oos.reset();
-					oos.writeBoolean(true);
-					oos.flush();
-					Chunk c = (Chunk) ois.readObject(); //block
-					System.out.println("receive " + c.getFrom() + " " + c.getTo() + " " + c.getText());
-					ServerData.receiverQueue.put(c);
-				}
-			} else if (type.equals(Constants.KIND_RECEIVE)) { // stt off
-				if (ServerData.clients.containsKey(to)) {
-					Client client = ServerData.clients.get(to);
-					synchronized (client) {
-						if (client.isActivated())
-							System.out.println("notify!!");
-						client.notify();
+					checkEachOther(ServerData.clients.containsKey(to), ServerData.clients.get(to).getType().equals(Constants.KIND_RECEIVE));
+				} else { //call receiver flow
+					Client callSender = ServerData.clients.get(to);
+					synchronized (callSender) {
+						System.out.println(from + "->" + to + " notify!!");
+						callSender.notify();
 					}
+					checkEachOther(callSender.getSocket().isConnected(), callSender.getType().equals(Constants.KIND_RECEIVE));
 				}
-				while (isActivated && socket.isConnected() && !socket.isClosed()) {
-					sendChunk = senderDeque.poll(Constants.RECEIVER_TIMEOUT, TimeUnit.MILLISECONDS); //block
-					
-					if (sendChunk == null) {
-						System.out.println("TIMEOUT");
-						break;
+				
+			} else { // reconnect
+				Client client = ServerData.clients.get(from);
+				System.out.println("reconnect: " + client.isActivated);
+				
+				checkEachOther(!client.isActivated, ServerData.clients.containsKey(to));
+				if (isActivated) { 
+					if(client.getType().equals(Constants.KIND_RECEIVE)) {
+						if(clientWriter != null) {
+							if(clientWriter.isAlive()) {
+								clientWriter.interrupt();
+							}
+						}
 					}
-
-					oos.reset();
-					oos.writeObject(sendChunk);
-					oos.flush();
-					System.out.println("send " + sendChunk.getFrom() + " " + sendChunk.getTo() + " " + sendChunk.getText());
-					sendChunk = null;
-
+					if (client.getSenderDeque() != null && !client.getSenderDeque().isEmpty())
+						senderDeque.addAll(client.getSenderDeque());
 				}
+				
+				System.out.println("Client reconnect");
+				client.close();
+				ServerData.clients.replace(from, this);
 			}
-		} 
-		catch (ClassNotFoundException | IOException | InterruptedException e) {
+			
+			System.out.println("result:" + isActivated);
+			if(isActivated) { //operation
+				if (type.equals(Constants.KIND_RECEIVE)) { // writer
+					this.senderDeque = new LinkedBlockingDeque<Chunk>(512);
+					this.clientWriter = new ClientWriter(this, senderDeque);
+					this.clientWriter.start();
+				}
+				if (ServerData.clients.get(to).getType().equals(Constants.KIND_RECEIVE)) { // read
+					while (isActivated && socket.isConnected() && !socket.isClosed()) {
+						Chunk receiveChunk = (Chunk) ois.readObject();
+						if(receiveChunk != null)
+							ServerData.receiverQueue.put(receiveChunk);
+					}
+					close();
+				}
+			} else {
+				System.out.println("Connect init fail");
+				ServerData.clients.remove(from, this);
+				//Thread.currentThread().interrupt();
+			}
+		} catch (ClassNotFoundException | IOException | InterruptedException e) {
 			e.printStackTrace();
-			if(sendChunk != null) {
-				System.out.println("recover");
-				senderDeque.addFirst(sendChunk);
-			}
-		} finally {
 			close();
+			//Thread.currentThread().interrupt();
 		}
 	}
-
 }

@@ -1,7 +1,6 @@
 import com.swmem.voicetoview.data.Chunk;
 
 public class ChunkSender extends Thread {
-
 	@Override
 	public void run() {
 		super.run();
@@ -16,5 +15,4 @@ public class ChunkSender extends Thread {
 			}
 		}
 	}
-
 }

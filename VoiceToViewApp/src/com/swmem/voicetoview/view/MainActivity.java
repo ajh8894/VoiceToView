@@ -11,55 +11,39 @@ import android.widget.LinearLayout;
 
 import com.swmem.voicetoview.R;
 import com.swmem.voicetoview.data.Constants;
-import com.swmem.voicetoview.data.Database;
 import com.swmem.voicetoview.data.User;
 import com.swmem.voicetoview.service.VoiceToViewService;
+import com.swmem.voicetoview.util.Database;
 
 public class MainActivity extends Activity implements OnClickListener {
 	private User option;
-	LinearLayout onoffLayout;
-	LinearLayout genderLayout;
-	LinearLayout animationLayout;
-	String[] header = new String[3];
+	private LinearLayout[] btnLayout;
+	
+	private String[] header = new String[3];
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// set UI
-		setContentView(R.layout.activity_main);
-		onoffLayout = (LinearLayout) findViewById(R.id.onoff_layout);
-		genderLayout = (LinearLayout) findViewById(R.id.gender_layout);
-		animationLayout = (LinearLayout) findViewById(R.id.animation_layout);
-		// LinearLayout themeLayout = (LinearLayout)
-		// findViewById(R.id.theme_layout);
-		// LinearLayout dataLayout = (LinearLayout)
-		// findViewById(R.id.data_layout);
-		// LinearLayout helpLayout = (LinearLayout)
-		// findViewById(R.id.help_layout);
-
-		onoffLayout.setOnClickListener(this);
-		genderLayout.setOnClickListener(this);
-		animationLayout.setOnClickListener(this);
-		/*
-		 * genderLayout.setOnClickListener(this);
-		 * animationLayout.setOnClickListener(this);
-		 * themeLayout.setOnClickListener(this);
-		 * dataLayout.setOnClickListener(this);
-		 * helpLayout.setOnClickListener(this);
-		 */
-
+		
 		// DB create
 		Database.openOrCreateDB(getApplicationContext());
 		option = Database.selectUser();
-		Database.updateUser(option);
-
+		
+		// set UI
+		setContentView(R.layout.activity_main);
+		int[] layoutId = { R.id.onoff_layout, R.id.gender_layout, R.id.gender_layout, R.id.animation_layout, R.id.theme_layout, R.id.data_layout, R.id.help_layout };
+		btnLayout = new LinearLayout[layoutId.length];
+		for (int i = 0; i < layoutId.length; i++) {
+			btnLayout[i] = (LinearLayout) findViewById(layoutId[i]);
+			btnLayout[i].setOnClickListener(this);
+		}
 		if (option.getMode() == Constants.VIEW_OFF) {
-			onoffLayout.setBackgroundColor(Color.WHITE);
+			btnLayout[0].setBackgroundColor(Color.WHITE);
 			header[0] = Constants.KIND_SEND; // 종류
 			header[1] = "01086048894"; // from
 			header[2] = "01067108898"; // to
 		} else {
-			onoffLayout.setBackgroundColor(Color.RED);
+			btnLayout[0].setBackgroundColor(Color.RED);
 			header[0] = Constants.KIND_RECEIVE; // 종류
 			header[1] = "01067108898"; // from
 			header[2] = "01086048894"; // to
@@ -89,7 +73,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			if (option.getMode() == Constants.VIEW_OFF) {
 				option.setMode(Constants.VIEW_ON);
 				Database.updateUser(option);
-				onoffLayout.setBackgroundColor(Color.RED);
+				btnLayout[0].setBackgroundColor(Color.RED);
 				
 				header[0] = Constants.KIND_RECEIVE; // 종류
 				header[1] = "01067108898"; // from
@@ -98,7 +82,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			} else {
 				option.setMode(Constants.VIEW_OFF);
 				Database.updateUser(option);
-				onoffLayout.setBackgroundColor(Color.WHITE);
+				btnLayout[0].setBackgroundColor(Color.WHITE);
 				
 				header[0] = Constants.KIND_SEND; // 종류
 				header[1] = "01086048894"; // from

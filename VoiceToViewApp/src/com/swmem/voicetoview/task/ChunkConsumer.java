@@ -8,27 +8,26 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.swmem.voicetoview.data.Chunk;
-import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
+import com.swmem.voicetoview.service.Connection;
 
 public class ChunkConsumer extends Thread {
-	private BlockingQueue<Chunk> senderQueue;
+	private BlockingQueue<Object> senderQueue;
 	private Handler senderHandler;
-	private Chunk reChunk;
+	private Object resend;
 	private boolean isActivated;
 
-	public ChunkConsumer(BlockingQueue<Chunk> senderQueue, Handler senderHandler) {
+	public ChunkConsumer(BlockingQueue<Object> senderQueue, Handler senderHandler) {
 		this.senderQueue = senderQueue;
 		this.senderHandler = senderHandler;
-		this.reChunk = null;
+		this.resend = null;
 		this.isActivated = true;
 	}
 	
-	public ChunkConsumer(BlockingQueue<Chunk> senderQueue, Handler senderHandler, Chunk reChunk) {
+	public ChunkConsumer(BlockingQueue<Object> senderQueue, Handler senderHandler, Object resend) {
 		this.senderQueue = senderQueue;
 		this.senderHandler = senderHandler;
-		this.reChunk = reChunk;
+		this.resend = resend;
 		this.isActivated = true;
 	}
 
@@ -43,33 +42,32 @@ public class ChunkConsumer extends Thread {
 	@Override
 	public void run() {
 		super.run();
-		Message msg = null;
+		Message msg = new Message();
 		try {
 			Connection.init(Constants.CONNECT_INIT);
 			
 			while(isActivated && Connection.socket.isConnected() && !Connection.socket.isClosed()) {
-
-				if(reChunk == null)
-					reChunk = senderQueue.take();
+				if(resend == null)
+					resend = senderQueue.take();
 				
 				Connection.oos.reset();
-				Connection.oos.writeObject(reChunk);
+				Connection.oos.writeObject(resend);
 				Connection.oos.flush();
-				reChunk = null;
+				resend = null;
 				Log.i("Consumer", "Chunk send succsess");
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
-			if (isActivated && reChunk != null) {
+			if (isActivated && resend != null) {
 				msg.what = Constants.RECONNECT;
-				msg.obj = reChunk;
+				msg.obj = resend;
 				senderHandler.sendMessageDelayed(msg, Constants.TASK_DELAY_STOP);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			if (isActivated && reChunk != null) {
+			if (isActivated && resend != null) {
 				msg.what = Constants.RECONNECT;
-				msg.obj = reChunk;
+				msg.obj = resend;
 				senderHandler.sendMessageDelayed(msg, Constants.TASK_DELAY_STOP);
 			}
 		} catch (InterruptedException e) {

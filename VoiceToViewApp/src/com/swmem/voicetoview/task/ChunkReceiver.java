@@ -11,8 +11,8 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.swmem.voicetoview.data.Chunk;
-import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
+import com.swmem.voicetoview.service.Connection;
 
 public class ChunkReceiver extends Thread {
 	private BlockingQueue<Chunk> receiverQueue;

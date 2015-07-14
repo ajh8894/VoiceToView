@@ -19,7 +19,7 @@
         <LinearLayout
             android:id="@+id/category_buttons"
             android:layout_width="match_parent"
-            android:layout_height="0dip"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="vertical" >
 
@@ -27,7 +27,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dip"
+                android:layout_height="0dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:orientation="horizontal" >
@@ -36,9 +36,10 @@
 
                 <LinearLayout
                     android:id="@+id/onoff_layout"
-                    android:layout_width="0dip"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="@drawable/pressed_selector"
                     android:clickable="true"
                     android:gravity="center"
                     android:orientation="vertical" >
@@ -54,9 +55,9 @@
                         android:id="@+id/onofftext"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="OFF"
+                        android:text="@string/view_on"
                         android:textColor="#747474"
-                        android:textSize="15dp"
+                        android:textSize="@dimen/text_size"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -64,9 +65,10 @@
 
                 <LinearLayout
                     android:id="@+id/gender_layout"
-                    android:layout_width="0dip"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="@drawable/pressed_selector"
                     android:clickable="true"
                     android:gravity="center"
                     android:orientation="vertical" >
@@ -82,9 +84,9 @@
                         android:id="@+id/gendertext"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="MAN"
+                        android:text="@string/gender_man"
                         android:textColor="#747474"
-                        android:textSize="15dp"
+                        android:textSize="@dimen/text_size"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -93,7 +95,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dip"
+                android:layout_height="0dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:orientation="horizontal" >
@@ -102,9 +104,10 @@
 
                 <LinearLayout
                     android:id="@+id/animation_layout"
-                    android:layout_width="0dip"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="@drawable/pressed_selector"
                     android:clickable="true"
                     android:gravity="center"
                     android:orientation="vertical" >
@@ -118,9 +121,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Animation"
+                        android:text="@string/animation"
                         android:textColor="#747474"
-                        android:textSize="15dp"
+                        android:textSize="@dimen/text_size"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -128,9 +131,10 @@
 
                 <LinearLayout
                     android:id="@+id/theme_layout"
-                    android:layout_width="0dip"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="@drawable/pressed_selector"
                     android:clickable="true"
                     android:gravity="center"
                     android:orientation="vertical" >
@@ -144,9 +148,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Theme"
+                        android:text="@string/theme"
                         android:textColor="#747474"
-                        android:textSize="15dp"
+                        android:textSize="@dimen/text_size"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -155,7 +159,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dip"
+                android:layout_height="0dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:orientation="horizontal" >
@@ -164,9 +168,10 @@
 
                 <LinearLayout
                     android:id="@+id/data_layout"
-                    android:layout_width="0dip"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="@drawable/pressed_selector"
                     android:clickable="true"
                     android:gravity="center"
                     android:orientation="vertical" >
@@ -180,9 +185,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Data"
+                        android:text="@string/data"
                         android:textColor="#747474"
-                        android:textSize="15dp"
+                        android:textSize="@dimen/text_size"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -190,9 +195,10 @@
 
                 <LinearLayout
                     android:id="@+id/help_layout"
-                    android:layout_width="0dip"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="@drawable/pressed_selector"
                     android:clickable="true"
                     android:gravity="center"
                     android:orientation="vertical" >
@@ -206,9 +212,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Help"
+                        android:text="@string/help"
                         android:textColor="#747474"
-                        android:textSize="15dp"
+                        android:textSize="@dimen/text_size"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>

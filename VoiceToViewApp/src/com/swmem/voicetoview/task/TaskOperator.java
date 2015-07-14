@@ -5,8 +5,8 @@ import java.net.UnknownHostException;
 
 import android.os.Handler;
 
-import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
+import com.swmem.voicetoview.service.Connection;
 
 public class TaskOperator extends Thread {
 	private int type;
@@ -29,15 +29,12 @@ public class TaskOperator extends Thread {
 				Connection.oos.writeBoolean(true);
 				Connection.oos.flush();
 				if (response) { // write
-					senderHandler.sendEmptyMessage(type);
+					senderHandler.sendEmptyMessage(Constants.CONNECT);
 				}
 				if (Connection.header[0].equals(Constants.KIND_RECEIVE)) { //VIEW_ON
-					receiverHandler.sendEmptyMessage(type);
+					receiverHandler.sendEmptyMessage(Constants.CONNECT);
 				}
-			} else {
-				senderHandler.sendEmptyMessage(type);
 			}
-
 		} catch (UnknownHostException e) {
 			Connection.close();
 			senderHandler.sendEmptyMessageDelayed(type, Constants.TASK_DELAY_STOP);

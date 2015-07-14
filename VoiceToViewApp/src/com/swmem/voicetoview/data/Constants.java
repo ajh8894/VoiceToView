@@ -9,8 +9,11 @@ public class Constants {
 	public static final String KIND_END = "disconnect";
 	
 	// server	
-	public static final String SERVER_IP = "211.189.127.200";
+	public static final String SERVER_IP = "211.189.127.145";
 	public static final int SERVER_PORT = 8080;
+	
+	public static final String TEST_IP = "211.189.127.218";
+	public static final int TEST_PORT = 3577;
 	
 	// option
 	public static final int VIEW_OFF = 0;
@@ -21,7 +24,6 @@ public class Constants {
 	public static final int FEMALE = 1;
 	public static final int MAX_RECORD_TIME = 15;
     public static final int TASK_DELAY_STOP = 1000;
-    
 
 	public static final int CONNECT_INIT = 100;
     public static final int CONNECT = 200;
@@ -39,4 +41,5 @@ public class Constants {
 	// Variables used to establish return code
     public static final long MIN = 10000000;
     public static final long MAX = 900000009999999L;
+
 }

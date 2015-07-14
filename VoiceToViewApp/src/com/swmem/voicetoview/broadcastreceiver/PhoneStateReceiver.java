@@ -7,11 +7,10 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
-import com.swmem.voicetoview.data.Database;
 import com.swmem.voicetoview.data.User;
 import com.swmem.voicetoview.service.VoiceToViewService;
+import com.swmem.voicetoview.util.Database;
 
 public class PhoneStateReceiver extends BroadcastReceiver {
 	private final String LOG_TAG = PhoneStateReceiver.class.getName();
@@ -19,7 +18,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
     private static String[] header;
 
     @Override
-	public void onReceive(Context context, final Intent intent) {
+	public void onReceive(Context context, Intent intent) {
     	Database.openOrCreateDB(context);
 		final User option = Database.selectUser();
 		final Context c = context;

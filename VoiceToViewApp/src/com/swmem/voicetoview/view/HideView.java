@@ -3,6 +3,7 @@ package com.swmem.voicetoview.view;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,7 +32,7 @@ public class HideView implements OnClickListener {
 																
 			PixelFormat.TRANSLUCENT
 		);													
-		//mParams.gravity = Gravity.TOP | Gravity.RIGHT;
+		mParams.gravity = Gravity.TOP | Gravity.RIGHT;
 		view.setVisibility(View.GONE);
 		wManager.addView(view, mParams);
 	}

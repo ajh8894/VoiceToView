@@ -11,8 +11,7 @@ public final class R {
     public static final class attr {
     }
     public static final class dimen {
-        /**  Default screen margins, per the Android Design guidelines. 
-
+        /** 
          Example customization of dimensions originally defined in res/values/dimens.xml
          (such as screen margins) for screens with more than 820dp of available width. This
          would include 7" and 10" devices in landscape (~960dp and ~1280dp respectively).
@@ -20,6 +19,7 @@ public final class R {
          */
         public static final int activity_horizontal_margin=0x7f040000;
         public static final int activity_vertical_margin=0x7f040001;
+        public static final int text_size=0x7f040002;
     }
     public static final class drawable {
         public static final int category_button_bg_left=0x7f020000;
@@ -36,8 +36,11 @@ public final class R {
         public static final int category_icon_on=0x7f02000b;
         public static final int category_icon_theme=0x7f02000c;
         public static final int categroy_icon_boom=0x7f02000d;
-        public static final int ic_launcher=0x7f02000e;
-        public static final int user_icon=0x7f02000f;
+        public static final int gender_selector=0x7f02000e;
+        public static final int ic_launcher=0x7f02000f;
+        public static final int onoff_selector=0x7f020010;
+        public static final int pressed_selector=0x7f020011;
+        public static final int user_icon=0x7f020012;
     }
     public static final class id {
         public static final int LinearLayout1=0x7f080000;
@@ -83,9 +86,16 @@ public final class R {
         public static final int main=0x7f070000;
     }
     public static final class string {
-        public static final int action_settings=0x7f050002;
+        public static final int action_settings=0x7f050001;
+        public static final int animation=0x7f050006;
         public static final int app_name=0x7f050000;
-        public static final int hello_world=0x7f050001;
+        public static final int data=0x7f050008;
+        public static final int gender_man=0x7f050004;
+        public static final int gender_woman=0x7f050005;
+        public static final int help=0x7f050009;
+        public static final int theme=0x7f050007;
+        public static final int view_off=0x7f050003;
+        public static final int view_on=0x7f050002;
     }
     public static final class style {
         /** 

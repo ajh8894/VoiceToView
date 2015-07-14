@@ -7,14 +7,18 @@ import android.os.Parcelable;
 
 public class Chunk implements Serializable, Parcelable {
 	private static final long serialVersionUID = 1L;
+	private int order;
 	private String from, to;
 	private String text;
+	private int emotion;
 	private String date;
 
-	public Chunk(String from, String to, String text) {
+	public Chunk(int order, String from, String to, String text) {
+		this.order = order;
 		this.from = from;
 		this.to = to;
 		this.text = text;
+		this.emotion = -1;
 	}
 
 	public Chunk(Parcel in) {
@@ -41,17 +45,27 @@ public class Chunk implements Serializable, Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(order);
 		dest.writeString(from);
 		dest.writeString(to);
 		dest.writeString(text);
-		// dest.writeDoubleArray(features);
+		dest.writeInt(emotion);
 	}
 
 	private void readFromParcel(Parcel in) {
+		order = in.readInt();
 		to = in.readString();
 		from = in.readString();
 		text = in.readString();
-		// in.readDoubleArray(features);
+		emotion = in.readInt();
+	}
+
+	public int getOrder() {
+		return order;
+	}
+
+	public void setOrder(int order) {
+		this.order = order;
 	}
 
 	public String getText() {
@@ -76,6 +90,14 @@ public class Chunk implements Serializable, Parcelable {
 
 	public void setTo(String to) {
 		this.to = to;
+	}
+
+	public int getEmotion() {
+		return emotion;
+	}
+
+	public void setEmotion(int emotion) {
+		this.emotion = emotion;
 	}
 
 	public String getDate() {

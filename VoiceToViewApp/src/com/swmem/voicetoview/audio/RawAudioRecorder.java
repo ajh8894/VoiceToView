@@ -203,7 +203,6 @@ public class RawAudioRecorder {
 		return getCurrentRecording(0);
 	}
 
-
 	/**
 	 * @return bytes that have been recorded since the beginning, with wav-header
 	 */

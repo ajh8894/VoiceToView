@@ -22,7 +22,6 @@ public class PhoneStateReceiver extends BroadcastReceiver {
     	Database.openOrCreateDB(context);
 		final User option = Database.selectUser();
 		final Context c = context;
-		
 		final TelephonyManager telManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         
         telManager.listen(new PhoneStateListener(){

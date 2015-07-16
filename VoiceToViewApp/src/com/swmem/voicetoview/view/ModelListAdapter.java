@@ -11,12 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.swmem.voicetoview.R;
-import com.swmem.voicetoview.data.Chunk;
+import com.swmem.voicetoview.data.Model;
 
-public class ChunkListAdapter extends BaseAdapter {
+public class ModelListAdapter extends BaseAdapter {
 	private LayoutInflater mInflater;
 	private int mLayout;
-	private List<Chunk> mItemList;
+	private List<Model> mItemList;
 	
 	private class ViewHolder {
 		public ImageView emotion;
@@ -24,7 +24,7 @@ public class ChunkListAdapter extends BaseAdapter {
 		public TextView date;
 	}
 	
-	public ChunkListAdapter(Context context, int layout, List<Chunk> itemList) {
+	public ModelListAdapter(Context context, int layout, List<Model> itemList) {
 		this.mInflater = LayoutInflater.from(context);
 		this.mLayout = layout;
 		this.mItemList = itemList;
@@ -35,7 +35,7 @@ public class ChunkListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Chunk getItem(int position) {
+	public Model getItem(int position) {
 		return mItemList.get(position);
 	}
 
@@ -48,7 +48,7 @@ public class ChunkListAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder viewHolder = null;
 		
-		Chunk item = getItem(position);
+		Model item = getItem(position);
 		
 		if(convertView == null) {
 			convertView = mInflater.inflate(mLayout, parent, false);
@@ -67,11 +67,11 @@ public class ChunkListAdapter extends BaseAdapter {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
 
-		viewHolder.message.setText(item.getText());
+		viewHolder.message.setText(item.getTextResult());
 		viewHolder.date.setText(item.getDate());
 		return convertView;
 	}
-	public void reflesh(List<Chunk> list) {
+	public void reflesh(List<Model> list) {
 		this.mItemList = list;
 		notifyDataSetChanged();
 	}

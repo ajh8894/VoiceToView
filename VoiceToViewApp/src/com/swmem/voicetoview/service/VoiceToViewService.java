@@ -2,7 +2,9 @@ package com.swmem.voicetoview.service;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
+import Test.NetworkStateReceiver;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -17,11 +19,12 @@ import android.view.WindowManager;
 import com.swmem.voicetoview.audio.AudioPauser;
 import com.swmem.voicetoview.audio.RawAudioRecorder;
 import com.swmem.voicetoview.audio.RawAudioRecorder.State;
-import com.swmem.voicetoview.data.Chunk;
+import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
-import com.swmem.voicetoview.task.ChunkConsumer;
-import com.swmem.voicetoview.task.ChunkProducer;
-import com.swmem.voicetoview.task.ChunkReceiver;
+import com.swmem.voicetoview.data.Model;
+import com.swmem.voicetoview.data.ModelComparator;
+import com.swmem.voicetoview.task.ModelReceiver;
+import com.swmem.voicetoview.task.ModelSender;
 import com.swmem.voicetoview.task.TaskOperator;
 import com.swmem.voicetoview.view.AssistantView;
 import com.swmem.voicetoview.view.HideView;
@@ -31,8 +34,8 @@ public class VoiceToViewService extends Service {
 	private final IBinder mBinder = new VoiceToViewBinder();
 	
 	// DataQueue instance
-	private BlockingQueue<Object> mSenderQueue;
-	private BlockingQueue<Chunk> mReceiverQueue;
+	private BlockingQueue<Model> mSenderQueue;
+	private BlockingQueue<Model> mReceiverQueue;
 
 	// View instance
 	private WindowManager mWindowManager;
@@ -54,10 +57,10 @@ public class VoiceToViewService extends Service {
 			if (isActivated) {
 				if (mMaxRecordingTime < (SystemClock.elapsedRealtime() - mStartTime)) {
 					Log.d(LOG_TAG, "Max recording time exceeded");
-					repeatRecoding(false);
+					repeatRecoding();
 				} else if (mRecorder.isPausing()) {
 					Log.d(LOG_TAG, "Speaker finished speaking");
-					repeatRecoding(true);
+					repeatRecoding();
 				}
 				mStopHandler.postDelayed(this, Constants.TASK_DELAY_STOP);
 			}
@@ -66,8 +69,8 @@ public class VoiceToViewService extends Service {
 
 	// Http, Tcp/Ip instance
 	private TaskOperator mOperator;
-	private ChunkReceiver mChunkReceiver;
-	private ChunkConsumer mChunkConsumer;
+	private ModelSender mModelSender;
+	private ModelReceiver mModelReceiver;
 	private Handler mReceiverHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -78,19 +81,15 @@ public class VoiceToViewService extends Service {
 				mAssistantView = new AssistantView(getApplicationContext(), mWindowManager, mReceiverHandler);
 				mHideView = new HideView(getApplicationContext(), mWindowManager, mReceiverHandler);
 				mVisible = true;
-				mChunkReceiver = new ChunkReceiver(mReceiverQueue, mReceiverHandler);
-				mChunkReceiver.start();
+				mModelReceiver = new ModelReceiver(mReceiverQueue, this);
+				mModelReceiver.start();
 				break;
 			case Constants.RECONNECT:
-				mChunkReceiver = new ChunkReceiver(mReceiverQueue, this);
-				mChunkReceiver.start();
+				mModelReceiver = new ModelReceiver(mReceiverQueue, this);
+				mModelReceiver.start();
 				break;
 			case Constants.REFRESH:
-				try {
-					mAssistantView.chunkListAdd(mReceiverQueue.take());
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				mAssistantView.modelListAdd(mReceiverQueue.poll());
 				break;
 			case Constants.SWAP:
 				if (mVisible) {
@@ -122,12 +121,12 @@ public class VoiceToViewService extends Service {
 				mRecorder.start();
 				mStartTime = SystemClock.elapsedRealtime();
 				mStopHandler.postDelayed(mStopRunnable, Constants.TASK_DELAY_STOP);
-				mChunkConsumer = new ChunkConsumer(mSenderQueue, this, (Chunk) msg.obj);
-				mChunkConsumer.start();
+				mModelSender = new ModelSender(mSenderQueue, this);
+				mModelSender.start();
 				break;
 			case Constants.RECONNECT:
-				mChunkConsumer = new ChunkConsumer(mSenderQueue, this, (Chunk) msg.obj);
-				mChunkConsumer.start();
+				mModelSender = new ModelSender(mSenderQueue, this);
+				mModelSender.start();
 				break;
 			case Constants.DISCONNECT:
 				mOperator = new TaskOperator(Constants.DISCONNECT, mSenderHandler, mReceiverHandler);
@@ -150,13 +149,7 @@ public class VoiceToViewService extends Service {
 		return mBinder;
 	}
 
-	@Override
-	public void onCreate() {
-		Log.i(LOG_TAG, "onCreate");
-		super.onCreate();
-		init();
-	}
-
+	NetworkStateReceiver networkStateReceiver = new NetworkStateReceiver();
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "onStartCommand");
@@ -173,9 +166,9 @@ public class VoiceToViewService extends Service {
 		stopAllTasks();
 	}
 
-	private void init() {
-		mSenderQueue = new ArrayBlockingQueue<Object>(1024);
-		mReceiverQueue = new ArrayBlockingQueue<Chunk>(1024);
+	private void startAllTasks() {
+		mSenderQueue = new PriorityBlockingQueue<Model>(1024);
+		mReceiverQueue = new PriorityBlockingQueue<Model>(1024);
 
 		mAudioPauser = new AudioPauser(this);
 		mRecorder = new RawAudioRecorder();
@@ -184,9 +177,8 @@ public class VoiceToViewService extends Service {
 		mStopHandler = new Handler();
 		
 		mOperator = new TaskOperator(Constants.CONNECT_INIT, mSenderHandler, mReceiverHandler);
-	}
-
-	private void startAllTasks() {
+		mModelSender = new ModelSender(mSenderQueue, mSenderHandler);
+		
 		mAudioPauser.pause();
 		Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2]);
 		mOperator.start();
@@ -194,7 +186,7 @@ public class VoiceToViewService extends Service {
 
 	private void stopAllTasks() {
 		isActivated = false;
-		Connection.close();
+		Connection.disconnect();
 		
 		if (mRecorder.getState() == State.READY || mRecorder.getState() == State.RECORDING)
 			mRecorder.stop();
@@ -222,15 +214,15 @@ public class VoiceToViewService extends Service {
 			mSenderHandler.removeMessages(Constants.RECONNECT);
 		}
 
-		if (mChunkReceiver != null) {
-			mChunkReceiver.setActivated(false);
-			if (mChunkReceiver.isAlive())
-				mChunkReceiver.interrupt();
+		if (mModelReceiver != null) {
+			mModelReceiver.setActivated(false);
+			if (mModelReceiver.isAlive())
+				mModelReceiver.interrupt();
 		}
-		if (mChunkConsumer != null) {
-			mChunkConsumer.setActivated(false);
-			if (mChunkConsumer.isAlive())
-				mChunkConsumer.interrupt();
+		if (mModelSender != null) {
+			mModelSender.setActivated(false);
+			if (mModelSender.isAlive())
+				mModelSender.interrupt();
 		}
 
 		if (mWindowManager != null) {
@@ -253,16 +245,21 @@ public class VoiceToViewService extends Service {
 		Log.i(LOG_TAG, "Destroy Complete");
 	}
 
-	private void repeatRecoding(boolean success) {
+	private void repeatRecoding() {
 		if (mRecorder.getState() == State.RECORDING)
 			mRecorder.stop();
 
-		if(success) {
-			ChunkProducer aChunkProducer = new ChunkProducer(mSenderQueue, order++, mRecorder.consumeRecordingAndTruncate());
-			new Thread(aChunkProducer).start();
-		} else
-			mRecorder.consumeRecordingAndTruncate();
-	
+		try {
+			Model model = new Model(Connection.header[1], Connection.header[2], order, mRecorder.consumeRecordingAndTruncate());
+			model.setTextResult("안녕"+ order);
+			order++;
+			mSenderQueue.put(model);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+			/*ModelProducer aModelProducer = new ModelProducer(mSenderQueue, order++, mRecorder.consumeRecordingAndTruncate());
+			new Thread(aModelProducer).start();*/
+		
 		
 		mRecorder.release();
 

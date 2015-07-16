@@ -1,17 +1,16 @@
 package data;
-import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import client.Client;
 
-import com.swmem.voicetoview.data.Chunk;
+import com.swmem.voicetoview.data.Model;
 
 
 public class ServerData {
-	public static ServerSocket serverSocket;
 	public static HashMap<String, Client> clients = new HashMap<String, Client>();
-	public static BlockingQueue<Object> receiverQueue = new ArrayBlockingQueue<>(1024);
-	public static BlockingQueue<Chunk> senderQueue = new ArrayBlockingQueue<>(1024);
+	public static BlockingQueue<Model> receiverQueue = new ArrayBlockingQueue<>(2024);
+	public static BlockingQueue<Model> senderQueue = new PriorityBlockingQueue<>(1024);
 }

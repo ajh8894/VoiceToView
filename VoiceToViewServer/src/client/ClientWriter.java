@@ -1,42 +1,39 @@
 package client;
+
 import java.io.IOException;
-import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 
-import com.swmem.voicetoview.data.Chunk;
-
+import com.swmem.voicetoview.data.Model;
 
 public class ClientWriter extends Thread {
 	private Client client;
-	private BlockingDeque<Chunk> senderDeque;
-	
-	public ClientWriter(Client client, BlockingDeque<Chunk> senderDeque) {
+	private BlockingQueue<Model> senderQueue;
+
+	public ClientWriter(Client client, BlockingQueue<Model> senderDeque) {
 		this.client = client;
-		this.senderDeque = senderDeque;
+		this.senderQueue = senderDeque;
 	}
 
 	@Override
 	public void run() {
-		Chunk sendChunk = null;
+		Model m = null;
 		try {
-			while(client.isActivated() && client.getSocket().isConnected() && !client.getSocket().isClosed()) {
-				sendChunk = senderDeque.takeFirst();
-				if(sendChunk != null)
-					client.sendToClient(sendChunk);
-				sendChunk = null;
+			while (client.isActivated() && client.getSocket().isConnected() && !client.getSocket().isClosed()) {
+				m = senderQueue.take();
+				if (m != null)
+					client.sendToClient(m);
 			}
 		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
-			System.out.println("Interrupted");
-		} finally {
-			client.close();
-/*			if(sendChunk != null) {
+			if (m != null) {
 				try {
-					senderDeque.putFirst(sendChunk);
+					senderQueue.put(m);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
-			}*/
+			}
+		} finally {
+			//client.close();
 		}
-		super.run();
 	}
 }

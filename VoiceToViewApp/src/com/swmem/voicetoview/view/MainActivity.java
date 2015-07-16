@@ -74,19 +74,22 @@ public class MainActivity extends Activity implements OnClickListener {
 				option.setMode(Constants.VIEW_ON);
 				Database.updateUser(option);
 				btnLayout[0].setBackgroundColor(Color.RED);
-				
+/*				
 				header[0] = Constants.KIND_RECEIVE; // 종류
 				header[1] = "01067108898"; // from
 				header[2] = "01086048894"; // to
-				
+*/				
+				header[0] = Constants.KIND_RECEIVE; // 종류
+				header[1] = "01066664444"; // from
+				header[2] = "05050505050"; // to
 			} else {
 				option.setMode(Constants.VIEW_OFF);
 				Database.updateUser(option);
 				btnLayout[0].setBackgroundColor(Color.WHITE);
 				
-				header[0] = Constants.KIND_SEND; // 종류
-				header[1] = "01086048894"; // from
-				header[2] = "01067108898"; // to
+				header[0] = Constants.KIND_RECEIVE; // 종류
+				header[1] = "05050505050"; // from
+				header[2] = "01066664444"; // to
 
 			}
 

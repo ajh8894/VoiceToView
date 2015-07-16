@@ -15,25 +15,23 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.swmem.voicetoview.R;
-import com.swmem.voicetoview.data.Chunk;
 import com.swmem.voicetoview.data.Constants;
+import com.swmem.voicetoview.data.Model;
 
 public class AssistantView implements OnClickListener {
 	private View view;
 	private Handler handler;
 	private ListView listView;
-	private ChunkListAdapter listAdapter;
-	private List<Chunk> chunkList;
+	private ModelListAdapter listAdapter;
+	private List<Model> modelList;
 
 	public AssistantView(Context c, WindowManager wManager, Handler handler) {
-		LayoutInflater inflater = (LayoutInflater) c
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.view = inflater.inflate(R.layout.view_assistant, null);
 		this.handler = handler;
 		this.listView = (ListView) view.findViewById(R.id.lv_chunk);
-		this.chunkList = new ArrayList<Chunk>();
-		this.listAdapter = new ChunkListAdapter(c, R.layout.item_chunk,
-				chunkList);
+		this.modelList = new ArrayList<Model>();
+		this.listAdapter = new ModelListAdapter(c, R.layout.item_chunk, modelList);
 		this.listView.setAdapter(listAdapter);
 		Button hideBtn = (Button) view.findViewById(R.id.btn_hide);
 		hideBtn.setOnClickListener(this);
@@ -43,7 +41,7 @@ public class AssistantView implements OnClickListener {
 
 				PixelFormat.TRANSLUCENT);
 		mParams.gravity = Gravity.LEFT | Gravity.TOP;
-		
+
 		view.setVisibility(View.VISIBLE);
 		wManager.addView(view, mParams);
 	}
@@ -52,9 +50,11 @@ public class AssistantView implements OnClickListener {
 		return view;
 	}
 
-	public void chunkListAdd(Chunk c) {
-		chunkList.add(c);
-		listAdapter.reflesh(chunkList);
+	public void modelListAdd(Model m) {
+		if (m != null) {
+			modelList.add(m);
+			listAdapter.reflesh(modelList);
+		}
 	}
 
 	@Override

@@ -10,16 +10,16 @@ import java.util.concurrent.BlockingQueue;
 import android.os.Handler;
 import android.util.Log;
 
-import com.swmem.voicetoview.data.Chunk;
+import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
-import com.swmem.voicetoview.service.Connection;
+import com.swmem.voicetoview.data.Model;
 
-public class ChunkReceiver extends Thread {
-	private BlockingQueue<Chunk> receiverQueue;
+public class ModelReceiver extends Thread {
+	private BlockingQueue<Model> receiverQueue;
 	private Handler receiverHandler;
 	private boolean isActivated;
 
-	public ChunkReceiver(BlockingQueue<Chunk> receiverQueue, Handler receiverHandler) {
+	public ModelReceiver(BlockingQueue<Model> receiverQueue, Handler receiverHandler) {
 		this.receiverQueue = receiverQueue;
 		this.receiverHandler = receiverHandler;
 		this.isActivated = true;
@@ -38,30 +38,28 @@ public class ChunkReceiver extends Thread {
 		super.run();
 		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
 		try {
-			Connection.init(Constants.CONNECT_INIT);
+			Connection.connect(Constants.CONNECT);
 			
 			while(isActivated && Connection.socket.isConnected() && !Connection.socket.isClosed()) {
-				Chunk c = (Chunk) Connection.ois.readObject();
-				Log.d("Receiver", c.getText() + " Chunk receive succsess");
-				c.setDate(timeFormat.format(new Date()));
-				receiverQueue.put(c);
+				Model m = (Model) Connection.ois.readObject();
+				Log.d("Receiver", m.getTextResult() + " Chunk receive succsess");
+				m.setDate(timeFormat.format(new Date()));
+				receiverQueue.put(m);
 				receiverHandler.sendEmptyMessage(Constants.REFRESH);
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
-			if(isActivated)
-				receiverHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_STOP);
 		} catch (IOException e) {
 			e.printStackTrace();
 			if(isActivated)
-				receiverHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_STOP);
+				receiverHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_RECONNECT);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} finally {
 			Log.d("Receiver", "Receiver close");
-			Connection.close();
+			Connection.disconnect();
 		}
 	}
 }

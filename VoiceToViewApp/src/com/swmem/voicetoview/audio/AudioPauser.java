@@ -34,11 +34,9 @@ public class AudioPauser {
 	 */
 	public void pause() {
 		if (!isPausing && mAudioManager.isMusicActive()) {
-			mCurrentVolume = mAudioManager
-					.getStreamVolume(AudioManager.STREAM_MUSIC);
+			mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 			int result = mAudioManager.requestAudioFocus(mAfChangeListener,
-					AudioManager.STREAM_MUSIC,
-					AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+					AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
 			if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
 				Log.i("AUDIOFOCUS_REQUEST_GRANTED", "");
 			}
@@ -55,8 +53,7 @@ public class AudioPauser {
 	public void resume() {
 		if (isPausing) {
 			mAudioManager.abandonAudioFocus(mAfChangeListener);
-			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-					mCurrentVolume, 0);
+			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume, 0);
 			isPausing = false;
 			Log.i("AudioPauser: resume: ", "" + mCurrentVolume);
 		}

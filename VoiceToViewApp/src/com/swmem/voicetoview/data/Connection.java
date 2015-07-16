@@ -1,12 +1,10 @@
-package com.swmem.voicetoview.service;
+package com.swmem.voicetoview.data;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-import com.swmem.voicetoview.data.Constants;
 
 import android.util.Log;
 
@@ -16,23 +14,23 @@ public class Connection {
 	public static ObjectOutputStream oos;
 	public static ObjectInputStream ois;
 
-	synchronized public static void init(int mode) throws UnknownHostException, IOException {
+	synchronized public static void connect(int type) throws UnknownHostException, IOException {
 		if (socket == null || !socket.isConnected() || socket.isClosed()) {
-			socket = new Socket(Constants.SERVER_IP, Constants.SERVER_PORT);
+			socket = new Socket(Constants.CONNECT_SERVER_IP, Constants.CONNECT_SERVER_PORT);
 			ois = new ObjectInputStream(socket.getInputStream());
 			oos = new ObjectOutputStream(socket.getOutputStream());
-			Log.d("Connection Init", "initConnection()");
-			if(mode == Constants.DISCONNECT) {
+			Log.d("Connection connect()", "initConnection()");
+			if(type == Constants.DISCONNECT) {
 				header[0] = Constants.KIND_END;
-			}
+			} 
 			Connection.oos.writeObject(Connection.header);
 			Connection.oos.flush();
 		}
 	}
 
-	synchronized public static void close() {
+	synchronized public static void disconnect() {
+		Log.d("Connection connect()", "disconnect()");
 		try {
-			Log.d("Connection Close", "closeConnection()");
 			if (ois != null) {
 				ois.close();
 				Log.d("ObjectInputStream", "close");

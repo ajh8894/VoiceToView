@@ -4,25 +4,32 @@ import java.io.Serializable;
 
 public class Model implements Serializable, Comparable<Model> {
 	private static final long serialVersionUID = 1L;
-	
+
 	// header
 	private String from;
 	private String to;
+	private boolean man;
+	private int messageNum;
 
 	// input signal
 	private byte buffers[];
 
 	// return
-	private int messageNum;
 	private String textResult;
 	private int emotionType;
-	
+
 	// view
 	private String date;
 
-	public Model(String from, String to, int messageNum, byte[] buffers) {
+	public Model() {
+
+	}
+
+	public Model(String from, String to, boolean man, int messageNum,
+			byte[] buffers) {
 		this.from = from;
 		this.to = to;
+		this.man = man;
 		this.messageNum = messageNum;
 		this.buffers = buffers;
 	}
@@ -83,8 +90,22 @@ public class Model implements Serializable, Comparable<Model> {
 		this.date = date;
 	}
 
+	public boolean isMan() {
+		return man;
+	}
+
+	public void setMan(boolean man) {
+		this.man = man;
+	}
+
 	@Override
 	public int compareTo(Model m) {
 		return this.messageNum - m.getMessageNum();
+	}
+
+	public void setInitValues(Model model) {
+		this.from = model.from;
+		this.to = model.to;
+		this.messageNum = model.messageNum;
 	}
 }

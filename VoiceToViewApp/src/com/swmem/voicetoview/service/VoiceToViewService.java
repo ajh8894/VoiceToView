@@ -4,7 +4,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import Test.NetworkStateReceiver;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -22,7 +21,6 @@ import com.swmem.voicetoview.audio.RawAudioRecorder.State;
 import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Model;
-import com.swmem.voicetoview.data.ModelComparator;
 import com.swmem.voicetoview.task.ModelReceiver;
 import com.swmem.voicetoview.task.ModelSender;
 import com.swmem.voicetoview.task.TaskOperator;
@@ -149,7 +147,6 @@ public class VoiceToViewService extends Service {
 		return mBinder;
 	}
 
-	NetworkStateReceiver networkStateReceiver = new NetworkStateReceiver();
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "onStartCommand");
@@ -168,7 +165,7 @@ public class VoiceToViewService extends Service {
 
 	private void startAllTasks() {
 		mSenderQueue = new PriorityBlockingQueue<Model>(1024);
-		mReceiverQueue = new PriorityBlockingQueue<Model>(1024);
+		mReceiverQueue = new ArrayBlockingQueue<Model>(1024);
 
 		mAudioPauser = new AudioPauser(this);
 		mRecorder = new RawAudioRecorder();
@@ -250,9 +247,7 @@ public class VoiceToViewService extends Service {
 			mRecorder.stop();
 
 		try {
-			Model model = new Model(Connection.header[1], Connection.header[2], order, mRecorder.consumeRecordingAndTruncate());
-			model.setTextResult("안녕"+ order);
-			order++;
+			Model model = new Model(Connection.header[1], Connection.header[2], true, order++, mRecorder.consumeRecordingAndTruncate());
 			mSenderQueue.put(model);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

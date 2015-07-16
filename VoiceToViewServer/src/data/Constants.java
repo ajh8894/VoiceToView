@@ -6,11 +6,11 @@ public class Constants {
 	public static final int SENDER_TIMEOUT = 60000;
 	
 	// svm server info
-/*	public static final String SVM_SERVER_IP = "211.189.127.218";
-	public static final int SVM_SERVER_PORT = 3577;*/
+	public static final String SVM_SERVER_IP = "211.189.127.217";
+	public static final int SVM_SERVER_PORT = 3577;
 	
-	public static final String SVM_SERVER_IP = "211.189.127.145";
-	public static final int SVM_SERVER_PORT = 8090;
+/*	public static final String SVM_SERVER_IP = "211.189.127.145";
+	public static final int SVM_SERVER_PORT = 8090;*/
 	
 	// header
 	public static final String SERVICE_EXTRA_MODE = "mode";

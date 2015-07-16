@@ -10,6 +10,7 @@ public class IndividualSorter extends Thread {
 		while (true) {
 			try {
 				Model m = (Model) ServerData.receiverQueue.take();
+				
 				if (ServerData.clients.containsKey(m.getTo())) {
 					if(ServerData.clients.get(m.getTo()).getSenderQueue() != null) {
 						ServerData.clients.get(m.getTo()).putSenderQueue(m);

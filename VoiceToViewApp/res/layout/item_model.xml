@@ -14,27 +14,25 @@
         android:src="@drawable/user_icon" />
 
     <TextView
-        android:id="@+id/tv_message"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="10dp"
-        android:layout_toRightOf="@+id/emotion_iv"
-        android:background="@drawable/categroy_icon_boom"
-        android:textStyle="bold"
-        android:textSize="14dp"
-        android:textColor="#000000"
-        android:text="msg" />
-
-    <TextView
         android:id="@+id/tv_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/message_tv"
-        android:layout_toRightOf="@+id/message_tv"
-        android:background="#8FBC8F"
-        android:textStyle="bold"
+        android:layout_alignBottom="@+id/tv_message"
+        android:layout_toRightOf="@+id/tv_message"
+        android:text="date"
         android:textSize="13dp"
-        android:textColor="#FFFFFF"
-        android:text="date" />
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/iv_emotion"
+        android:layout_toRightOf="@+id/iv_emotion"
+        android:background="@drawable/categroy_icon_boom"
+        android:text="msg"
+        android:textColor="#000000"
+        android:textSize="14dp"
+        android:textStyle="bold" />
 
 </RelativeLayout>

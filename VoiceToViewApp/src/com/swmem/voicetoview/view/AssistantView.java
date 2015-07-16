@@ -29,9 +29,9 @@ public class AssistantView implements OnClickListener {
 		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.view = inflater.inflate(R.layout.view_assistant, null);
 		this.handler = handler;
-		this.listView = (ListView) view.findViewById(R.id.lv_chunk);
+		this.listView = (ListView) view.findViewById(R.id.lv_model);
 		this.modelList = new ArrayList<Model>();
-		this.listAdapter = new ModelListAdapter(c, R.layout.item_chunk, modelList);
+		this.listAdapter = new ModelListAdapter(c, R.layout.item_model, modelList);
 		this.listView.setAdapter(listAdapter);
 		Button hideBtn = (Button) view.findViewById(R.id.btn_hide);
 		hideBtn.setOnClickListener(this);

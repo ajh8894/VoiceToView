@@ -8,6 +8,7 @@ import com.swmem.voicetoview.data.Model;
 public class ClientWriter extends Thread {
 	private Client client;
 	private BlockingQueue<Model> senderQueue;
+	//private Integer order;
 
 	public ClientWriter(Client client, BlockingQueue<Model> senderDeque) {
 		this.client = client;
@@ -20,6 +21,7 @@ public class ClientWriter extends Thread {
 		try {
 			while (client.isActivated() && client.getSocket().isConnected() && !client.getSocket().isClosed()) {
 				m = senderQueue.take();
+				//order++;
 				if (m != null)
 					client.sendToClient(m);
 			}

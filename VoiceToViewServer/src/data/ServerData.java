@@ -11,6 +11,6 @@ import com.swmem.voicetoview.data.Model;
 
 public class ServerData {
 	public static HashMap<String, Client> clients = new HashMap<String, Client>();
-	public static BlockingQueue<Model> receiverQueue = new ArrayBlockingQueue<>(2024);
-	public static BlockingQueue<Model> senderQueue = new PriorityBlockingQueue<>(1024);
+	public static BlockingQueue<Model> receiverQueue = new ArrayBlockingQueue<Model>(2024);
+	public static BlockingQueue<Model> senderQueue = new PriorityBlockingQueue<Model>(1024);
 }

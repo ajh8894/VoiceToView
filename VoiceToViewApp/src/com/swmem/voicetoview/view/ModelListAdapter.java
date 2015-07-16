@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.swmem.voicetoview.R;
+import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Model;
 
 public class ModelListAdapter extends BaseAdapter {
@@ -56,19 +57,35 @@ public class ModelListAdapter extends BaseAdapter {
 			viewHolder = new ViewHolder();
 			
 			
-			//viewHolder.icon = (ImageView) convertView.findViewById(R.id.iconImage);
+			viewHolder.emotion = (ImageView) convertView.findViewById(R.id.iv_emotion);
 			viewHolder.message = (TextView) convertView.findViewById(R.id.tv_message);
 			viewHolder.date = (TextView) convertView.findViewById(R.id.tv_date);
-/*			switch (item.getEmotion()) {
-			
-			}*/
+			switch (item.getEmotionType()) {
+			case Constants.SAD:
+				viewHolder.emotion.setImageResource(R.drawable.sad);
+				break;
+			case Constants.NATURAL:
+				viewHolder.emotion.setImageResource(R.drawable.natural);
+				break;
+			case Constants.ANGRY:
+				viewHolder.emotion.setImageResource(R.drawable.angry);
+				break;
+			case Constants.HAPPY:
+				viewHolder.emotion.setImageResource(R.drawable.happy);
+				break;
+			default:
+				break;
+			}
 			convertView.setTag(viewHolder);
 		} else {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
-
-		viewHolder.message.setText(item.getTextResult());
-		viewHolder.date.setText(item.getDate());
+		
+		if(item.getTextResult() != null)
+			viewHolder.message.setText(item.getTextResult());
+		if(item.getTextResult() != null)
+			viewHolder.date.setText(item.getDate());
+		
 		return convertView;
 	}
 	public void reflesh(List<Model> list) {

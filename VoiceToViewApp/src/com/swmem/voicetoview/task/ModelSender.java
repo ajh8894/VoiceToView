@@ -52,7 +52,7 @@ public class ModelSender extends Thread {
 
 				socket = new Socket(Constants.SVM_SERVER_IP, Constants.SVM_SERVER_PORT);
 				oos = new ObjectOutputStream(socket.getOutputStream());
-				oos.reset();
+				//oos.reset();
 				oos.writeObject(m);
 				oos.flush();
 				close();

@@ -8,13 +8,21 @@ public class Constants {
 	public static final String KIND_SEND = "sender";
 	public static final String KIND_END = "disconnect";
 	
+	// emotion
+	public static final int SAD = 1;
+	public static final int NATURAL = 2;
+	public static final int ANGRY = 3;
+	public static final int HAPPY = 4;
+	
 	// server	
 	public static final String CONNECT_SERVER_IP = "211.189.127.145";
 	public static final int CONNECT_SERVER_PORT = 8080;
-/*	public static final String SVM_SERVER_IP = "211.189.127.218";
-	public static final int SVM_SERVER_PORT = 3577;*/
-	public static final String SVM_SERVER_IP = "211.189.127.145";
-	public static final int SVM_SERVER_PORT = 8090;
+	
+	public static final String SVM_SERVER_IP = "211.189.127.217";
+	public static final int SVM_SERVER_PORT = 3577;
+	
+/*	public static final String SVM_SERVER_IP = "211.189.127.145";
+	public static final int SVM_SERVER_PORT = 8090;*/
 	
 	// sqlite option
 	public static final int VIEW_OFF = 0;

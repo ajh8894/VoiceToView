@@ -17,6 +17,7 @@ public class Client implements Runnable {
 	private ObjectOutputStream oos;
 	private String type;
 	private String from, to;
+	private Integer order;
 	private boolean isActivated;
 	private BlockingQueue<Model> senderQueue;
 	private ClientWriter clientWriter;
@@ -46,6 +47,14 @@ public class Client implements Runnable {
 
 	public void setActivated(boolean isActivated) {
 		this.isActivated = isActivated;
+	}
+
+	public Integer getOrder() {
+		return order;
+	}
+
+	public void setOrder(Integer order) {
+		this.order = order;
 	}
 
 	synchronized public BlockingQueue<Model> getSenderQueue() {

@@ -6,7 +6,6 @@ import java.net.Socket;
 
 import client.Client;
 import data.Constants;
-import data.ServerData;
 
 public class ClientAcceptor extends Thread {
 	private ServerSocket serverSocket;
@@ -19,10 +18,6 @@ public class ClientAcceptor extends Thread {
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("Client connection accepted");
-				System.out.println("-----------------------");
-				System.out.println("현재 유저 " + ServerData.clients.size());
-				System.out.println("-----------------------");
-				System.out.println("");
 				Client client = new Client(clientSocket);
 				new Thread(client).start();
 			}

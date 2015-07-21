@@ -74,6 +74,7 @@ public class ModelListAdapter extends BaseAdapter {
 				viewHolder.emotion.setImageResource(R.drawable.happy);
 				break;
 			default:
+				viewHolder.emotion.setImageResource(R.drawable.user_icon);
 				break;
 			}
 			convertView.setTag(viewHolder);
@@ -88,8 +89,8 @@ public class ModelListAdapter extends BaseAdapter {
 		
 		return convertView;
 	}
-	public void reflesh(List<Model> list) {
+/*	public void reflesh(List<Model> list) {
 		this.mItemList = list;
 		notifyDataSetChanged();
-	}
+	}*/
 }

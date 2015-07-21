@@ -29,16 +29,15 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 			public void onCallStateChanged(int state, String incomingNumber){
                 if(state != pState){
                     if(state == TelephonyManager.CALL_STATE_IDLE){
-                        Log.i("Phone","IDLE");
+                        Log.i(LOG_TAG,"IDLE");
                         if(header != null){
                         	header = null;
 
-                        	Intent serviceIntent = new Intent(c, VoiceToViewService.class); //명시적 인텐트, 롤리팝
+                        	Intent serviceIntent = new Intent(c, VoiceToViewService.class);
                             c.stopService(serviceIntent);
                         }
                     }
                     else if(state == TelephonyManager.CALL_STATE_RINGING){
-                        Log.i("Phone","RINGING");
                         header = new String[3];
                         header[1] = telManager.getLine1Number();
                         header[2] = incomingNumber;
@@ -49,9 +48,15 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 							header[0] = Constants.KIND_RECEIVE;
 						else
 							header[0] = Constants.KIND_SEND;
-						Log.i(LOG_TAG, "OFFHOOK " + header[0] + " " + header[1] + " " + header[2]);
+						
 						Intent serviceIntent = new Intent(c, VoiceToViewService.class);
 						serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, header);
+						
+						if (option.getGender() == Constants.MALE)
+							serviceIntent.putExtra(Constants.SERVICE_EXTRA_GENDER, true);
+						else
+							serviceIntent.putExtra(Constants.SERVICE_EXTRA_GENDER, false);
+						Log.i(LOG_TAG, "OFFHOOK " + header[0] + " " + header[1] + " " + header[2] + " " + option.getGender());
 						c.startService(serviceIntent);
                     }
                      
@@ -61,7 +66,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
         }, PhoneStateListener.LISTEN_CALL_STATE);
          
         if(intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)){
-            Log.i("Phone","OUT");
+            Log.i(LOG_TAG, "OUT");
             header = new String[3];
             header[1] = telManager.getLine1Number();
             header[2] = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);

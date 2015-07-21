@@ -10,6 +10,7 @@ import android.util.Log;
 
 public class Connection {
 	public static String[] header;
+	public static boolean gender;
 	public static Socket socket;
 	public static ObjectOutputStream oos;
 	public static ObjectInputStream ois;

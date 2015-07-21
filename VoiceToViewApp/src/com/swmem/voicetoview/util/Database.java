@@ -1,5 +1,6 @@
 package com.swmem.voicetoview.util;
 
+import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.User;
 
 import android.content.Context;
@@ -11,16 +12,19 @@ public class Database {
 	public final int DEFAULT_MODE = 0;
 	public final int DEFAULT_TEST_SIZE = 10;
 	public final String DEFAULT_TEST_STYLE = "?";
-	
+
 	public static void openOrCreateDB(Context con) {
 		if (db == null)
 			db = con.openOrCreateDatabase("UserOption.db", 2, null);
 		synchronized (db) {
-			Cursor c = db.rawQuery("select name from sqlite_master where type = 'table' and name = 'user'", null);
-			
+			Cursor c = db
+					.rawQuery(
+							"select name from sqlite_master where type = 'table' and name = 'user'",
+							null);
+
 			if (!c.moveToFirst()) {
 				createUser();
-				insertUser(new User(0, 0, "0"));
+				insertUser(new User(Constants.VIEW_OFF, Constants.MALE));
 			}
 		}
 	}
@@ -32,7 +36,7 @@ public class Database {
 	public static void createUser() {
 		try {
 			db.execSQL("create table user(" + "mode integer, "
-					+ "textsize integer, " + "textstyle text)");
+					+ "gender integer)");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -42,17 +46,16 @@ public class Database {
 	public static void insertUser(User u) {
 		try {
 			db.execSQL("insert into user values ('" + u.getMode() + "','"
-					+ u.getTextSize() + "','" + u.getTextStyle() + "')");
+					+ u.getGender() + "')");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void updateUser(User u) {
 		try {
 			db.execSQL("update user set mode = '" + u.getMode()
-					+ "', textsize = '" + u.getTextSize() + "', textstyle = '"
-					+ u.getTextStyle() + "'");
+					+ "', gender = '" + u.getGender() + "'");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -66,8 +69,7 @@ public class Database {
 			c.moveToNext();
 			u = new User();
 			u.setMode(c.getInt(0));
-			u.setTextSize(c.getInt(1));
-			u.setTextStyle(c.getString(2));
+			u.setGender(c.getInt(1));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

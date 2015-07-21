@@ -7,7 +7,6 @@ import java.net.Socket;
 import com.swmem.voicetoview.data.Model;
 
 import data.Constants;
-import data.ServerData;
 
 public class SVMServerConnector extends Thread {
 	private Socket socket;
@@ -16,19 +15,16 @@ public class SVMServerConnector extends Thread {
 	@Override
 	public void run() {
 		try {
-			System.out.println("run");
 			if (socket == null || !socket.isConnected() || socket.isClosed()) {
 				socket = new Socket(Constants.SVM_SERVER_IP, Constants.SVM_SERVER_PORT);
-				System.out.println("socket open");
 				ois = new ObjectInputStream(socket.getInputStream());
-				System.out.println("InputStream open");
-				System.out.println("Svm server connect()");
+				System.out.println("SVM server connect()");
 			}
 
 			while (true) {
 				Model m = (Model) ois.readObject();
 				System.out.println(m.getMessageNum() + " " + m.getFrom() + " " + m.getTo() + " " + m.getEmotionType() + " " + m.getTextResult());
-				ServerData.receiverQueue.put(m);
+				Constants.receiverQueue.put(m);
 			}
 		} catch (IOException | InterruptedException | ClassNotFoundException e) {
 			e.printStackTrace();

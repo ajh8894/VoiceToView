@@ -3,7 +3,7 @@ package com.swmem.voicetoview.data;
 public class Constants {
 	// header
 	public static final String SERVICE_EXTRA_HEADER = "header";
-	public static final String SERVICE_EXTRA_KIND_CALL = "call";
+	public static final String SERVICE_EXTRA_GENDER = "gender";
 	public static final String KIND_RECEIVE = "receiver";
 	public static final String KIND_SEND = "sender";
 	public static final String KIND_END = "disconnect";
@@ -16,19 +16,19 @@ public class Constants {
 	
 	// server	
 	public static final String CONNECT_SERVER_IP = "211.189.127.145";
-	public static final int CONNECT_SERVER_PORT = 8080;
+	public static final int CONNECT_SERVER_PORT = 8894;
 	
-	public static final String SVM_SERVER_IP = "211.189.127.217";
+/*	public static final String SVM_SERVER_IP = "211.189.127.217";
+	public static final int SVM_SERVER_PORT = 3577;*/
+	
+	public static final String SVM_SERVER_IP = "211.189.127.145";
 	public static final int SVM_SERVER_PORT = 3577;
-	
-/*	public static final String SVM_SERVER_IP = "211.189.127.145";
-	public static final int SVM_SERVER_PORT = 8090;*/
 	
 	// sqlite option
 	public static final int VIEW_OFF = 0;
 	public static final int VIEW_ON = 1;
-	public static final int MALE = 0;
-	public static final int FEMALE = 1;
+	public static final int FEMALE = 0;
+	public static final int MALE = 1;
 	
 	// task option
 	public static final int HIDE_VIEW = 0;

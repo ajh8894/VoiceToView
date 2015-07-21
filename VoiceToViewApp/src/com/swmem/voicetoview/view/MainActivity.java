@@ -39,12 +39,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		if (option.getMode() == Constants.VIEW_OFF) {
 			btnLayout[0].setBackgroundColor(Color.WHITE);
-			header[0] = Constants.KIND_SEND; // 종류
+			header[0] = Constants.KIND_SEND; // 醫�瑜�
 			header[1] = "01086048894"; // from
 			header[2] = "01067108898"; // to
 		} else {
 			btnLayout[0].setBackgroundColor(Color.RED);
-			header[0] = Constants.KIND_RECEIVE; // 종류
+			header[0] = Constants.KIND_RECEIVE; // 醫�瑜�
 			header[1] = "01067108898"; // from
 			header[2] = "01086048894"; // to
 		}
@@ -74,22 +74,16 @@ public class MainActivity extends Activity implements OnClickListener {
 				option.setMode(Constants.VIEW_ON);
 				Database.updateUser(option);
 				btnLayout[0].setBackgroundColor(Color.RED);
-/*				
-				header[0] = Constants.KIND_RECEIVE; // 종류
+				header[0] = Constants.KIND_RECEIVE; // 醫�瑜�
 				header[1] = "01067108898"; // from
 				header[2] = "01086048894"; // to
-*/				
-				header[0] = Constants.KIND_RECEIVE; // 종류
-				header[1] = "01066664444"; // from
-				header[2] = "05050505050"; // to
 			} else {
 				option.setMode(Constants.VIEW_OFF);
 				Database.updateUser(option);
 				btnLayout[0].setBackgroundColor(Color.WHITE);
-				
-				header[0] = Constants.KIND_RECEIVE; // 종류
-				header[1] = "05050505050"; // from
-				header[2] = "01066664444"; // to
+				header[0] = Constants.KIND_SEND; // 醫�瑜�
+				header[1] = "01086048894"; // from
+				header[2] = "01067108898"; // to
 
 			}
 
@@ -106,8 +100,16 @@ public class MainActivity extends Activity implements OnClickListener {
 			stopService(serviceIntent1);
 			break;
 		case R.id.theme_layout:
+			btnLayout[0].setBackgroundColor(Color.BLUE);
+			header[0] = Constants.KIND_RECEIVE; 
+			header[1] = "01052995400"; // from
+			header[2] = "01069048989"; // to
 			break;
 		case R.id.data_layout:
+			btnLayout[0].setBackgroundColor(Color.BLUE);
+			header[0] = Constants.KIND_RECEIVE; 
+			header[1] = "01069048989"; // from
+			header[2] = "01052995400"; // to
 			break;
 		case R.id.help_layout:
 			break;

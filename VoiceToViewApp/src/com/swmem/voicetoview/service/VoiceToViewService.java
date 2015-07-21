@@ -151,6 +151,8 @@ public class VoiceToViewService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "onStartCommand");
 		Connection.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
+		Connection.gender = intent.getBooleanExtra(Constants.SERVICE_EXTRA_GENDER, true);
+		Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2] + " " + Connection.gender);
 		startAllTasks();
 		
 		return super.onStartCommand(intent, flags, startId);
@@ -177,7 +179,6 @@ public class VoiceToViewService extends Service {
 		mModelSender = new ModelSender(mSenderQueue, mSenderHandler);
 		
 		mAudioPauser.pause();
-		Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2]);
 		mOperator.start();
 	}
 
@@ -247,14 +248,11 @@ public class VoiceToViewService extends Service {
 			mRecorder.stop();
 
 		try {
-			Model model = new Model(Connection.header[1], Connection.header[2], true, order++, mRecorder.consumeRecordingAndTruncate());
+			Model model = new Model(Connection.header[1], Connection.header[2], Connection.gender, order++, mRecorder.consumeRecordingAndTruncate());
 			mSenderQueue.put(model);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-			/*ModelProducer aModelProducer = new ModelProducer(mSenderQueue, order++, mRecorder.consumeRecordingAndTruncate());
-			new Thread(aModelProducer).start();*/
-		
 		
 		mRecorder.release();
 

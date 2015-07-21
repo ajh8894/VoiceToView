@@ -25,8 +25,7 @@ public class Model implements Serializable, Comparable<Model> {
 
 	}
 
-	public Model(String from, String to, boolean man, int messageNum,
-			byte[] buffers) {
+	public Model(String from, String to, boolean man, int messageNum, byte[] buffers) {
 		this.from = from;
 		this.to = to;
 		this.man = man;

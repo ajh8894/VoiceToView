@@ -1,7 +1,7 @@
 package main;
 
 
-public class MainServer {
+public class ServerOperator {
 	public static void main(String[] args) {
 		SVMServerConnector svmServerConnector = new SVMServerConnector();
 		svmServerConnector.start();

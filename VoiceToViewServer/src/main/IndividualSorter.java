@@ -1,7 +1,8 @@
 package main;
+
 import com.swmem.voicetoview.data.Model;
 
-import data.ServerData;
+import data.Constants;
 
 public class IndividualSorter extends Thread {
 	@Override
@@ -9,14 +10,12 @@ public class IndividualSorter extends Thread {
 		super.run();
 		while (true) {
 			try {
-				Model m = (Model) ServerData.receiverQueue.take();
-				
-				if (ServerData.clients.containsKey(m.getTo())) {
-					if(ServerData.clients.get(m.getTo()).getSenderQueue() != null) {
-						ServerData.clients.get(m.getTo()).putSenderQueue(m);
-					}
+				Model m = (Model) Constants.receiverQueue.take();
+
+				if (Constants.clients.containsKey(m.getTo()) && Constants.clients.get(m.getTo()).getSenderQueue() != null) {
+					Constants.clients.get(m.getTo()).putSenderQueue(m);
 				} else {
-					ServerData.receiverQueue.put(m);
+					//Constants.receiverQueue.put(m);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();

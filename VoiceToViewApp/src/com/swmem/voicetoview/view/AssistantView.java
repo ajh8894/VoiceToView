@@ -26,12 +26,14 @@ public class AssistantView implements OnClickListener {
 	private List<Model> modelList;
 
 	public AssistantView(Context c, WindowManager wManager, Handler handler) {
-		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater inflater = (LayoutInflater) c
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.view = inflater.inflate(R.layout.view_assistant, null);
 		this.handler = handler;
 		this.listView = (ListView) view.findViewById(R.id.lv_model);
 		this.modelList = new ArrayList<Model>();
-		this.listAdapter = new ModelListAdapter(c, R.layout.item_model, modelList);
+		this.listAdapter = new ModelListAdapter(c, R.layout.item_model,
+				modelList);
 		this.listView.setAdapter(listAdapter);
 		Button hideBtn = (Button) view.findViewById(R.id.btn_hide);
 		hideBtn.setOnClickListener(this);
@@ -50,10 +52,27 @@ public class AssistantView implements OnClickListener {
 		return view;
 	}
 
-	public void modelListAdd(Model m) {
+	synchronized public void modelListAdd(Model m) {
 		if (m != null) {
+			for (Model model : modelList) {
+				if (m.getMessageNum() == model.getMessageNum()) {
+					if (m.getTextResult() != null) {
+						if (model.getTextResult() == null) {
+							model.setTextResult(m.getTextResult());
+							listAdapter.notifyDataSetChanged();
+							return;
+						}
+					} else if (m.getEmotionType() != 0) {
+						if (model.getEmotionType() == 0) {
+							model.setEmotionType(m.getEmotionType());
+							listAdapter.notifyDataSetChanged();
+							return;
+						}
+					}
+				}
+			}
 			modelList.add(m);
-			listAdapter.reflesh(modelList);
+			//listAdapter.reflesh(modelList);
 		}
 	}
 

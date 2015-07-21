@@ -9,16 +9,16 @@ import java.util.concurrent.PriorityBlockingQueue;
 import com.swmem.voicetoview.data.Model;
 
 import data.Constants;
-import data.ServerData;
 
 public class Client implements Runnable {
+	private boolean isActivated;
 	private Socket socket;
-	private ObjectInputStream ois;
-	private ObjectOutputStream oos;
+	public ObjectInputStream ois;
+	public ObjectOutputStream oos;
 	private String type;
 	private String from, to;
 	private Integer order;
-	private boolean isActivated;
+	private Integer isCompleted;
 	private BlockingQueue<Model> senderQueue;
 	private ClientWriter clientWriter;
 
@@ -33,20 +33,20 @@ public class Client implements Runnable {
 		}
 	}
 	
-	public Socket getSocket() {
-		return socket;
-	}
-
-	public String getType() {
-		return type;
-	}
-
 	public boolean isActivated() {
 		return isActivated;
 	}
 
 	public void setActivated(boolean isActivated) {
 		this.isActivated = isActivated;
+	}
+
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public String getType() {
+		return type;
 	}
 
 	public Integer getOrder() {
@@ -57,8 +57,20 @@ public class Client implements Runnable {
 		this.order = order;
 	}
 
+	public Integer getIsCompleted() {
+		return isCompleted;
+	}
+
+	public void setIsCompleted(Integer isCompleted) {
+		this.isCompleted = isCompleted;
+	}
+
 	synchronized public BlockingQueue<Model> getSenderQueue() {
 		return senderQueue;
+	}
+
+	public void setSenderQueue(BlockingQueue<Model> senderQueue) {
+		this.senderQueue = senderQueue;
 	}
 
 	synchronized public void putSenderQueue(Model m) {
@@ -70,9 +82,13 @@ public class Client implements Runnable {
 	}
 	
 	public void sendToClient(Model m) throws IOException {
-		//oos.reset();
+		oos.reset();
 		oos.writeObject(m);
 		oos.flush();
+	}
+	
+	public boolean readFromClient() throws IOException {
+		return ois.readBoolean();
 	}
 	
 	public ClientWriter getClientWriter() {
@@ -97,14 +113,14 @@ public class Client implements Runnable {
 		}
 	}
 
-	private void checkEachOther(boolean target, boolean mode) throws IOException {
+	private void checkEachOther(boolean target) throws IOException {
 		if(target) {
-			if (mode) {
-				System.out.println(target + " "	+ Constants.KIND_RECEIVE);
+			if (Constants.clients.get(to).getType().equals(Constants.KIND_RECEIVE)) {
+				//System.out.println(target + " "	+ Constants.KIND_RECEIVE + " operator");
 				oos.writeBoolean(true);
 				oos.flush();
 			} else {
-				System.out.println(target + " "	+ Constants.KIND_SEND);
+				//System.out.println(target + " "	+ Constants.KIND_SEND + " operator");
 				oos.writeBoolean(false);
 				oos.flush();
 			}
@@ -125,103 +141,109 @@ public class Client implements Runnable {
 			
 			//client disconnect
 			if(header[0].equals(Constants.KIND_END)) {
-				if(ServerData.clients.containsKey(from)) {
-					Client client = ServerData.clients.get(from);
+				if(Constants.clients.containsKey(from)) {
+					Client client = Constants.clients.get(from);
 					client.setActivated(false);
+					client.setSenderQueue(null);
+					
 					synchronized (client) {
 						client.close();
 						client.notify();
 					}
-					if(client.getType().equals(Constants.KIND_RECEIVE)) {
-						if(client.getClientWriter() != null) {
-							if(client.getClientWriter().isAlive()) {
-								client.getClientWriter().interrupt();
-							}
-						}
+					if (client.getType().equals(Constants.KIND_RECEIVE)
+							&& client.getClientWriter() != null
+							&& client.getClientWriter().isAlive()) {
+						client.getClientWriter().interrupt();
 					}
 					close();
-					ServerData.clients.remove(from, client);
-					//ServerData.clients.remove(from, this);
+					Constants.clients.remove(from, client);
 					System.out.println(from + " Bye Bye");
-					return;
 				}
+				return;
 			}
 			// client connect, reconnect distinguish
-			if (!ServerData.clients.containsKey(from)) { // connect
+			if (!Constants.clients.containsKey(from)) { // connect
 				System.out.println("client connect");
-				ServerData.clients.put(from, this);
+				Constants.clients.put(from, this);
 				
-				if (!ServerData.clients.containsKey(to)) { //call sender flow
+				if (!Constants.clients.containsKey(to)) { //call sender flow
 					synchronized (this) {
 						System.out.println(from + " wait!!");
 						wait(Constants.SENDER_TIMEOUT); //block
 						System.out.println(from + " wake up!!");
 					}
-					if(ServerData.clients.get(to) != null) {
-						checkEachOther(ServerData.clients.containsKey(to), ServerData.clients.get(to).getType().equals(Constants.KIND_RECEIVE));
-					} else {
-						isActivated = false;
-					}
+					checkEachOther(Constants.clients.containsKey(to));
+					
 				} else { //call receiver flow
-					Client callSender = ServerData.clients.get(to);
-					if (callSender != null) {
-						synchronized (callSender) {
+					if (Constants.clients.get(to) != null) {
+						synchronized (Constants.clients.get(to)) {
 							System.out.println(from + "->" + to + " notify!!");
-							callSender.notify();
+							Constants.clients.get(to).notify();
 						}
-						if(ServerData.clients.get(to) != null) {
-							checkEachOther(callSender.getSocket().isConnected(), callSender.getType().equals(Constants.KIND_RECEIVE));
-						} else {
-							isActivated = false;
-						}
+						checkEachOther(Constants.clients.get(to).getSocket().isConnected());
 					}
 				}
 			} else { // reconnect
-				Client client = ServerData.clients.get(from);
+				Client client = Constants.clients.get(from);
 				if (client != null) {
 					isActivated = client.isActivated();
 					if (isActivated) {
 						if (client.getType().equals(Constants.KIND_RECEIVE)) {
-							client.isActivated = false;
-							this.senderQueue = new PriorityBlockingQueue<Model>(512);
-							this.clientWriter = new ClientWriter(this, senderQueue);
-							this.clientWriter.start();
-							if (client.getSenderQueue() != null && !client.getSenderQueue().isEmpty()) {
-								if(client.getSenderQueue() == null)
-									System.out.println("null");
-								else 
-									System.out.println("not null");
-								this.senderQueue.addAll(client.getSenderQueue());
+							client.setActivated(false);
+							
+							if (client.getOrder() != null) {
+								this.order = client.getOrder();
 							}
+							else {
+								this.order = new Integer(0);
+							}
+
+							if (client.getIsCompleted() != null)
+								this.isCompleted = client.getIsCompleted();
+							else
+								this.isCompleted = new Integer(0);
+
 							if (client.getClientWriter() != null && client.getClientWriter().isAlive()) {
 								client.getClientWriter().interrupt();
 							}
+							
+							if (client.getSenderQueue() != null && !client.getSenderQueue().isEmpty()) {
+								this.senderQueue = client.getSenderQueue();
+							}
 						}
 					} else {
-						checkEachOther(ServerData.clients.containsKey(to), ServerData.clients.get(to).getType().equals(Constants.KIND_RECEIVE));
+						checkEachOther(Constants.clients.containsKey(to));
 					}
+					
 					synchronized (client) {
 						client.close();
 						client.notify();
 					}
 					System.out.println("Client reconnect");
-					ServerData.clients.replace(from, this);
+					Constants.clients.replace(from, this);
 				}
 			}
 			
 			if(isActivated) { //operation
 				System.out.println("Connect success");
 				if (type.equals(Constants.KIND_RECEIVE)) { // writer
-					System.out.println("writer run");
-					this.senderQueue = new PriorityBlockingQueue<Model>(512);
-					this.clientWriter = new ClientWriter(this, senderQueue);
+					System.out.println("Writer run");
+					if(senderQueue == null)
+						this.senderQueue = new PriorityBlockingQueue<Model>(512);
+					if(order == null) {
+						this.order = new Integer(0);
+					}
+					if(isCompleted == null)
+						this.isCompleted = new Integer(0);
+					
+					this.clientWriter = new ClientWriter(this);
 					this.clientWriter.start();
 				}
-/*				if (ServerData.clients.get(to).getType().equals(Constants.KIND_RECEIVE)) { // read
+/*				if (Constants.clients.get(to).getType().equals(Constants.KIND_RECEIVE)) { // read
 					while (isActivated && socket.isConnected() && !socket.isClosed()) {
 						Object receiveObject = ois.readObject();
 						if(receiveObject != null) {
-							ServerData.receiverQueue.put(receiveObject);
+							Constants.receiverQueue.put(receiveObject);
 						}
 					}
 					close();
@@ -233,6 +255,11 @@ public class Client implements Runnable {
 		} catch (ClassNotFoundException | IOException | InterruptedException e) {
 			e.printStackTrace();
 			close();
+		} finally {
+			System.out.println("-----------------------");
+			System.out.println("현재 사용자 수 " + Constants.clients.size());
+			System.out.println("-----------------------");
+			System.out.println("");
 		}
 	}
 }

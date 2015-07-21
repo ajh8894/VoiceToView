@@ -2,17 +2,14 @@ package com.swmem.voicetoview.data;
 
 public class User {
 	private int mode;
-	private int textSize;
-	private String textStyle;
-
-	public User(int mode, int textSize, String textStyle) {
-		this.mode = mode;
-		this.textStyle = textStyle;
-		this.textSize = textSize;
-	}
+	private int gender;
 
 	public User() {
-		// TODO Auto-generated constructor stub
+	}
+
+	public User(int mode, int gender) {
+		this.mode = mode;
+		this.gender = gender;
 	}
 
 	public int getMode() {
@@ -23,19 +20,11 @@ public class User {
 		this.mode = mode;
 	}
 
-	public String getTextStyle() {
-		return textStyle;
+	public int getGender() {
+		return gender;
 	}
 
-	public void setTextStyle(String textStyle) {
-		this.textStyle = textStyle;
-	}
-
-	public int getTextSize() {
-		return textSize;
-	}
-
-	public void setTextSize(int textSize) {
-		this.textSize = textSize;
+	public void setGender(int gender) {
+		this.gender = gender;
 	}
 }

@@ -6,7 +6,6 @@ import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.util.Log;
 
 public class AudioPauser {
-
 	private final AudioManager mAudioManager;
 	private final OnAudioFocusChangeListener mAfChangeListener;
 	private int mCurrentVolume;
@@ -58,5 +57,4 @@ public class AudioPauser {
 			Log.i("AudioPauser: resume: ", "" + mCurrentVolume);
 		}
 	}
-
 }

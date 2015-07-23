@@ -17,7 +17,7 @@ public class ClientAcceptor extends Thread {
 
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
-				System.out.println("Client connection accepted");
+				System.out.println("client connection accepted");
 				Client client = new Client(clientSocket);
 				new Thread(client).start();
 			}

@@ -20,7 +20,7 @@ public class Connection {
 			socket = new Socket(Constants.CONNECT_SERVER_IP, Constants.CONNECT_SERVER_PORT);
 			ois = new ObjectInputStream(socket.getInputStream());
 			oos = new ObjectOutputStream(socket.getOutputStream());
-			Log.d("Connection connect()", "initConnection()");
+			Log.d(Connection.class.getName(), "connect");
 			if(type == Constants.DISCONNECT) {
 				header[0] = Constants.KIND_END;
 			} 
@@ -30,7 +30,7 @@ public class Connection {
 	}
 
 	synchronized public static void disconnect() {
-		Log.d("Connection connect()", "disconnect()");
+		Log.d(Connection.class.getName(), "disconnect");
 		try {
 			if (ois != null) {
 				ois.close();
@@ -45,6 +45,7 @@ public class Connection {
 				Log.d("Socket", "close");
 			}
 		} catch (IOException e) {
+			Log.e(Connection.class.getName(), "IOException");
 			e.printStackTrace();
 		} finally {
 			ois = null;

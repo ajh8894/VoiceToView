@@ -28,15 +28,14 @@ public class Constants {
 	public static final String KIND_END = "disconnect";
 
 	// error
-	public static final int RECEIVER_TIMEOUT = 60000;
-	public static final int SENDER_TIMEOUT = 60000;
+	public static final int SENDER_TIMEOUT = 60000 * 3;
 	public static final int MESSAGE_TIMEOUT = 10000;
 	public static final int MESSAGE_SEND_COMPLETE = 2;
-	public static final int EMOTION_NOT_COMPLETE = 0;
 	public static final int SILENCE = 5;
 	public static final String SPEECH_FAIL = "X";
 	
 	//emotion
+	public static final int EMOTION_NOT_COMPLETE = 0;
 	public static final int SAD = 1;
 	public static final int NATURAL = 2;
 	public static final int ANGRY = 3;

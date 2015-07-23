@@ -72,7 +72,7 @@ public class VoiceToViewService extends Service {
 	private Handler mReceiverHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			Log.d("receiverHandler", String.valueOf(msg.what));
+			Log.d(LOG_TAG, "receiverHandler: "+ String.valueOf(msg.what));
 			switch (msg.what) {
 			case Constants.CONNECT:
 				mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
@@ -108,7 +108,7 @@ public class VoiceToViewService extends Service {
 	private Handler mSenderHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			Log.d("senderHandler", String.valueOf(msg.what));
+			Log.d(LOG_TAG, "senderHandler: " + String.valueOf(msg.what));
 			switch (msg.what) {
 			case Constants.CONNECT_INIT:
 				mOperator = new TaskOperator(Constants.CONNECT_INIT, mSenderHandler, mReceiverHandler);
@@ -150,9 +150,14 @@ public class VoiceToViewService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "onStartCommand");
-		Connection.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
-		Connection.gender = intent.getBooleanExtra(Constants.SERVICE_EXTRA_GENDER, true);
-		Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2] + " " + Connection.gender);
+		//Connection.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
+		if(intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER) != null)
+			Connection.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
+		else 
+			Log.e(LOG_TAG, "header null");
+		Connection.gender = intent.getBooleanExtra(Constants.SERVICE_EXTRA_GENDER, true); //true: male, false: female
+		if(Connection.header != null)
+				Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2] + " " + Connection.gender);
 		startAllTasks();
 		
 		return super.onStartCommand(intent, flags, startId);
@@ -161,8 +166,8 @@ public class VoiceToViewService extends Service {
 	@Override
 	public void onDestroy() {
 		Log.i(LOG_TAG, "onDestroy");
-		super.onDestroy();
 		stopAllTasks();
+		super.onDestroy();
 	}
 
 	private void startAllTasks() {
@@ -184,7 +189,6 @@ public class VoiceToViewService extends Service {
 
 	private void stopAllTasks() {
 		isActivated = false;
-		Connection.disconnect();
 		
 		if (mRecorder.getState() == State.READY || mRecorder.getState() == State.RECORDING)
 			mRecorder.stop();
@@ -194,7 +198,8 @@ public class VoiceToViewService extends Service {
 			mStopHandler.removeCallbacks(mStopRunnable);
 		}
 		
-		if (mOperator != null) {
+		if(mOperator != null) {
+			mOperator.setActivated(false);
 			if (mOperator.isAlive())
 				mOperator.interrupt();
 		}

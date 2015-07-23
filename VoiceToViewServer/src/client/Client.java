@@ -18,7 +18,7 @@ public class Client implements Runnable {
 	private String type;
 	private String from, to;
 	private Integer order;
-	private Integer isCompleted;
+	private Integer completed;
 	private BlockingQueue<Model> senderQueue;
 	private ClientWriter clientWriter;
 
@@ -32,7 +32,7 @@ public class Client implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public boolean isActivated() {
 		return isActivated;
 	}
@@ -48,6 +48,10 @@ public class Client implements Runnable {
 	public String getType() {
 		return type;
 	}
+	
+	public String getFrom() {
+		return from;
+	}
 
 	public Integer getOrder() {
 		return order;
@@ -56,13 +60,13 @@ public class Client implements Runnable {
 	public void setOrder(Integer order) {
 		this.order = order;
 	}
-
-	public Integer getIsCompleted() {
-		return isCompleted;
+	
+	public Integer getCompleted() {
+		return completed;
 	}
 
-	public void setIsCompleted(Integer isCompleted) {
-		this.isCompleted = isCompleted;
+	public void setCompleted(Integer completed) {
+		this.completed = completed;
 	}
 
 	synchronized public BlockingQueue<Model> getSenderQueue() {
@@ -130,21 +134,43 @@ public class Client implements Runnable {
 		}
 	}
 	
+	private void interaction() throws InterruptedException, IOException {
+		if (!Constants.clients.containsKey(to)) { //call sender flow
+			synchronized (this) {
+				System.out.println(from + " - wait");
+				wait(Constants.SENDER_TIMEOUT); //block
+				System.out.println(from + " - wait exit");
+				checkEachOther(Constants.clients.containsKey(to));
+			}
+		} else { //call receiver flow
+			if (Constants.clients.get(to) != null) {
+				synchronized (Constants.clients.get(to)) {
+					System.out.println(from + "->" + to + " notify!!");
+					Constants.clients.get(to).notify();
+					checkEachOther(Constants.clients.get(to).getSocket().isConnected());
+				}
+			}
+		}
+	}
+	
 	@Override
 	public void run() {
 		try {
 			String[] header = (String[]) ois.readObject();
-			type = header[0];
-			from = header[1];
-			to = header[2];
-			System.out.println("user: " + type + " " + from + " " + to);
+			if(header != null) {
+				type = header[0];
+				from = header[1];
+				to = header[2];
+				System.out.println("client connect - id(from): " + from + " type: " + type + " to: " + to);
+			} else {
+				return;
+			}
 			
 			//client disconnect
 			if(header[0].equals(Constants.KIND_END)) {
 				if(Constants.clients.containsKey(from)) {
 					Client client = Constants.clients.get(from);
 					client.setActivated(false);
-					client.setSenderQueue(null);
 					
 					synchronized (client) {
 						client.close();
@@ -155,34 +181,19 @@ public class Client implements Runnable {
 							&& client.getClientWriter().isAlive()) {
 						client.getClientWriter().interrupt();
 					}
+					client.setSenderQueue(null);
+					
 					close();
 					Constants.clients.remove(from, client);
-					System.out.println(from + " Bye Bye");
+					System.out.println(from + " - disconnect");
 				}
 				return;
 			}
 			// client connect, reconnect distinguish
 			if (!Constants.clients.containsKey(from)) { // connect
-				System.out.println("client connect");
+				System.out.println(from + " - new connect");
 				Constants.clients.put(from, this);
-				
-				if (!Constants.clients.containsKey(to)) { //call sender flow
-					synchronized (this) {
-						System.out.println(from + " wait!!");
-						wait(Constants.SENDER_TIMEOUT); //block
-						System.out.println(from + " wake up!!");
-					}
-					checkEachOther(Constants.clients.containsKey(to));
-					
-				} else { //call receiver flow
-					if (Constants.clients.get(to) != null) {
-						synchronized (Constants.clients.get(to)) {
-							System.out.println(from + "->" + to + " notify!!");
-							Constants.clients.get(to).notify();
-						}
-						checkEachOther(Constants.clients.get(to).getSocket().isConnected());
-					}
-				}
+				interaction();
 			} else { // reconnect
 				Client client = Constants.clients.get(from);
 				if (client != null) {
@@ -191,65 +202,57 @@ public class Client implements Runnable {
 						if (client.getType().equals(Constants.KIND_RECEIVE)) {
 							client.setActivated(false);
 							
-							if (client.getOrder() != null) {
+							if (client.getOrder() != null)
 								this.order = client.getOrder();
-							}
-							else {
-								this.order = new Integer(0);
-							}
-
-							if (client.getIsCompleted() != null)
-								this.isCompleted = client.getIsCompleted();
 							else
-								this.isCompleted = new Integer(0);
+								this.order = new Integer(0);
 
-							if (client.getClientWriter() != null && client.getClientWriter().isAlive()) {
+							if (client.getCompleted() != null)
+								this.completed = client.getCompleted();
+							else
+								this.completed = new Integer(0);
+
+							if (client.getClientWriter() != null
+									&& client.getClientWriter().isAlive()) {
 								client.getClientWriter().interrupt();
 							}
 							
-							if (client.getSenderQueue() != null && !client.getSenderQueue().isEmpty()) {
+							if (client.getSenderQueue() != null
+									&& !client.getSenderQueue().isEmpty()) {
 								this.senderQueue = client.getSenderQueue();
 							}
 						}
+						System.out.println(from + " - reconnect");
+						Constants.clients.replace(from, this);
 					} else {
-						checkEachOther(Constants.clients.containsKey(to));
+						synchronized (client) {
+							client.close();
+							client.notify();
+						}
+						System.out.println(from + " - reconnect");
+						Constants.clients.replace(from, this);
+						interaction();
 					}
-					
-					synchronized (client) {
-						client.close();
-						client.notify();
-					}
-					System.out.println("Client reconnect");
-					Constants.clients.replace(from, this);
 				}
 			}
 			
 			if(isActivated) { //operation
-				System.out.println("Connect success");
+				System.out.println(from + " - connect success");
 				if (type.equals(Constants.KIND_RECEIVE)) { // writer
-					System.out.println("Writer run");
-					if(senderQueue == null)
+					System.out.println(from + " - writer run");
+					if(this.senderQueue == null)
 						this.senderQueue = new PriorityBlockingQueue<Model>(512);
-					if(order == null) {
+					if(this.order == null) {
 						this.order = new Integer(0);
 					}
-					if(isCompleted == null)
-						this.isCompleted = new Integer(0);
+					if(this.completed == null)
+						this.completed = new Integer(0);
 					
 					this.clientWriter = new ClientWriter(this);
 					this.clientWriter.start();
 				}
-/*				if (Constants.clients.get(to).getType().equals(Constants.KIND_RECEIVE)) { // read
-					while (isActivated && socket.isConnected() && !socket.isClosed()) {
-						Object receiveObject = ois.readObject();
-						if(receiveObject != null) {
-							Constants.receiverQueue.put(receiveObject);
-						}
-					}
-					close();
-				}*/
 			} else {
-				System.out.println("Connect fail");
+				System.out.println(from +" - connect fail");
 				close();
 			}
 		} catch (ClassNotFoundException | IOException | InterruptedException e) {
@@ -257,9 +260,8 @@ public class Client implements Runnable {
 			close();
 		} finally {
 			System.out.println("-----------------------");
-			System.out.println("현재 사용자 수 " + Constants.clients.size());
+			System.out.println("current user - " + Constants.clients.size());
 			System.out.println("-----------------------");
-			System.out.println("");
 		}
 	}
 }

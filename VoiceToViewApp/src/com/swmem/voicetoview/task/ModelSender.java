@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.BlockingQueue;
 
 import android.os.Handler;
+import android.util.Log;
 
 import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Model;
@@ -35,6 +36,7 @@ public class ModelSender extends Thread {
 			if (socket != null)
 				socket.close();
 		} catch (IOException e) {
+			Log.e(ModelSender.class.getName(), "IOException");
 			e.printStackTrace();
 		} finally {
 			oos = null;
@@ -60,16 +62,20 @@ public class ModelSender extends Thread {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			Log.e(ModelSender.class.getName(), "IOException");
 			e.printStackTrace();
 			if (m != null) {
 				try {
 					senderQueue.put(m);
 				} catch (InterruptedException e1) {
+					Log.e(ModelSender.class.getName(), "InterruptedException");
 					e1.printStackTrace();
 				}
 			}
-			senderHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_RECONNECT);
+			if(isActivated)
+				senderHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_RECONNECT);
 		} catch (InterruptedException e) {
+			Log.e(ModelSender.class.getName(), "InterruptedException");
 			e.printStackTrace();
 		} finally {
 			close();

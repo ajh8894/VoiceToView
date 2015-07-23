@@ -3,7 +3,7 @@ package main;
 
 public class ServerOperator {
 	public static void main(String[] args) {
-		SVMServerConnector svmServerConnector = new SVMServerConnector();
+		SVMserverConnector svmServerConnector = new SVMserverConnector();
 		svmServerConnector.start();
 		
 		ClientAcceptor clientAcceptor = new ClientAcceptor();

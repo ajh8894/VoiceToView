@@ -20,7 +20,7 @@ public class Constants {
 	
 /*	public static final String SVM_SERVER_IP = "211.189.127.217";
 	public static final int SVM_SERVER_PORT = 3577;*/
-	
+
 	public static final String SVM_SERVER_IP = "211.189.127.145";
 	public static final int SVM_SERVER_PORT = 3577;
 	
@@ -35,7 +35,7 @@ public class Constants {
 	public static final int ASSISTANT_VIEW = 1;
 	public static final int MAX_RECORD_TIME = 15;
     public static final int TASK_DELAY_STOP = 1000;
-    public static final int TASK_DELAY_RECONNECT = 2000;
+    public static final int TASK_DELAY_RECONNECT = 3000;
 
 	public static final int CONNECT_INIT = 100;
     public static final int CONNECT = 200;

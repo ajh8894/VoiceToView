@@ -9,18 +9,12 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class Database {
 	public static SQLiteDatabase db;
-	public final int DEFAULT_MODE = 0;
-	public final int DEFAULT_TEST_SIZE = 10;
-	public final String DEFAULT_TEST_STYLE = "?";
 
 	public static void openOrCreateDB(Context con) {
 		if (db == null)
 			db = con.openOrCreateDatabase("UserOption.db", 2, null);
 		synchronized (db) {
-			Cursor c = db
-					.rawQuery(
-							"select name from sqlite_master where type = 'table' and name = 'user'",
-							null);
+			Cursor c = db.rawQuery("select name from sqlite_master where type = 'table' and name = 'user'", null);
 
 			if (!c.moveToFirst()) {
 				createUser();

@@ -12,6 +12,9 @@ import com.swmem.voicetoview.data.User;
 import com.swmem.voicetoview.service.VoiceToViewService;
 import com.swmem.voicetoview.util.Database;
 
+//State
+//receiver: IDLE -> OFFHOOK -> IDLE
+//sender: IDLE -> RINGING -> OFFHOOK -> IDLE
 public class PhoneStateReceiver extends BroadcastReceiver {
 	private final String LOG_TAG = PhoneStateReceiver.class.getName();
     private static int pState = TelephonyManager.CALL_STATE_IDLE;
@@ -66,7 +69,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
         }, PhoneStateListener.LISTEN_CALL_STATE);
          
         if(intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)){
-            Log.i(LOG_TAG, "OUT");
+            Log.i(LOG_TAG, "OUTGOING_CALL");
             header = new String[3];
             header[1] = telManager.getLine1Number();
             header[2] = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);

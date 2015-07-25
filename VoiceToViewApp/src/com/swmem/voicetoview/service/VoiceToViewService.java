@@ -1,5 +1,8 @@
 package com.swmem.voicetoview.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -21,9 +24,11 @@ import com.swmem.voicetoview.audio.RawAudioRecorder.State;
 import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Model;
+import com.swmem.voicetoview.data.Talk;
 import com.swmem.voicetoview.task.ModelReceiver;
 import com.swmem.voicetoview.task.ModelSender;
 import com.swmem.voicetoview.task.TaskOperator;
+import com.swmem.voicetoview.util.Database;
 import com.swmem.voicetoview.view.AssistantView;
 import com.swmem.voicetoview.view.HideView;
 
@@ -227,10 +232,17 @@ public class VoiceToViewService extends Service {
 			if (mModelSender.isAlive())
 				mModelSender.interrupt();
 		}
-
+		
 		if (mWindowManager != null) {
-			if (mAssistantView != null)
+			if (mAssistantView != null) {
+				if (mAssistantView.getModelList() != null
+						&& !mAssistantView.getModelList().isEmpty()) {
+					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.KOREA);
+					Database.insertTalk(new Talk(dateFormat.format(new Date()), Connection.header[1]));
+					Database.insertModelList(mAssistantView.getModelList(), Database.selectTalk().getKey());
+				}
 				mWindowManager.removeView(mAssistantView.getView());
+			}
 			if (mHideView != null)
 				mWindowManager.removeView(mHideView.getView());
 		}

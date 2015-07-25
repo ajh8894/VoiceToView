@@ -44,7 +44,7 @@ public class ModelReceiver extends Thread {
 				Model m = (Model) Connection.ois.readObject();
 				Log.d("Receiver", m.getMessageNum() + " " + m.getEmotionType() + " " + m.getTextResult() + " Model receive succsess");
 				
-				m.setDate(timeFormat.format(new Date()));
+				m.setTime(timeFormat.format(new Date()));
 				receiverQueue.put(m);
 				receiverHandler.sendEmptyMessage(Constants.REFRESH);
 				

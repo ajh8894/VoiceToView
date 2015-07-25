@@ -3,13 +3,5 @@
 
     <string name="app_name">VoiceToView</string>
     <string name="action_settings">Settings</string>
-    <string name="view_on">On</string>
-    <string name="view_off">Off</string>
-    <string name="gender_man">Man</string>
-    <string name="gender_woman">Woman</string>
-    <string name="animation">Animation</string>
-    <string name="theme">Theme</string>
-    <string name="data">Data</string>
-    <string name="help">Help</string>
-
+    
 </resources>

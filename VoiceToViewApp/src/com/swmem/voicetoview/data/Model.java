@@ -19,12 +19,18 @@ public class Model implements Serializable, Comparable<Model> {
 	private int emotionType;
 
 	// view
-	private String date;
+	private String time;
 
 	public Model() {
 
 	}
 
+	public Model(int emotionType, String textResult, String time) {
+		this.emotionType = emotionType;
+		this.textResult = textResult;
+		this.time = time;
+	}
+	
 	public Model(String from, String to, boolean man, int messageNum, byte[] buffers) {
 		this.from = from;
 		this.to = to;
@@ -81,12 +87,12 @@ public class Model implements Serializable, Comparable<Model> {
 		this.emotionType = emotionType;
 	}
 
-	public String getDate() {
-		return date;
+	public String getTime() {
+		return time;
 	}
 
-	public void setDate(String date) {
-		this.date = date;
+	public void setTime(String time) {
+		this.time = time;
 	}
 
 	public boolean isMan() {

@@ -17,6 +17,28 @@
         android:text="△" />
 
     <!-- 두번째 탭 : 문자 메시지 보여줄 탭 -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.50" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.00"
+            android:src="@drawable/user_icon" />
+
+        <ImageView
+            android:id="@+id/iv_current_emotion"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.00"
+            android:src="@drawable/user_icon" />
+
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
@@ -24,24 +46,18 @@
         android:orientation="vertical" >
 
         <!-- 리스트 뷰 : 문자메시지 보여주는 곳 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="6"
-            android:orientation="vertical" >
-
-            <ListView
-                android:id="@+id/lv_model"
-                android:layout_width="match_parent"
-                android:layout_height="0dip"
-                android:layout_weight="1.36"
-                android:divider="#00000000"
-                android:transcriptMode="alwaysScroll" >
-            </ListView>
-
-        </LinearLayout>
 
         <!-- 문자 메시지 보내는 것 -->
+
+        <ListView
+            android:id="@+id/lv_model"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1.00"
+            android:divider="#00000000"
+            android:transcriptMode="alwaysScroll" >
+        </ListView>
+
     </LinearLayout>
 
 </LinearLayout>

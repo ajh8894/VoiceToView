@@ -2,6 +2,7 @@
 <lint>
     <issue id="HandlerLeak" severity="ignore" />
     <issue id="InflateParams" severity="ignore" />
+    <issue id="NewApi" severity="ignore" />
     <issue id="RtlHardcoded" severity="ignore" />
     <issue id="ShowToast" severity="ignore" />
 </lint>

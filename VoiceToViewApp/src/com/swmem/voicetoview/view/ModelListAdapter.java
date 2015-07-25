@@ -21,7 +21,7 @@ public class ModelListAdapter extends BaseAdapter {
 	private class ViewHolder {
 		public ImageView emotion;
 		public TextView message;
-		public TextView date;
+		public TextView time;
 	}
 	
 	public ModelListAdapter(Context context, int layout, List<Model> itemList) {
@@ -55,7 +55,7 @@ public class ModelListAdapter extends BaseAdapter {
 
 			viewHolder.emotion = (ImageView) convertView.findViewById(R.id.iv_emotion);
 			viewHolder.message = (TextView) convertView.findViewById(R.id.tv_message);
-			viewHolder.date = (TextView) convertView.findViewById(R.id.tv_date);
+			viewHolder.time = (TextView) convertView.findViewById(R.id.tv_time);
 
 			convertView.setTag(viewHolder);
 		} else {
@@ -67,7 +67,8 @@ public class ModelListAdapter extends BaseAdapter {
 		if(item.getTextResult() != null)
 			viewHolder.message.setText(item.getTextResult());
 		if(item.getTextResult() != null)
-			viewHolder.date.setText(item.getDate());
+			viewHolder.time.setText(item.getTime());
+		
 		switch (item.getEmotionType()) {
 		case Constants.SAD:
 			viewHolder.emotion.setImageResource(R.drawable.sad);
@@ -88,9 +89,4 @@ public class ModelListAdapter extends BaseAdapter {
 		
 		return convertView;
 	}
-	
-/*	public void reflesh(List<Model> list) {	
-		this.mItemList = list;
-		notifyDataSetChanged();
-	}*/
 }

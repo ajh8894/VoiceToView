@@ -140,10 +140,12 @@ public class Database {
 	public static void insertModelList(List<Model> modelList, int key) {
 		try {
 			for (Model model : modelList) {
-				db.execSQL("INSERT INTO model VALUES ('" + key + "','"
-						+ model.getEmotionType() + "','"
-						+ model.getTextResult() + "','" + model.getTime()
-						+ "')");
+				if (model.getTextResult() != null) {
+					db.execSQL("INSERT INTO model VALUES ('" + key + "','"
+							+ model.getEmotionType() + "','"
+							+ model.getTextResult() + "','" + model.getTime()
+							+ "')");
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

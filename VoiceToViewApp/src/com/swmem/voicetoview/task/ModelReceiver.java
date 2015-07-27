@@ -36,7 +36,7 @@ public class ModelReceiver extends Thread {
 	@Override
 	public void run() {
 		super.run();
-		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
+		SimpleDateFormat timeFormat = new SimpleDateFormat("a hh:mm", Locale.KOREA);
 		try {
 			Connection.connect(Constants.CONNECT);
 			

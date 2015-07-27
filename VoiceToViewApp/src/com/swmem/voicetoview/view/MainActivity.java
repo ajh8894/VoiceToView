@@ -8,6 +8,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.swmem.voicetoview.R;
 import com.swmem.voicetoview.data.Constants;
@@ -18,10 +21,16 @@ import com.swmem.voicetoview.util.Database;
 public class MainActivity extends Activity implements OnClickListener {
 	private final String LOG_TAG = MainActivity.class.getName();
 	private User option;
-	private Button modeBtn;
-	private Button genderBtn;
-	private Button dataBtn;
+	
+	private LinearLayout modeLayout;
+	private LinearLayout genderLayout;
+	private LinearLayout dataLayout;
 
+	private ImageView modeIV;
+	private ImageView genderIV;
+	
+	private TextView modeTV;
+	
 	private Button startBtn;
 	private Button stopBtn;
 	private String[] header = new String[3];
@@ -37,47 +46,51 @@ public class MainActivity extends Activity implements OnClickListener {
 		// set UI
 		setContentView(R.layout.activity_main);
 
-		modeBtn = (Button) findViewById(R.id.btn_mode);
-		genderBtn = (Button) findViewById(R.id.btn_gender);
-		dataBtn = (Button) findViewById(R.id.btn_data);
+		modeLayout = (LinearLayout) findViewById(R.id.layout_mode);
+		genderLayout = (LinearLayout) findViewById(R.id.layout_gender);
+		dataLayout = (LinearLayout) findViewById(R.id.layout_data);
 
+		modeIV = (ImageView) findViewById(R.id.iv_mode);
+		genderIV = (ImageView) findViewById(R.id.iv_gender);
+		
+		modeTV = (TextView) findViewById(R.id.tv_mode);
+		
 		startBtn = (Button) findViewById(R.id.button1);
 		stopBtn = (Button) findViewById(R.id.button2);
 		
-		modeBtn.setOnClickListener(this);
-		genderBtn.setOnClickListener(this);
-		dataBtn.setOnClickListener(this);
+		modeLayout.setOnClickListener(this);
+		genderLayout.setOnClickListener(this);
+		dataLayout.setOnClickListener(this);
 		
 		startBtn.setOnClickListener(this);
 		stopBtn.setOnClickListener(this);
 
 		if (option.getMode() == Constants.VIEW_OFF) {
-			modeBtn.setText("OFF");
-			modeBtn.setBackgroundColor(Color.WHITE);
+			modeIV.setImageResource(R.drawable.category_icon_switch_off);
+			modeTV.setTextColor(Color.parseColor("#747474"));
+			modeLayout.setSelected(false);
 			header[0] = Constants.KIND_SEND; 
 			header[1] = "01086048894"; // from
 			header[2] = "01067108898"; // to
 		} else {
-			modeBtn.setText("ON");
-			modeBtn.setBackgroundColor(Color.RED);
+			modeIV.setImageResource(R.drawable.category_icon_switch_on);
+			modeTV.setTextColor(Color.parseColor("#FFFFFF"));
+			modeLayout.setSelected(true);
 			header[0] = Constants.KIND_RECEIVE;
 			header[1] = "01067108898"; // from
 			header[2] = "01086048894"; // to
 		}
 
-		if (option.getMode() == Constants.MALE) {
-			genderBtn.setText("MAN");
-			genderBtn.setBackgroundColor(Color.BLUE);
+		if (option.getGender() == Constants.MALE) {
+			genderIV.setImageResource(R.drawable.category_icon_man);
 		} else {
-			genderBtn.setText("WOMAN");
-			genderBtn.setBackgroundColor(Color.RED);
+			genderIV.setImageResource(R.drawable.category_icon_woman);
 		}
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-
 		Intent serviceIntent = new Intent(this, VoiceToViewService.class);
 		stopService(serviceIntent);
 	}
@@ -85,18 +98,20 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.btn_mode:
+		case R.id.layout_mode:
 			if (option.getMode() == Constants.VIEW_OFF) {
+				modeIV.setImageResource(R.drawable.category_icon_switch_on);
+				modeTV.setTextColor(Color.parseColor("#FFFFFF"));
+				modeLayout.setSelected(true);
 				option.setMode(Constants.VIEW_ON);
-				modeBtn.setBackgroundColor(Color.RED);
-				modeBtn.setText("ON");
 				header[0] = Constants.KIND_RECEIVE;
 				header[1] = "01067108898"; // from
 				header[2] = "01086048894"; // to
 			} else {
+				modeIV.setImageResource(R.drawable.category_icon_switch_off);
+				modeTV.setTextColor(Color.parseColor("#747474"));
+				modeLayout.setSelected(false);
 				option.setMode(Constants.VIEW_OFF);
-				modeBtn.setBackgroundColor(Color.TRANSPARENT);
-				modeBtn.setText("OFF");
 				header[0] = Constants.KIND_SEND;
 				header[1] = "01086048894"; // from
 				header[2] = "01067108898"; // to
@@ -104,23 +119,21 @@ public class MainActivity extends Activity implements OnClickListener {
 			Database.updateUser(option);
 			Log.d(LOG_TAG, "MODE: " + option.getMode());
 			break;
-		case R.id.btn_gender:
+		case R.id.layout_gender:
 			if (option.getGender() == Constants.MALE) {
+				genderIV.setImageResource(R.drawable.category_icon_woman);
 				option.setGender(Constants.FEMALE);
-				genderBtn.setBackgroundColor(Color.RED);
-				genderBtn.setText("WOMAN");
 			} else {
+				genderIV.setImageResource(R.drawable.category_icon_man);
 				option.setGender(Constants.MALE);
-				genderBtn.setBackgroundColor(Color.BLUE);
-				genderBtn.setText("MAN");
 			}
 			Database.updateUser(option);
 			Log.d(LOG_TAG, "GENDER: " + option.getGender());
-
 			break;
-		case R.id.btn_data:
+		case R.id.layout_data:
 			startActivity(new Intent(this, TalkActivity.class));
 			break;
+			
 		case R.id.button1:
 			Intent serviceIntent = new Intent(this, VoiceToViewService.class);
 			serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, header);

@@ -19,7 +19,8 @@ public class ModelListAdapter extends BaseAdapter {
 	private int mLayout;
 	private List<Model> mItemList;
 	private class ViewHolder {
-		public ImageView emotion;
+		public ImageView warning;
+		public TextView emotion;
 		public TextView message;
 		public TextView time;
 	}
@@ -53,7 +54,8 @@ public class ModelListAdapter extends BaseAdapter {
 			
 			viewHolder = new ViewHolder();
 
-			viewHolder.emotion = (ImageView) convertView.findViewById(R.id.iv_emotion);
+			viewHolder.warning = (ImageView) convertView.findViewById(R.id.iv_warning);
+			viewHolder.emotion = (TextView) convertView.findViewById(R.id.tv_emotion);
 			viewHolder.message = (TextView) convertView.findViewById(R.id.tv_message);
 			viewHolder.time = (TextView) convertView.findViewById(R.id.tv_time);
 
@@ -64,6 +66,8 @@ public class ModelListAdapter extends BaseAdapter {
 		
 		Model item = getItem(position);
 		
+		if(item.getConfidence() < Constants.CONFIDENCE)
+			viewHolder.warning.setVisibility(View.GONE);
 		if(item.getTextResult() != null)
 			viewHolder.message.setText(item.getTextResult());
 		if(item.getTextResult() != null)
@@ -71,19 +75,23 @@ public class ModelListAdapter extends BaseAdapter {
 		
 		switch (item.getEmotionType()) {
 		case Constants.SAD:
-			viewHolder.emotion.setImageResource(R.drawable.sad);
+			viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_sad);
+			viewHolder.emotion.setText(Constants.STR_SAD);
 			break;
 		case Constants.NATURAL:
-			viewHolder.emotion.setImageResource(R.drawable.natural);
+			viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_natural);
+			viewHolder.emotion.setText(Constants.STR_NATURAL);
 			break;
 		case Constants.ANGRY:
-			viewHolder.emotion.setImageResource(R.drawable.angry);
+			viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_angry);
+			viewHolder.emotion.setText(Constants.STR_ANGRY);
 			break;
 		case Constants.HAPPY:
-			viewHolder.emotion.setImageResource(R.drawable.happy);
+			viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_happy);
+			viewHolder.emotion.setText(Constants.STR_HAPPY);
 			break;
 		default:
-			viewHolder.emotion.setImageResource(R.drawable.user_icon);
+			viewHolder.emotion.setVisibility(View.GONE);
 			break;
 		}
 		

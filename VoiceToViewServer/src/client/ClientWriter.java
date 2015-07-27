@@ -35,9 +35,9 @@ public class ClientWriter extends Thread {
 						if (client.getOrder().intValue() == m.getMessageNum()) {
 							if (m.getTextResult() != null && m.getTextResult().equals(Constants.SPEECH_FAIL)) {
 								System.out.println(client.getFrom() + " - 2. speech fail junk - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
-								client.setCompleted(0);
-								client.setOrder(client.getOrder() + 1);
-								continue;
+								//client.setCompleted(0);
+								//client.setOrder(client.getOrder() + 1);
+								//continue;
 							} else if (m.getEmotionType() == Constants.SILENCE) {
 								System.out.println(client.getFrom() + " - 3. slience junk - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
 								client.setCompleted(0);

@@ -171,7 +171,7 @@ public class AssistantView implements OnClickListener {
 		mCurEmotionIV.startAnimation(mAnimation);
 	}
 
-	synchronized public void modelListAdd(Model m) {
+	public void modelListAdd(Model m) {
 		if (m != null) {
 			for (Model model : mModelList) {
 				if (m.getMessageNum() == model.getMessageNum()) {

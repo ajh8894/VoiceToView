@@ -37,6 +37,7 @@ public class Constants {
 	public static final int HIDE_VIEW = 0;
 	public static final int ASSISTANT_VIEW = 1;
 	public static final int MAX_RECORD_TIME = 15;
+	public static final int SAMPLE_RATE = 16000;
     public static final int TASK_DELAY_STOP = 1000;
     public static final int TASK_DELAY_RECONNECT = 3000;
 

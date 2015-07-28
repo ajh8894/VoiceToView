@@ -51,6 +51,7 @@ public class VoiceToViewService extends Service {
 	private AudioPauser mAudioPauser;
 	private RawAudioRecorder mRecorder;
 	private long mStartTime = 0;
+	private int mSampleRate = 16000;
 	private int mMaxRecordingTime = 1000;
 	private int mOrder = 0;
 	private Handler mStopHandler;
@@ -181,9 +182,11 @@ public class VoiceToViewService extends Service {
 		mReceiverQueue = new ArrayBlockingQueue<Model>(1024);
 
 		mAudioPauser = new AudioPauser(this);
-		mRecorder = new RawAudioRecorder();
-		// 15 second, sampleRate 16000 setting
+
 		mMaxRecordingTime *= Constants.MAX_RECORD_TIME;
+		mSampleRate = Constants.SAMPLE_RATE;
+		mRecorder = new RawAudioRecorder(mSampleRate);
+		// 15 second, sampleRate 16000 setting
 		mStopHandler = new Handler();
 		
 		mOperator = new TaskOperator(Constants.CONNECT_INIT, mSenderHandler, mReceiverHandler);
@@ -274,7 +277,7 @@ public class VoiceToViewService extends Service {
 		
 		mRecorder.release();
 
-		mRecorder = new RawAudioRecorder();
+		mRecorder = new RawAudioRecorder(mSampleRate);
 		mRecorder.start();
 		mStartTime = SystemClock.elapsedRealtime();
 	}

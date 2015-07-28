@@ -82,21 +82,25 @@ public class ModelListAdapter extends BaseAdapter {
 			viewHolder.time.setText(item.getTime());
 		else
 			viewHolder.time.setText(null);
-
+		
 		switch (item.getEmotionType()) {
 		case Constants.SAD:
+			viewHolder.emotion.setVisibility(View.VISIBLE);
 			viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_sad);
 			viewHolder.emotion.setText(Constants.STR_SAD);
 			break;
 		case Constants.NATURAL:
+			viewHolder.emotion.setVisibility(View.VISIBLE);
 			viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_natural);
 			viewHolder.emotion.setText(Constants.STR_NATURAL);
 			break;
 		case Constants.ANGRY:
+			viewHolder.emotion.setVisibility(View.VISIBLE);
 			viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_angry);
 			viewHolder.emotion.setText(Constants.STR_ANGRY);
 			break;
 		case Constants.HAPPY:
+			viewHolder.emotion.setVisibility(View.VISIBLE);
 			viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_happy);
 			viewHolder.emotion.setText(Constants.STR_HAPPY);
 			break;

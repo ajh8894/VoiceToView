@@ -86,7 +86,7 @@ public class Client implements Runnable {
 	}
 	
 	public void sendToClient(Model m) throws IOException {
-		oos.reset();
+		//oos.reset();
 		oos.writeObject(m);
 		oos.flush();
 	}

@@ -1,6 +1,8 @@
 package client;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.swmem.voicetoview.data.Model;
 
@@ -12,54 +14,88 @@ public class ClientWriter extends Thread {
 	public ClientWriter(Client client) {
 		this.client = client;
 	}
-	
+
+	private String getEmotion(int e) {
+		String r = null;
+		switch (e) {
+		case Constants.EMOTION_NOT_COMPLETE:
+			r = "미완료";
+			break;
+		case Constants.SAD:
+			r = "슬픔";
+			break;
+		case Constants.NATURAL:
+			r = "보통";
+			break;
+		case Constants.ANGRY:
+			r = "화남";
+			break;
+		case Constants.HAPPY:
+			r = "기쁨";
+			break;
+		default:
+			r = "묵음";
+			break;
+		}
+		return r;
+	}
+
 	@Override
 	public void run() {
 		Model m = null;
-/*		long start = System.currentTimeMillis();
-		long end = 0;*/
+		
+		long start = System.currentTimeMillis();
+		long end = 0;
+		 
 		try {
-			while (client.isActivated() && client.getSocket().isConnected() && !client.getSocket().isClosed()) {
+			while (client.isActivated() && client.getSocket().isConnected()
+					&& !client.getSocket().isClosed()) {
 				m = client.getSenderQueue().take();
-				Thread.sleep(1500);
-				//end = System.currentTimeMillis();
+				// Thread.sleep(1500);
+				end = System.currentTimeMillis();
 				if (isAlive()) {
 					System.out.println();
 					System.out.println(client.getFrom() + " - current order: " + client.getOrder().intValue() + " completed: " + client.getCompleted().intValue());
-					System.out.println(client.getFrom() + " - take() model - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
+					System.out.println(client.getFrom() + " - take() model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 					if (m != null) {
 						if (client.getOrder().intValue() > m.getMessageNum()) {
-							System.out.println(client.getFrom() + " - 1. either junk - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
+							System.out.println(client.getFrom() + " - 1. either junk - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 							continue;
 						}
 						if (client.getOrder().intValue() == m.getMessageNum()) {
-							if (m.getTextResult() != null && m.getTextResult().equals(Constants.SPEECH_FAIL)) {
-								System.out.println(client.getFrom() + " - 2. speech fail junk - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
+							if (m.getTextResult() != null
+									&& m.getTextResult().equals(Constants.SPEECH_FAIL)) {
+								System.out.println(client.getFrom() + " - 2. speech fail junk - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 								client.setCompleted(0);
 								client.setOrder(client.getOrder() + 1);
 								continue;
 							} else if (m.getEmotionType() == Constants.SILENCE) {
-								System.out.println(client.getFrom() + " - 3. slience junk - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
+								System.out.println(client.getFrom() + " - 3. slience junk - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 								client.setCompleted(0);
 								client.setOrder(client.getOrder() + 1);
 								continue;
 							} else {
-								client.sendToClient(m);
-								if (client.readFromClient()) {
-									System.out.println(client.getFrom() + " - *send model - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult() + " " + System.currentTimeMillis());
-									client.setCompleted(client.getCompleted() + 1);
+								if(m.getEmotionType() != Constants.EMOTION_NOT_COMPLETE && m.getEmotionType() != Constants.SILENCE && client.getCompleted() == 0) {
+									System.out.println(client.getFrom() + "- restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+									if (client != null && client.getSenderQueue() != null)
+										client.getSenderQueue().put(m);
+								} else {
+									client.sendToClient(m);
+									if (client.readFromClient()) {
+										System.out.println(client.getFrom() + " - *send model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult() + " " + new SimpleDateFormat("hh:mm:ss a").format(new Date()));
+										client.setCompleted(client.getCompleted() + 1);
+									}
 								}
 							}
 						} else {
-/*							if (Constants.MESSAGE_TIMEOUT <= (end - start) / 1000.0) {
-								System.out.println("--4. 시간초과 버림: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
-								isCompleted = Integer.valueOf(0);
-								order = Integer.valueOf(order.intValue() + 1);
-							} else {
-
+/*							if (Constants.MESSAGE_TIMEOUT < (end - start) / 1000.0) {
+								System.out.println(client.getFrom() + " - 4. time out - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+								client.setCompleted(0);
+								client.setOrder(client.getOrder() + 1);
 							}*/
-							System.out.println(client.getFrom() + "- restore - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
-							if(client != null && client.getSenderQueue() != null)
+							
+							System.out.println(client.getFrom() + "- restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+							if (client != null && client.getSenderQueue() != null)
 								client.getSenderQueue().put(m);
 						}
 
@@ -67,7 +103,7 @@ public class ClientWriter extends Thread {
 							System.out.println(client.getFrom() + " - **complete -" + client.getOrder());
 							client.setCompleted(0);
 							client.setOrder(client.getOrder() + 1);
-							//start = System.currentTimeMillis();
+							start = System.currentTimeMillis();
 						}
 					}
 				}
@@ -78,11 +114,11 @@ public class ClientWriter extends Thread {
 				try {
 					System.out.println();
 					System.out.println(client.getFrom() + " - current order: " + client.getOrder().intValue() + " completed: " + client.getCompleted().intValue());
-					System.out.println(client.getFrom() + " - InterruptedException restore - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
-					
-					if(client != null && client.getSenderQueue() != null)
+					System.out.println(client.getFrom() + " - InterruptedException restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+
+					if (client != null && client.getSenderQueue() != null)
 						client.getSenderQueue().put(m);
-					
+
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}

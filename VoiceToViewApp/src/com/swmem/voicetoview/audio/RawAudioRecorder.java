@@ -46,8 +46,8 @@ public class RawAudioRecorder {
 	private static final String LOG_TAG = RawAudioRecorder.class.getName();
 
 	private static final int DEFAULT_AUDIO_SOURCE = MediaRecorder.AudioSource.VOICE_RECOGNITION;
-	private static final int DEFAULT_SAMPLE_RATE = 8000;
-	//private static final int DEFAULT_SAMPLE_RATE = 16000;
+	
+	private static final int DEFAULT_SAMPLE_RATE = 16000;
 	
 	private static final int RESOLUTION = AudioFormat.ENCODING_PCM_16BIT;
 	private static final short RESOLUTION_IN_BYTES = 2;

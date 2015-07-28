@@ -18,7 +18,7 @@ import com.swmem.voicetoview.util.Database;
 public class PhoneStateReceiver extends BroadcastReceiver {
 	private final String LOG_TAG = PhoneStateReceiver.class.getName();
     private static int pState = TelephonyManager.CALL_STATE_IDLE;
-    private static String[] header;
+    private static String[] header = new String[3];
 
     @Override
 	public void onReceive(Context context, Intent intent) {
@@ -33,15 +33,14 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                 if(state != pState){
                     if(state == TelephonyManager.CALL_STATE_IDLE){
                         Log.i(LOG_TAG,"IDLE");
-                        if(header != null){
-                        	header = null;
+                        if(header[0] != null){
+                        	header[0] = null;
 
                         	Intent serviceIntent = new Intent(c, VoiceToViewService.class);
                             c.stopService(serviceIntent);
                         }
                     }
                     else if(state == TelephonyManager.CALL_STATE_RINGING){
-                        header = new String[3];
                         header[1] = telManager.getLine1Number();
                         header[2] = incomingNumber;
                         Log.i(LOG_TAG, "RINGING " + header[0] + " " + header[1] + " " + header[2]);
@@ -70,7 +69,6 @@ public class PhoneStateReceiver extends BroadcastReceiver {
          
         if(intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)){
             Log.i(LOG_TAG, "OUTGOING_CALL");
-            header = new String[3];
             header[1] = telManager.getLine1Number();
             header[2] = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
         }

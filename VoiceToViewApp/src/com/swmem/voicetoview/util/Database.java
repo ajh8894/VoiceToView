@@ -19,10 +19,7 @@ public class Database {
 		if (db == null)
 			db = con.openOrCreateDatabase("USEROPTION.db", 2, null);
 		synchronized (db) {
-			Cursor c = db
-					.rawQuery(
-							"SELECT NAME FROM sqlite_master WHERE type = 'table' AND name = 'user'",
-							null);
+			Cursor c = db.rawQuery("SELECT NAME FROM sqlite_master WHERE type = 'table' AND name = 'user'", null);
 
 			if (!c.moveToFirst()) {
 				createTable();

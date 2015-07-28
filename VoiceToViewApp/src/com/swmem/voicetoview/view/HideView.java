@@ -15,14 +15,14 @@ import com.swmem.voicetoview.R;
 import com.swmem.voicetoview.data.Constants;
 
 public class HideView implements OnClickListener {
-	private View view;
-	private Handler handler;
+	private View mView;
+	private Handler mHandler;
 
-	public HideView(Context c, WindowManager wManager, Handler handler) {
+	public HideView(Context c, WindowManager wManager, Handler mHandler) {
 		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		this.view = inflater.inflate(R.layout.view_hide, null);
-		this.handler = handler;
-		ImageView hideIV = (ImageView) view.findViewById(R.id.iv_hide);
+		this.mView = inflater.inflate(R.layout.view_hide, null);
+		this.mHandler = mHandler;
+		ImageView hideIV = (ImageView) mView.findViewById(R.id.iv_hide);
 		hideIV.setOnClickListener(this);
 		WindowManager.LayoutParams params = new WindowManager.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
@@ -32,19 +32,19 @@ public class HideView implements OnClickListener {
 				PixelFormat.TRANSLUCENT);
 		params.gravity = Gravity.TOP | Gravity.RIGHT;
 		
-		view.setVisibility(View.GONE);
-		wManager.addView(view, params);
+		mView.setVisibility(View.GONE);
+		wManager.addView(mView, params);
 	}
 
 	public View getView() {
-		return view;
+		return mView;
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.iv_hide:
-			handler.sendEmptyMessage(Constants.SWAP);
+			mHandler.sendEmptyMessage(Constants.SWAP);
 			break;
 		}
 	}

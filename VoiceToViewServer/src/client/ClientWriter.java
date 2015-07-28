@@ -21,7 +21,7 @@ public class ClientWriter extends Thread {
 		try {
 			while (client.isActivated() && client.getSocket().isConnected() && !client.getSocket().isClosed()) {
 				m = client.getSenderQueue().take();
-				//Thread.sleep(1500);
+				Thread.sleep(1500);
 				//end = System.currentTimeMillis();
 				if (isAlive()) {
 					System.out.println();
@@ -35,9 +35,9 @@ public class ClientWriter extends Thread {
 						if (client.getOrder().intValue() == m.getMessageNum()) {
 							if (m.getTextResult() != null && m.getTextResult().equals(Constants.SPEECH_FAIL)) {
 								System.out.println(client.getFrom() + " - 2. speech fail junk - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
-								//client.setCompleted(0);
-								//client.setOrder(client.getOrder() + 1);
-								//continue;
+								client.setCompleted(0);
+								client.setOrder(client.getOrder() + 1);
+								continue;
 							} else if (m.getEmotionType() == Constants.SILENCE) {
 								System.out.println(client.getFrom() + " - 3. slience junk - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
 								client.setCompleted(0);
@@ -46,7 +46,7 @@ public class ClientWriter extends Thread {
 							} else {
 								client.sendToClient(m);
 								if (client.readFromClient()) {
-									System.out.println(client.getFrom() + " - *send model - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult());
+									System.out.println(client.getFrom() + " - *send model - order: " + m.getMessageNum() + " emotion: " + m.getEmotionType() + " text: " + m.getTextResult() + " " + System.currentTimeMillis());
 									client.setCompleted(client.getCompleted() + 1);
 								}
 							}

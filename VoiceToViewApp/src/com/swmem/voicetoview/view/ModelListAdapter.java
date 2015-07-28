@@ -18,18 +18,20 @@ public class ModelListAdapter extends BaseAdapter {
 	private LayoutInflater mInflater;
 	private int mLayout;
 	private List<Model> mItemList;
+
 	private class ViewHolder {
 		public ImageView warning;
 		public TextView emotion;
 		public TextView message;
 		public TextView time;
 	}
-	
+
 	public ModelListAdapter(Context context, int layout, List<Model> itemList) {
 		this.mInflater = LayoutInflater.from(context);
 		this.mLayout = layout;
 		this.mItemList = itemList;
 	}
+
 	@Override
 	public int getCount() {
 		return mItemList.size();
@@ -48,10 +50,10 @@ public class ModelListAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder viewHolder = null;
-		
-		if(convertView == null) {
+
+		if (convertView == null) {
 			convertView = mInflater.inflate(mLayout, parent, false);
-			
+
 			viewHolder = new ViewHolder();
 
 			viewHolder.warning = (ImageView) convertView.findViewById(R.id.iv_warning);
@@ -63,16 +65,24 @@ public class ModelListAdapter extends BaseAdapter {
 		} else {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
-		
+
 		Model item = getItem(position);
-		
-		if(item.getConfidence() < Constants.CONFIDENCE)
+
+		if (item.getConfidence() < Constants.CONFIDENCE)
 			viewHolder.warning.setVisibility(View.GONE);
-		if(item.getTextResult() != null)
-			viewHolder.message.setText(item.getTextResult());
-		if(item.getTextResult() != null)
-			viewHolder.time.setText(item.getTime());
+		else
+			viewHolder.warning.setVisibility(View.VISIBLE);
 		
+		if (item.getTextResult() != null)
+			viewHolder.message.setText(item.getTextResult());
+		else
+			viewHolder.message.setText(null);
+		
+		if (item.getTime() != null)
+			viewHolder.time.setText(item.getTime());
+		else
+			viewHolder.time.setText(null);
+
 		switch (item.getEmotionType()) {
 		case Constants.SAD:
 			viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_sad);
@@ -94,7 +104,7 @@ public class ModelListAdapter extends BaseAdapter {
 			viewHolder.emotion.setVisibility(View.GONE);
 			break;
 		}
-		
+
 		return convertView;
 	}
 }

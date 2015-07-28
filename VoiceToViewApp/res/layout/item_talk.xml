@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="top"
+    android:orientation="horizontal"
     android:padding="15dp" >
 
-    <TextView
-        android:id="@+id/tv_date"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="date"
-        android:textSize="13dp"
-        android:textStyle="bold" />
+        android:layout_weight="1"
+        android:gravity="center" >
 
-    <TextView
-        android:id="@+id/tv_id"
-        android:layout_width="150dp"
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="date"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/tv_date"
-        android:layout_marginLeft="56dp"
-        android:layout_toRightOf="@+id/tv_date"
-        android:text="id"
-        android:textColor="#000000"
-        android:textSize="14dp"
-        android:textStyle="bold" />
+        android:layout_weight="1"
+        android:gravity="center" >
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/tv_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="id"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+</LinearLayout>

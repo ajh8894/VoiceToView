@@ -10,20 +10,20 @@ import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
 
 public class TaskOperator extends Thread {
-	private boolean isActivated;
-	private int type;
-	private Handler senderHandler;
-	private Handler receiverHandler;
+	private boolean mIsActivated;
+	private int mType;
+	private Handler mSenderHandler;
+	private Handler mReceiverHandler;
 
-	public TaskOperator(int type, Handler senderHandler, Handler receiverHandler) {
-		isActivated = true;
-		this.type = type;
-		this.senderHandler = senderHandler;
-		this.receiverHandler = receiverHandler;
+	public TaskOperator(int mType, Handler mSenderHandler, Handler mReceiverHandler) {
+		this.mIsActivated = true;
+		this.mType = mType;
+		this.mSenderHandler = mSenderHandler;
+		this.mReceiverHandler = mReceiverHandler;
 	}
 	
 	public void setActivated(boolean isActivated) {
-		this.isActivated = isActivated;
+		this.mIsActivated = isActivated;
 	}
 	
 	@Override
@@ -32,15 +32,15 @@ public class TaskOperator extends Thread {
 		try {
 			Connection.connect(Constants.CONNECT);
 			
-			if (type == Constants.CONNECT_INIT) {
+			if (mType == Constants.CONNECT_INIT) {
 				boolean response = Connection.ois.readBoolean(); // true = STT_ON, false = STT_OFF
 				Connection.oos.writeBoolean(true);
 				Connection.oos.flush();
 				if (response) { // write, STT_ON
-					senderHandler.sendEmptyMessage(Constants.CONNECT);
+					mSenderHandler.sendEmptyMessage(Constants.CONNECT);
 				}
 				if (Connection.header[0].equals(Constants.KIND_RECEIVE)) { // read, VIEW_ON
-					receiverHandler.sendEmptyMessage(Constants.CONNECT);
+					mReceiverHandler.sendEmptyMessage(Constants.CONNECT);
 				}
 			} else {
 				Connection.disconnect();
@@ -52,8 +52,8 @@ public class TaskOperator extends Thread {
 		} catch (IOException e) {
 			Log.e(TaskOperator.class.getName(), "IOException");
 			Connection.disconnect();
-			if(isActivated)
-				senderHandler.sendEmptyMessageDelayed(type, Constants.TASK_DELAY_RECONNECT);
+			if(mIsActivated)
+				mSenderHandler.sendEmptyMessageDelayed(mType, Constants.TASK_DELAY_RECONNECT);
 		}
 	}
 }

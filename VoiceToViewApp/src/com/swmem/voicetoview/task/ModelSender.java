@@ -13,20 +13,20 @@ import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Model;
 
 public class ModelSender extends Thread {
-	private boolean isActivated;
-	private BlockingQueue<Model> senderQueue;
-	private Handler senderHandler;
+	private boolean mIsActivated;
+	private BlockingQueue<Model> mSenderQueue;
+	private Handler mSenderHandler;
 	private Socket socket;
 	private ObjectOutputStream oos;
 
-	public ModelSender(BlockingQueue<Model> senderQueue, Handler senderHandler) {
-		this.isActivated = true;
-		this.senderQueue = senderQueue;
-		this.senderHandler = senderHandler;
+	public ModelSender(BlockingQueue<Model> mSenderQueue, Handler mSenderHandler) {
+		this.mIsActivated = true;
+		this.mSenderQueue = mSenderQueue;
+		this.mSenderHandler = mSenderHandler;
 	}
 
 	public void setActivated(boolean isActivated) {
-		this.isActivated = isActivated;
+		this.mIsActivated = isActivated;
 	}
 
 	public void close() {
@@ -49,8 +49,8 @@ public class ModelSender extends Thread {
 		super.run();
 		Model m = null;
 		try {
-			while (isActivated) {
-				m = senderQueue.take();
+			while (mIsActivated) {
+				m = mSenderQueue.take();
 
 				socket = new Socket(Constants.SVM_SERVER_IP, Constants.SVM_SERVER_PORT);
 				oos = new ObjectOutputStream(socket.getOutputStream());
@@ -66,14 +66,14 @@ public class ModelSender extends Thread {
 			e.printStackTrace();
 			if (m != null) {
 				try {
-					senderQueue.put(m);
+					mSenderQueue.put(m);
 				} catch (InterruptedException e1) {
 					Log.e(ModelSender.class.getName(), "InterruptedException");
 					e1.printStackTrace();
 				}
 			}
-			if(isActivated)
-				senderHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_RECONNECT);
+			if(mIsActivated)
+				mSenderHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_RECONNECT);
 		} catch (InterruptedException e) {
 			Log.e(ModelSender.class.getName(), "InterruptedException");
 			e.printStackTrace();

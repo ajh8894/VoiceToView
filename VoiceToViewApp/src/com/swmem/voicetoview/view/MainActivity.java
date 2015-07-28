@@ -19,17 +19,16 @@ import com.swmem.voicetoview.service.VoiceToViewService;
 import com.swmem.voicetoview.util.Database;
 
 public class MainActivity extends Activity implements OnClickListener {
-	private final String LOG_TAG = MainActivity.class.getName();
-	private User option;
+	private User mOption;
 	
-	private LinearLayout modeLayout;
-	private LinearLayout genderLayout;
-	private LinearLayout dataLayout;
+	private LinearLayout mModeLayout;
+	private LinearLayout mGenderLayout;
+	private LinearLayout mDataLayout;
 
-	private ImageView modeIV;
-	private ImageView genderIV;
+	private ImageView mModeIV;
+	private ImageView mGenderIV;
 	
-	private TextView modeTV;
+	private TextView mModeTV;
 	
 	private Button startBtn;
 	private Button stopBtn;
@@ -41,50 +40,50 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		// DB create
 		Database.openOrCreateDB(getApplicationContext());
-		option = Database.selectUser();
+		mOption = Database.selectUser();
 
 		// set UI
 		setContentView(R.layout.activity_main);
 
-		modeLayout = (LinearLayout) findViewById(R.id.layout_mode);
-		genderLayout = (LinearLayout) findViewById(R.id.layout_gender);
-		dataLayout = (LinearLayout) findViewById(R.id.layout_data);
+		mModeLayout = (LinearLayout) findViewById(R.id.layout_mode);
+		mGenderLayout = (LinearLayout) findViewById(R.id.layout_gender);
+		mDataLayout = (LinearLayout) findViewById(R.id.layout_data);
 
-		modeIV = (ImageView) findViewById(R.id.iv_mode);
-		genderIV = (ImageView) findViewById(R.id.iv_gender);
+		mModeIV = (ImageView) findViewById(R.id.iv_mode);
+		mGenderIV = (ImageView) findViewById(R.id.iv_gender);
 		
-		modeTV = (TextView) findViewById(R.id.tv_mode);
+		mModeTV = (TextView) findViewById(R.id.tv_mode);
 		
 		startBtn = (Button) findViewById(R.id.button1);
 		stopBtn = (Button) findViewById(R.id.button2);
 		
-		modeLayout.setOnClickListener(this);
-		genderLayout.setOnClickListener(this);
-		dataLayout.setOnClickListener(this);
+		mModeLayout.setOnClickListener(this);
+		mGenderLayout.setOnClickListener(this);
+		mDataLayout.setOnClickListener(this);
 		
 		startBtn.setOnClickListener(this);
 		stopBtn.setOnClickListener(this);
 
-		if (option.getMode() == Constants.VIEW_OFF) {
-			modeIV.setImageResource(R.drawable.category_icon_switch_off);
-			modeTV.setTextColor(Color.parseColor("#747474"));
-			modeLayout.setSelected(false);
+		if (mOption.getMode() == Constants.VIEW_OFF) {
+			mModeIV.setImageResource(R.drawable.category_icon_switch_off);
+			mModeTV.setTextColor(Color.parseColor("#747474"));
+			mModeLayout.setSelected(false);
 			header[0] = Constants.KIND_SEND; 
 			header[1] = "01086048894"; // from
 			header[2] = "01067108898"; // to
 		} else {
-			modeIV.setImageResource(R.drawable.category_icon_switch_on);
-			modeTV.setTextColor(Color.parseColor("#FFFFFF"));
-			modeLayout.setSelected(true);
+			mModeIV.setImageResource(R.drawable.category_icon_switch_on);
+			mModeTV.setTextColor(Color.parseColor("#FFFFFF"));
+			mModeLayout.setSelected(true);
 			header[0] = Constants.KIND_RECEIVE;
 			header[1] = "01067108898"; // from
 			header[2] = "01086048894"; // to
 		}
 
-		if (option.getGender() == Constants.MALE) {
-			genderIV.setImageResource(R.drawable.category_icon_man);
+		if (mOption.getGender() == Constants.MALE) {
+			mGenderIV.setImageResource(R.drawable.category_icon_man);
 		} else {
-			genderIV.setImageResource(R.drawable.category_icon_woman);
+			mGenderIV.setImageResource(R.drawable.category_icon_woman);
 		}
 	}
 
@@ -99,36 +98,36 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.layout_mode:
-			if (option.getMode() == Constants.VIEW_OFF) {
-				modeIV.setImageResource(R.drawable.category_icon_switch_on);
-				modeTV.setTextColor(Color.parseColor("#FFFFFF"));
-				modeLayout.setSelected(true);
-				option.setMode(Constants.VIEW_ON);
+			if (mOption.getMode() == Constants.VIEW_OFF) {
+				mModeIV.setImageResource(R.drawable.category_icon_switch_on);
+				mModeTV.setTextColor(Color.parseColor("#FFFFFF"));
+				mModeLayout.setSelected(true);
+				mOption.setMode(Constants.VIEW_ON);
 				header[0] = Constants.KIND_RECEIVE;
 				header[1] = "01067108898"; // from
 				header[2] = "01086048894"; // to
 			} else {
-				modeIV.setImageResource(R.drawable.category_icon_switch_off);
-				modeTV.setTextColor(Color.parseColor("#747474"));
-				modeLayout.setSelected(false);
-				option.setMode(Constants.VIEW_OFF);
+				mModeIV.setImageResource(R.drawable.category_icon_switch_off);
+				mModeTV.setTextColor(Color.parseColor("#747474"));
+				mModeLayout.setSelected(false);
+				mOption.setMode(Constants.VIEW_OFF);
 				header[0] = Constants.KIND_SEND;
 				header[1] = "01086048894"; // from
 				header[2] = "01067108898"; // to
 			}
-			Database.updateUser(option);
-			Log.d(LOG_TAG, "MODE: " + option.getMode());
+			Database.updateUser(mOption);
+			Log.d(MainActivity.class.getName(), "MODE: " + mOption.getMode());
 			break;
 		case R.id.layout_gender:
-			if (option.getGender() == Constants.MALE) {
-				genderIV.setImageResource(R.drawable.category_icon_woman);
-				option.setGender(Constants.FEMALE);
+			if (mOption.getGender() == Constants.MALE) {
+				mGenderIV.setImageResource(R.drawable.category_icon_woman);
+				mOption.setGender(Constants.FEMALE);
 			} else {
-				genderIV.setImageResource(R.drawable.category_icon_man);
-				option.setGender(Constants.MALE);
+				mGenderIV.setImageResource(R.drawable.category_icon_man);
+				mOption.setGender(Constants.MALE);
 			}
-			Database.updateUser(option);
-			Log.d(LOG_TAG, "GENDER: " + option.getGender());
+			Database.updateUser(mOption);
+			Log.d(MainActivity.class.getName(), "GENDER: " + mOption.getGender());
 			break;
 		case R.id.layout_data:
 			startActivity(new Intent(this, TalkActivity.class));

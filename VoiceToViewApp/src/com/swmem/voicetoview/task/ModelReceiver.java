@@ -15,38 +15,39 @@ import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Model;
 
 public class ModelReceiver extends Thread {
-	private boolean isActivated;
-	private BlockingQueue<Model> receiverQueue;
-	private Handler receiverHandler;
+	private boolean mIsActivated;
+	private BlockingQueue<Model> mReceiverQueue;
+	private Handler mReceiverHandler;
 
-	public ModelReceiver(BlockingQueue<Model> receiverQueue, Handler receiverHandler) {
-		this.isActivated = true;
-		this.receiverQueue = receiverQueue;
-		this.receiverHandler = receiverHandler;
+	public ModelReceiver(BlockingQueue<Model> mReceiverQueue, Handler mReceiverHandler) {
+		this.mIsActivated = true;
+		this.mReceiverQueue = mReceiverQueue;
+		this.mReceiverHandler = mReceiverHandler;
 	}
 
 	public boolean isActivated() {
-		return isActivated;
+		return mIsActivated;
 	}
 
 	public void setActivated(boolean isActivated) {
-		this.isActivated = isActivated;
+		this.mIsActivated = isActivated;
 	}
 
 	@Override
 	public void run() {
 		super.run();
-		SimpleDateFormat timeFormat = new SimpleDateFormat("a hh:mm", Locale.KOREA);
+		//SimpleDateFormat timeFormat = new SimpleDateFormat("a hh:mm", Locale.KOREA);
+		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
 		try {
 			Connection.connect(Constants.CONNECT);
 			
-			while(isActivated && Connection.socket.isConnected() && !Connection.socket.isClosed()) {
+			while(mIsActivated && Connection.socket.isConnected() && !Connection.socket.isClosed()) {
 				Model m = (Model) Connection.ois.readObject();
 				Log.d("Receiver", m.getMessageNum() + " " + m.getEmotionType() + " " + m.getTextResult() + " Model receive succsess");
 				
 				m.setTime(timeFormat.format(new Date()));
-				receiverQueue.put(m);
-				receiverHandler.sendEmptyMessage(Constants.REFRESH);
+				mReceiverQueue.put(m);
+				mReceiverHandler.sendEmptyMessage(Constants.REFRESH);
 				
 				Connection.oos.writeBoolean(true);
 				Connection.oos.flush();
@@ -56,8 +57,8 @@ public class ModelReceiver extends Thread {
 		} catch (IOException e) {
 			Log.e(ModelReceiver.class.getName(), "IOException");
 			e.printStackTrace();
-			if(isActivated)
-				receiverHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_RECONNECT);
+			if(mIsActivated)
+				mReceiverHandler.sendEmptyMessageDelayed(Constants.RECONNECT, Constants.TASK_DELAY_RECONNECT);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

@@ -3,10 +3,15 @@ package com.swmem.voicetoview.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.Handler;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +21,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.RadarChart;
 import com.github.mikephil.charting.components.Legend;
@@ -25,34 +31,41 @@ import com.github.mikephil.charting.data.RadarData;
 import com.github.mikephil.charting.data.RadarDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.swmem.voicetoview.R;
+import com.swmem.voicetoview.data.Connection;
 import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Model;
 
 public class AssistantView implements OnClickListener {
-	private View view;
-	private Animation animation;
-	private Handler handler;
-	private RadarChart totalEmotionChart;
-	private List<Entry> totalEmotion;
-	private ImageView currentEmotion;
-	private ListView listView;
-	private ModelListAdapter listAdapter;
-	private List<Model> modelList;
+	private Handler mHandler;
+	private View mView;
 
-	public AssistantView(Context c, WindowManager wManager, Handler handler) {
-		this.animation = AnimationUtils.loadAnimation(c, R.anim.abc_fade_in);
+	private Animation mAnimation;
+	private ImageView mCurEmotionIV;
+
+	private RadarChart mTotalEmotionChart;
+	private List<Entry> mTotalEmotionList;
+
+	private ListView mListView;
+	private List<Model> mModelList;
+	private ModelListAdapter mListAdapter;
+
+	public AssistantView(Context c, WindowManager wManager, Handler mHandler) {
+		this.mHandler = mHandler;
+		this.mAnimation = AnimationUtils.loadAnimation(c, R.anim.abc_fade_in);
 		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		this.view = inflater.inflate(R.layout.view_assistant, null);
-		this.handler = handler;
-		this.totalEmotionChart = (RadarChart) view.findViewById(R.id.chart_emotion);
-		this.currentEmotion = (ImageView) view.findViewById(R.id.iv_current_emotion);
-		this.listView = (ListView) view.findViewById(R.id.lv_model);
-		this.modelList = new ArrayList<Model>();
-		this.listAdapter = new ModelListAdapter(c, R.layout.item_model, modelList);
-		this.listView.setAdapter(listAdapter);
-		ImageView hideIV = (ImageView) view.findViewById(R.id.iv_hide);
-		hideIV.setOnClickListener(this);
+		this.mView = inflater.inflate(R.layout.view_assistant, null);
+		
+		//loadContacts(c.getContentResolver());
+		((TextView) mView.findViewById(R.id.tv_phonenumber)).setText(Connection.header[1]);
+		((ImageView) mView.findViewById(R.id.iv_hide)).setOnClickListener(this);
+		this.mTotalEmotionChart = (RadarChart) mView.findViewById(R.id.chart_emotion);
+		this.mCurEmotionIV = (ImageView) mView.findViewById(R.id.iv_current_emotion);
 		emotionChartsetData();
+
+		this.mListView = (ListView) mView.findViewById(R.id.lv_model);
+		this.mModelList = new ArrayList<Model>();
+		this.mListAdapter = new ModelListAdapter(c, R.layout.item_model, mModelList);
+		this.mListView.setAdapter(mListAdapter);
 
 		WindowManager.LayoutParams params = new WindowManager.LayoutParams(
 				WindowManager.LayoutParams.TYPE_PHONE,
@@ -61,30 +74,50 @@ public class AssistantView implements OnClickListener {
 				PixelFormat.TRANSLUCENT);
 		params.gravity = Gravity.TOP | Gravity.RIGHT;
 
-		view.setVisibility(View.VISIBLE);
-		wManager.addView(view, params);
+		mView.setVisibility(View.VISIBLE);
+		wManager.addView(mView, params);
+	}
+
+	private void loadContacts(ContentResolver contentResolver) {
+		String[] projection = new String[] {
+				ContactsContract.Contacts.DISPLAY_NAME,
+				ContactsContract.Contacts.HAS_PHONE_NUMBER };
+		
+		String name = null;
+	    String select = "((" + projection[0] + " NOTNULL) AND (" + projection[1] + "=1) AND (" + projection[0] + " != '' ))";
+
+	    Cursor c = contentResolver.query(Contacts.CONTENT_URI, projection, select, null, null);
+	    int nameColumn = c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
+	    if(!c.moveToFirst()) {
+	    	name = c.getString(nameColumn);
+	    }
+	    
+		if(name != null)
+			((TextView) mView.findViewById(R.id.tv_name)).setText(name);
+		else
+			((TextView) mView.findViewById(R.id.tv_name)).setText("없는 번호");
 	}
 
 	private void emotionChartsetData() {
-		totalEmotionChart.setDescription("");
-		totalEmotionChart.setRotationEnabled(false);
-		totalEmotionChart.setClickable(false);
+		mTotalEmotionChart.setDescription("");
+		mTotalEmotionChart.setRotationEnabled(false);
+		mTotalEmotionChart.setClickable(false);
 
-		totalEmotionChart.setDrawWeb(true);
-		totalEmotionChart.setWebLineWidth(0);
-		totalEmotionChart.setWebLineWidthInner(0.75f);
-		totalEmotionChart.setWebAlpha(100);
+		mTotalEmotionChart.setDrawWeb(true);
+		mTotalEmotionChart.setWebLineWidth(0);
+		mTotalEmotionChart.setWebLineWidthInner(0.75f);
+		mTotalEmotionChart.setWebAlpha(100);
 
-		totalEmotion = new ArrayList<Entry>();
-		totalEmotion.add(new Entry(1, Constants.SAD));
-		totalEmotion.add(new Entry(1, Constants.NATURAL));
-		totalEmotion.add(new Entry(1, Constants.ANGRY));
-		totalEmotion.add(new Entry(1, Constants.HAPPY));
+		mTotalEmotionList = new ArrayList<Entry>();
+		mTotalEmotionList.add(new Entry(0, Constants.SAD));
+		mTotalEmotionList.add(new Entry(0, Constants.NATURAL));
+		mTotalEmotionList.add(new Entry(0, Constants.ANGRY));
+		mTotalEmotionList.add(new Entry(0, Constants.HAPPY));
 
 		String[] xVal = { Constants.STR_SAD, Constants.STR_NATURAL,
 				Constants.STR_ANGRY, Constants.STR_HAPPY };
 
-		RadarDataSet set = new RadarDataSet(totalEmotion, "감정");
+		RadarDataSet set = new RadarDataSet(mTotalEmotionList, "감정");
 		// [0 : 초록 / 2 : 주황 / 3 : 파랑 / 4 : 빨강 ]
 		set.setColor(ColorTemplate.VORDIPLOM_COLORS[0]);
 		set.setDrawFilled(true);
@@ -94,58 +127,58 @@ public class AssistantView implements OnClickListener {
 		radarData.setValueTextSize(10f);
 		radarData.setDrawValues(false);
 
-		totalEmotionChart.getXAxis().setTextSize(8f);
-		totalEmotionChart.getXAxis().setTextColor(Color.parseColor("#000000"));
+		mTotalEmotionChart.getXAxis().setTextSize(8f);
+		mTotalEmotionChart.getXAxis().setTextColor(Color.parseColor("#000000"));
 
-		YAxis yAxis = totalEmotionChart.getYAxis();
+		YAxis yAxis = mTotalEmotionChart.getYAxis();
 		yAxis.setEnabled(false);
 		yAxis.setLabelCount(4);
-		yAxis.setAxisMaxValue(50);
+		yAxis.setAxisMaxValue(20);
 
-		Legend legend = totalEmotionChart.getLegend();
+		Legend legend = mTotalEmotionChart.getLegend();
 		legend.setEnabled(false);
 
-		totalEmotionChart.setData(radarData);
-		totalEmotionChart.invalidate();
+		mTotalEmotionChart.setData(radarData);
+		mTotalEmotionChart.invalidate();
 	}
 
 	public View getView() {
-		return view;
+		return mView;
 	}
 
 	public List<Model> getModelList() {
-		return modelList;
+		return mModelList;
 	}
 
 	public void setCurrentEmotion(int emotion) {
 		switch (emotion) {
 		case Constants.SAD:
-			currentEmotion.setImageResource(R.drawable.current_emotion_sad);
+			mCurEmotionIV.setImageResource(R.drawable.current_emotion_sad);
 			break;
 		case Constants.NATURAL:
-			currentEmotion.setImageResource(R.drawable.current_emotion_natural);
+			mCurEmotionIV.setImageResource(R.drawable.current_emotion_natural);
 			break;
 		case Constants.ANGRY:
-			currentEmotion.setImageResource(R.drawable.current_emotion_angry);
+			mCurEmotionIV.setImageResource(R.drawable.current_emotion_angry);
 			break;
 		case Constants.HAPPY:
-			currentEmotion.setImageResource(R.drawable.current_emotion_happy);
+			mCurEmotionIV.setImageResource(R.drawable.current_emotion_happy);
 			break;
 		default:
-			currentEmotion.setVisibility(View.INVISIBLE);
+			mCurEmotionIV.setVisibility(View.INVISIBLE);
 			break;
 		}
-		currentEmotion.startAnimation(animation);
+		mCurEmotionIV.startAnimation(mAnimation);
 	}
 
 	synchronized public void modelListAdd(Model m) {
 		if (m != null) {
-			for (Model model : modelList) {
+			for (Model model : mModelList) {
 				if (m.getMessageNum() == model.getMessageNum()) {
 					if (m.getTextResult() != null) {
 						if (model.getTextResult() == null) {
 							model.setTextResult(m.getTextResult());
-							listAdapter.notifyDataSetChanged();
+							mListAdapter.notifyDataSetChanged();
 							return;
 						}
 					} else if (m.getEmotionType() != 0) {
@@ -153,12 +186,10 @@ public class AssistantView implements OnClickListener {
 							model.setEmotionType(m.getEmotionType());
 							setCurrentEmotion(m.getEmotionType());
 
-							Entry emoEntry = totalEmotion.get(m
-									.getEmotionType() - 1);
+							Entry emoEntry = mTotalEmotionList.get(m.getEmotionType() - 1);
 							emoEntry.setVal(emoEntry.getVal() + 1);
-							totalEmotionChart.notifyDataSetChanged();
-
-							listAdapter.notifyDataSetChanged();
+							mTotalEmotionChart.notifyDataSetChanged();
+							mListAdapter.notifyDataSetChanged();
 							return;
 						}
 					}
@@ -168,12 +199,12 @@ public class AssistantView implements OnClickListener {
 			if (m.getEmotionType() != 0) {
 				setCurrentEmotion(m.getEmotionType());
 
-				Entry emoEntry = totalEmotion.get(m.getEmotionType() - 1);
+				Entry emoEntry = mTotalEmotionList.get(m.getEmotionType() - 1);
 				emoEntry.setVal(emoEntry.getVal() + 1);
-				totalEmotionChart.notifyDataSetChanged();
-
+				mTotalEmotionChart.notifyDataSetChanged();
 			}
-			modelList.add(m);
+			mModelList.add(m);
+			mListAdapter.notifyDataSetChanged();
 		}
 	}
 
@@ -181,7 +212,7 @@ public class AssistantView implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.iv_hide:
-			handler.sendEmptyMessage(Constants.SWAP);
+			mHandler.sendEmptyMessage(Constants.SWAP);
 			break;
 		}
 	}

@@ -62,8 +62,13 @@ public class TalkListAdapter extends BaseAdapter {
 		
 		if(item.getDate() != null)
 			viewHolder.date.setText(item.getDate());
+		else 
+			viewHolder.date.setText("");
+		
 		if(item.getId() != null)
 			viewHolder.id.setText(item.getId());
+		else
+			viewHolder.id.setText("");
 		
 		return convertView;
 	}

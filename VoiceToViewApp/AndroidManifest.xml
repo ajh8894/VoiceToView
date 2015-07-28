@@ -8,6 +8,7 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="22" />
 
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -29,10 +30,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity 
-            android:name="com.swmem.voicetoview.view.TalkActivity" >
+        <activity android:name="com.swmem.voicetoview.view.TalkActivity" >
         </activity>
-        
+
         <service
             android:name=".service.VoiceToViewService"
             android:exported="false" >

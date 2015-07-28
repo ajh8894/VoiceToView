@@ -47,17 +47,17 @@ public class VoiceToViewService extends Service {
 	private AssistantView mAssistantView;
 
 	// Recorder instance
-	private boolean isActivated;
+	private boolean mIsActivated;
 	private AudioPauser mAudioPauser;
 	private RawAudioRecorder mRecorder;
 	private long mStartTime = 0;
 	private int mMaxRecordingTime = 1000;
-	private int order = 0;
+	private int mOrder = 0;
 	private Handler mStopHandler;
 	private Runnable mStopRunnable = new Runnable() {
 		@Override
 		public void run() {
-			if (isActivated) {
+			if (mIsActivated) {
 				if (mMaxRecordingTime < (SystemClock.elapsedRealtime() - mStartTime)) {
 					Log.d(LOG_TAG, "Max recording time exceeded");
 					repeatRecoding();
@@ -120,7 +120,7 @@ public class VoiceToViewService extends Service {
 				mOperator.start();
 				break;
 			case Constants.CONNECT:
-				isActivated = true;
+				mIsActivated = true;
 				mRecorder.start();
 				mStartTime = SystemClock.elapsedRealtime();
 				mStopHandler.postDelayed(mStopRunnable, Constants.TASK_DELAY_STOP);
@@ -162,10 +162,11 @@ public class VoiceToViewService extends Service {
 			Log.e(LOG_TAG, "header null");
 		Connection.gender = intent.getBooleanExtra(Constants.SERVICE_EXTRA_GENDER, true); //true: male, false: female
 		if(Connection.header != null)
-				Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2] + " " + Connection.gender);
+			Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2] + " " + Connection.gender);
 		startAllTasks();
 		
 		return super.onStartCommand(intent, flags, startId);
+		//return START_STICKY;
 	}
 
 	@Override
@@ -193,7 +194,7 @@ public class VoiceToViewService extends Service {
 	}
 
 	private void stopAllTasks() {
-		isActivated = false;
+		mIsActivated = false;
 		
 		if (mRecorder.getState() == State.READY || mRecorder.getState() == State.RECORDING)
 			mRecorder.stop();
@@ -265,7 +266,7 @@ public class VoiceToViewService extends Service {
 			mRecorder.stop();
 
 		try {
-			Model model = new Model(Connection.header[1], Connection.header[2], Connection.gender, order++, mRecorder.consumeRecordingAndTruncate());
+			Model model = new Model(Connection.header[1], Connection.header[2], Connection.gender, mOrder++, mRecorder.consumeRecordingAndTruncate());
 			mSenderQueue.put(model);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

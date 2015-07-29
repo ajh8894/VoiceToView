@@ -11,7 +11,7 @@ import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.Contacts;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,7 +55,7 @@ public class AssistantView implements OnClickListener {
 		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mView = inflater.inflate(R.layout.view_assistant, null);
 		
-		//loadContacts(c.getContentResolver());
+		loadContact(c.getContentResolver());
 		((TextView) mView.findViewById(R.id.tv_phonenumber)).setText(Connection.header[1]);
 		((ImageView) mView.findViewById(R.id.iv_hide)).setOnClickListener(this);
 		this.mTotalEmotionChart = (RadarChart) mView.findViewById(R.id.chart_emotion);
@@ -78,20 +78,24 @@ public class AssistantView implements OnClickListener {
 		wManager.addView(mView, params);
 	}
 
-	private void loadContacts(ContentResolver contentResolver) {
-		String[] projection = new String[] {
-				ContactsContract.Contacts.DISPLAY_NAME,
-				ContactsContract.Contacts.HAS_PHONE_NUMBER };
-		
+	public void loadContact(ContentResolver contentResolver)
+	{
 		String name = null;
-	    String select = "((" + projection[0] + " NOTNULL) AND (" + projection[1] + "=1) AND (" + projection[0] + " != '' ))";
 
-	    Cursor c = contentResolver.query(Contacts.CONTENT_URI, projection, select, null, null);
-	    int nameColumn = c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
-	    if(!c.moveToFirst()) {
-	    	name = c.getString(nameColumn);
-	    }
-	    
+		Cursor cursor = contentResolver
+				.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+						new String[] { ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME },
+						ContactsContract.CommonDataKinds.Phone.NUMBER + "=?",
+						new String[] { Connection.header[1] }, null);
+
+		if (cursor.getCount() > 0) {
+			cursor.moveToFirst();
+			name = cursor.getString(0);
+		} else
+			name = null;
+
+		cursor.close();
+		
 		if(name != null)
 			((TextView) mView.findViewById(R.id.tv_name)).setText(name);
 		else

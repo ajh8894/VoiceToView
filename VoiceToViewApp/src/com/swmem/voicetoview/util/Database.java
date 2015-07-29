@@ -3,14 +3,14 @@ package com.swmem.voicetoview.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
 import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.Model;
 import com.swmem.voicetoview.data.Talk;
 import com.swmem.voicetoview.data.User;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 public class Database {
 	public static SQLiteDatabase db;

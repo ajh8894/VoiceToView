@@ -51,8 +51,8 @@ public class ClientWriter extends Thread {
 			while (client.isActivated() && client.getSocket().isConnected()
 					&& !client.getSocket().isClosed()) {
 				m = client.getSenderQueue().take();
-				// Thread.sleep(1500);
-				end = System.currentTimeMillis();
+				Thread.sleep(1500);
+				//end = System.currentTimeMillis();
 				if (isAlive()) {
 					System.out.println();
 					System.out.println(client.getFrom() + " - current order: " + client.getOrder().intValue() + " completed: " + client.getCompleted().intValue());
@@ -103,7 +103,7 @@ public class ClientWriter extends Thread {
 							System.out.println(client.getFrom() + " - **complete -" + client.getOrder());
 							client.setCompleted(0);
 							client.setOrder(client.getOrder() + 1);
-							start = System.currentTimeMillis();
+							//start = System.currentTimeMillis();
 						}
 					}
 				}

@@ -8,10 +8,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.net.Uri;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,10 +52,8 @@ public class AssistantView implements OnClickListener {
 		this.mAnimation = AnimationUtils.loadAnimation(c, R.anim.abc_fade_in);
 		LayoutInflater inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.mView = inflater.inflate(R.layout.view_assistant, null);
-		
-		loadContact(c.getContentResolver());
-		((TextView) mView.findViewById(R.id.tv_phonenumber)).setText(Connection.header[1]);
 		((ImageView) mView.findViewById(R.id.iv_hide)).setOnClickListener(this);
+		this.loadContact(c.getContentResolver());
 		this.mTotalEmotionChart = (RadarChart) mView.findViewById(R.id.chart_emotion);
 		this.mCurEmotionIV = (ImageView) mView.findViewById(R.id.iv_current_emotion);
 		emotionChartsetData();
@@ -78,29 +74,31 @@ public class AssistantView implements OnClickListener {
 		wManager.addView(mView, params);
 	}
 
+	
 	public void loadContact(ContentResolver contentResolver)
 	{
 		String name = null;
+		String number = Connection.header[2].replaceAll("(\\d{3})(\\d{3,4})(\\d{4})", "$1-$2-$3");
 
-		Cursor cursor = contentResolver
-				.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-						new String[] { ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME },
-						ContactsContract.CommonDataKinds.Phone.NUMBER + "=?",
-						new String[] { Connection.header[1] }, null);
+		Cursor cursor = contentResolver.query(
+				ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+				new String[] {
+						ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME },
+				ContactsContract.CommonDataKinds.Phone.NUMBER + "=?",
+				new String[] { number }, null);
 
-		if (cursor.getCount() > 0) {
-			cursor.moveToFirst();
+		if(cursor.moveToFirst())
 			name = cursor.getString(0);
-		} else
-			name = null;
-
+		
 		cursor.close();
 		
+		((TextView) mView.findViewById(R.id.tv_phonenumber)).setText(number);
 		if(name != null)
 			((TextView) mView.findViewById(R.id.tv_name)).setText(name);
-		else
-			((TextView) mView.findViewById(R.id.tv_name)).setText("없는 번호");
+		else 
+			((TextView) mView.findViewById(R.id.tv_name)).setText("없는 번호");	
 	}
+	
 
 	private void emotionChartsetData() {
 		mTotalEmotionChart.setDescription("");

@@ -161,7 +161,7 @@ public class Client implements Runnable {
 				type = header[0];
 				from = header[1];
 				to = header[2];
-				System.out.println("client connect - id(from): " + from + " type: " + type + " to: " + to);
+				System.out.println("client connect - id(from): " + from + ", type: " + type + ", to: " + to);
 			} else {
 				return;
 			}
@@ -180,8 +180,8 @@ public class Client implements Runnable {
 							&& client.getClientWriter() != null
 							&& client.getClientWriter().isAlive()) {
 						client.getClientWriter().interrupt();
+						client.setSenderQueue(null);
 					}
-					client.setSenderQueue(null);
 					
 					close();
 					Constants.clients.remove(from, client);

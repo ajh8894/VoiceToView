@@ -51,7 +51,7 @@ public class ClientWriter extends Thread {
 			while (client.isActivated() && client.getSocket().isConnected()
 					&& !client.getSocket().isClosed()) {
 				m = client.getSenderQueue().take();
-				Thread.sleep(1500);
+				//Thread.sleep(1500);
 				//end = System.currentTimeMillis();
 				if (isAlive()) {
 					System.out.println();
@@ -77,8 +77,13 @@ public class ClientWriter extends Thread {
 							} else {
 								if(m.getEmotionType() != Constants.EMOTION_NOT_COMPLETE && m.getEmotionType() != Constants.SILENCE && client.getCompleted() == 0) {
 									System.out.println(client.getFrom() + "- restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
-									if (client != null && client.getSenderQueue() != null)
+									if (client != null && client.getSenderQueue() != null) {
 										client.getSenderQueue().put(m);
+										synchronized (this) {
+											wait();
+											System.out.println("wake up");
+										}
+									}
 								} else {
 									client.sendToClient(m);
 									if (client.readFromClient()) {
@@ -93,10 +98,14 @@ public class ClientWriter extends Thread {
 								client.setCompleted(0);
 								client.setOrder(client.getOrder() + 1);
 							}*/
-							
 							System.out.println(client.getFrom() + "- restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
-							if (client != null && client.getSenderQueue() != null)
+							if (client != null && client.getSenderQueue() != null) {
 								client.getSenderQueue().put(m);
+								synchronized (this) {
+									wait();
+									System.out.println("wake up");
+								}
+							}
 						}
 
 						if (client.getCompleted().intValue() == Constants.MESSAGE_SEND_COMPLETE) {

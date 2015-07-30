@@ -12,8 +12,12 @@ public class IndividualSorter extends Thread {
 			try {
 				Model m = (Model) Constants.receiverQueue.take();
 
-				if (Constants.clients.containsKey(m.getTo()) && Constants.clients.get(m.getTo()).getSenderQueue() != null) {
+				if (Constants.clients.containsKey(m.getTo())
+						&& Constants.clients.get(m.getTo()).getSenderQueue() != null) {
 					Constants.clients.get(m.getTo()).putSenderQueue(m);
+					synchronized (Constants.clients.get(m.getTo())) {
+						Constants.clients.get(m.getTo()).notify();
+					}
 				} else {
 					//Constants.receiverQueue.put(m);
 				}

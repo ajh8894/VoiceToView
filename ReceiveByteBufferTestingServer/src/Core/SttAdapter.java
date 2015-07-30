@@ -25,7 +25,7 @@ import com.swmem.voicetoview.data.Model;
 public class SttAdapter extends Thread {
 	private long PAIR;
 	private Model model;
-	private static boolean version1=false;
+	private static boolean version1=true;
 	private static int fs=16000; 
 	// Key obtained through Google Developer group
 	public final String V1_API_KEY = "AIzaSyBgnC5fljMTmCFeilkgLsOKBvvnx6CBS0M";

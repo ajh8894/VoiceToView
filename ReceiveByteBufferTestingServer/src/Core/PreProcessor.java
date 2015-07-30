@@ -52,7 +52,7 @@ public class PreProcessor {
 		try {
 			
 			while(widthSum<3500){
-				if((Math.abs(( (double) audioShorts [ i*perDistance ])/ 0x8000)) < 0.2){
+				if((Math.abs(( (double) audioShorts [ i*perDistance ])/ 0x8000)) < 0.08){
 					i++;
 				}else{
 					widthSum++;

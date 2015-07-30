@@ -14,4 +14,8 @@ ReceiveByteBufferTestingServer/.settings/
 ReceiveByteBufferTestingServer/build/
 ReceiveByteBufferTestingServer/.classpath
 ReceiveByteBufferTestingServer/.project
+<<<<<<< HEAD
 ReceiveByteBufferTestingServer/bin/
+=======
+ReceiveByteBufferTestingServer/bin/
+>>>>>>> 6f6a758f541edaf39fd6720f3cd747a00e2231be

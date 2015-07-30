@@ -9,3 +9,10 @@ VoiceToViewApp/build/
 VoiceToViewApp/.classpath
 VoiceToViewApp/.project
 VoiceToViewApp/bin/
+
+ReceiveByteBufferTestingServer/.settings/
+ReceiveByteBufferTestingServer/build/
+ReceiveByteBufferTestingServer/.classpath
+ReceiveByteBufferTestingServer/.project
+ReceiveByteBufferTestingServer/bin/
+

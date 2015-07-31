@@ -82,8 +82,7 @@ public class AssistantView implements OnClickListener {
 
 		Cursor cursor = contentResolver.query(
 				ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-				new String[] {
-						ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME },
+				new String[] {ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME },
 				ContactsContract.CommonDataKinds.Phone.NUMBER + "=?",
 				new String[] { number }, null);
 
@@ -92,11 +91,14 @@ public class AssistantView implements OnClickListener {
 		
 		cursor.close();
 		
-		((TextView) mView.findViewById(R.id.tv_phonenumber)).setText(number);
-		if(name != null)
+
+		if(name != null) {
+			((TextView) mView.findViewById(R.id.tv_phonenumber)).setText(number);
 			((TextView) mView.findViewById(R.id.tv_name)).setText(name);
-		else 
-			((TextView) mView.findViewById(R.id.tv_name)).setText("없는 번호");	
+		} else {
+			((TextView) mView.findViewById(R.id.tv_phonenumber)).setVisibility(View.INVISIBLE);
+			((TextView) mView.findViewById(R.id.tv_name)).setText(number);
+		}
 	}
 	
 

@@ -4,11 +4,9 @@ package Core;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -25,7 +23,7 @@ import com.swmem.voicetoview.data.Model;
 public class SttAdapter extends Thread {
 	private long PAIR;
 	private Model model;
-	private static boolean version1=true;
+	private static boolean version1=false;
 	private static int fs=16000; 
 	// Key obtained through Google Developer group
 	public final String V1_API_KEY = "AIzaSyBgnC5fljMTmCFeilkgLsOKBvvnx6CBS0M";
@@ -108,6 +106,7 @@ public class SttAdapter extends Thread {
 				String stringReadLine;
 				in.readLine();
 				stringReadLine=in.readLine();
+				System.out.println("2nd" + stringReadLine);
 				// Ignore the first response, it's always empty
 				//				System.out.println(stringReadLine);
 				String textResult=null;;

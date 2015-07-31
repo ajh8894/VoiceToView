@@ -13,18 +13,15 @@ import com.swmem.voicetoview.data.Model;
 
 
 public class MessageProcessor extends Thread {
-	Model modelBean;
-	PreProcessor preProcessor;
-	ObjectInputStream ois;
-	svm_model svmModel;
-	int tempMsgNum;
-	Socket socket;
-
-	//TestValue
+	private Socket socket;
+	private ObjectInputStream ois;
+	private Model modelBean;
+	private PreProcessor preProcessor;
+	private svm_model svmModel;
+	private int tempMsgNum;
 
 	public MessageProcessor(Socket socket,int tempMsgNum) {
-		// TODO Auto-generated constructor stub
-		this.tempMsgNum =tempMsgNum; 
+		this.tempMsgNum = tempMsgNum; 
 		this.socket = socket;
 		preProcessor = new PreProcessor(tempMsgNum);
 	}

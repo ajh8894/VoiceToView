@@ -137,7 +137,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.button1:
 			Intent serviceIntent = new Intent(this, VoiceToViewService.class);
 			serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, header);
-			serviceIntent.putExtra(Constants.SERVICE_EXTRA_GENDER, true);
+			if(mOption.getGender() == Constants.MALE)
+				serviceIntent.putExtra(Constants.SERVICE_EXTRA_GENDER, true);
+			else
+				serviceIntent.putExtra(Constants.SERVICE_EXTRA_GENDER, false);
 			startService(serviceIntent);
 			break;
 		case R.id.button2:

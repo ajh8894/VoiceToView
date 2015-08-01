@@ -23,9 +23,9 @@ public class PreProcessor {
 	int bytesPerFrame;
 	AudioInputStream audioInputStream;
 	int totalFramesRead = 0;
-	public static String DIRECTORY = "sampleWav/";
+//	public static String DIRECTORY = "sampleWav/";
 //	public static String DIRECTORY = "testWav/";
-//	public static String DIRECTORY = "eachWav/";
+	public static String DIRECTORY = "eachWav/";
 
 	public PreProcessor() {
 		// TODO Auto-generated constructor stub
@@ -113,24 +113,23 @@ public class PreProcessor {
 	void printSampleFilesFeatures(String fileName){
 		
 		//Label 자동분류
-		char labelChar = fileName.split("\\.")[0].charAt(5);
-		switch(labelChar){
-		case 'T':
-			System.out.print("1 ");
-			break;
-		case 'N':
-			System.out.print("2 ");
-			break;
-		case 'W':
-			System.out.print("3 ");
-			break;
-		case 'F':
-			System.out.print("4 ");
-			break;
-		default:
-			return;
-			
-		}
+//		char labelChar = fileName.split("\\.")[0].charAt(5);
+//		switch(labelChar){
+//		case 'T':
+//			System.out.print("1 ");
+//			break;
+//		case 'N':
+//			System.out.print("2 ");
+//			break;
+//		case 'W':
+//			System.out.print("3 ");
+//			break;
+//		case 'F':
+//			System.out.print("4 ");
+//			break;
+//		default:
+//			return;
+//		}
 		
 		/**
 		 * 1.  speech signal 추출 및 샘플링
@@ -139,10 +138,10 @@ public class PreProcessor {
 		double[] signals = getSignalData(DIRECTORY+fileName,3);
 		int sampleNum = signals.length;
 //		System.out.println("sampleNum = " +sampleNum);
-//		for(int i=0;i<100;i++){
-//			System.out.print(signals[i]+", ");
-//		}
-//		System.out.println("\n");
+		for(int i=0;i<100;i++){
+			System.out.print(signals[i]+", ");
+		}
+		System.out.println("\n");
 //		System.out.println("sampleSignal's length="+signals.length);
 		
 		
@@ -155,9 +154,10 @@ public class PreProcessor {
 		ComplexDFT FFT = new ComplexDFT(signals.length);
 		double imageSignal[] = new double[signals.length];
 		FFT.transform(TransformDirection.Forward, signals, 0, imageSignal, 0, 1);
-//		for(int i=0;i<100;i++){
-//			System.out.print("["+signals[i]+" + "+imageSignal[i]+"]");
-//		}
+		for(int i=0;i<100;i++){
+			System.out.print("["+signals[i]+" + "+imageSignal[i]+"]");
+		}
+		System.out.println();
 		/**
 		 * 3. 복소수의 실수 변경 후 positive signal converting
 		 */

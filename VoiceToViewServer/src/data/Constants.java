@@ -16,7 +16,7 @@ public class Constants {
 	
 	// svm_server
 	//public static final String SVM_SERVER_IP = "211.189.127.145";
-	public static final String SVM_SERVER_IP = "211.189.127.217";
+	public static final String SVM_SERVER_IP = "localhost";
 	public static final int SVM_SERVER_PORT = 3577;
 	
 	// header

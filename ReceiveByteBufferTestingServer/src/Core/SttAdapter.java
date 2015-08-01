@@ -106,7 +106,6 @@ public class SttAdapter extends Thread {
 				String stringReadLine;
 				in.readLine();
 				stringReadLine=in.readLine();
-				System.out.println("2nd" + stringReadLine);
 				// Ignore the first response, it's always empty
 				//				System.out.println(stringReadLine);
 				String textResult=null;;
@@ -128,7 +127,7 @@ public class SttAdapter extends Thread {
 				model.setTextResult(textResult);
 				model.setConfidence(confidence);
 				if(Server.test)	Server.sendTargetQueue(textResult,false);
-				else Server.sendMessageToServer(model,false);
+				else Server.sendMessageToServer(model,1);
 			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

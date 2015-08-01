@@ -20,7 +20,7 @@ public class Server {
 	public static boolean PLAY_SIGNAL = false;//스피커로 재생할경우
 	
 	//Test value
-	public static boolean test=false;
+	public static boolean test=true;
 	public static ObjectOutputStream oos;
 	public static int count=0;
 	public static int queueCount=0;
@@ -58,16 +58,23 @@ public class Server {
 		}
 	}
 	
-	public static void  sendMessageToServer(Model model,boolean emotion){
+	/**
+	 * 
+	 * @param model
+	 * @param option 1.STT 2.감정 3.Loading
+	 */
+	public static void  sendMessageToServer(Model model,int option){
 		Model responseModel = new Model();
 		responseModel.setInitValues(model);
 		System.out.print("===================================================\n");
-		if(emotion){
+		if(option==1){
+			responseModel.setTextResult(model.getTextResult());
+			System.out.println("[한글] 보낸메시지 : "+responseModel.getTextResult()+",메시지번호 : "+responseModel.getMessageNum());
+		}else if(option==2){
 			responseModel.setEmotionType(model.getEmotionType());
 			System.out.println("[감정] 보낸메시지 : "+responseModel.getEmotionType()+",메시지번호 : "+responseModel.getMessageNum());
 		}else{
-			responseModel.setTextResult(model.getTextResult());
-			System.out.println("[한글] 보낸메시지 : "+responseModel.getTextResult()+",메시지번호 : "+responseModel.getMessageNum());
+			System.out.println("[작업시작] 보낸메시지 메시지번호 : "+responseModel.getMessageNum());
 		}
 		System.out.print("===================================================\n");
 		try {

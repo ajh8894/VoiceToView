@@ -121,5 +121,6 @@ public class Model implements Serializable, Comparable<Model> {
 		this.from = model.from;
 		this.to = model.to;
 		this.messageNum = model.messageNum;
+		this.confidence = model.confidence;
 	}
 }

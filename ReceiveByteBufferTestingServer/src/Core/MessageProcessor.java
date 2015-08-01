@@ -31,7 +31,13 @@ public class MessageProcessor extends Thread {
 		try{
 			ois = new ObjectInputStream(socket.getInputStream());
 			modelBean  = (Model) ois.readObject();
-
+			
+			//받았다는 상태전달
+			Model loadingModel = new Model();
+			loadingModel.setInitValues(modelBean);
+			loadingModel.setMessageNum(-1);
+			if(!Server.test)Server.sendMessageToServer(loadingModel, 3);
+			
 			// TODO Auto-generated method stub
 			System.out.println(tempMsgNum+"번째 받은 음성데이터");
 			//1.STT run() 을 샘플추출시 null이 아닌경우에만 보내도록 안으로 옮김
@@ -68,7 +74,7 @@ public class MessageProcessor extends Thread {
 				//이경우 STT Run이 작동도안하므로 Google에 STT보내지않음. 그래서 X를 여기서 임의로 보내준다.
 				emotion="전체묵음";
 				modelBean.setTextResult("X");
-				Server.sendMessageToServer(this.modelBean,false);
+				Server.sendMessageToServer(this.modelBean,1);
 				break;
 			}
 //			System.out.println(" (서버에저장될 메시지번호: " + tempMsgNum+")");
@@ -77,7 +83,7 @@ public class MessageProcessor extends Thread {
 			if(Server.test){
 				Server.sendTargetQueue(emotion, true);
 			}else{
-				Server.sendMessageToServer(this.modelBean,true);
+				Server.sendMessageToServer(this.modelBean,2);
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block

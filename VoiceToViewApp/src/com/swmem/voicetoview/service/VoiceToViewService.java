@@ -94,7 +94,12 @@ public class VoiceToViewService extends Service {
 				mModelReceiver.start();
 				break;
 			case Constants.CREATE:
-				mAssistantView.modelListAdd(new Model());
+				Model ready = new Model();
+				ready.setMessageNum(-2);
+				mAssistantView.modelListAdd(ready);
+				break;
+			case Constants.REMOVE:
+				mAssistantView.modelListFailRemove();
 				break;
 			case Constants.REFRESH:
 				mAssistantView.modelListAdd(mReceiverQueue.poll());
@@ -168,8 +173,8 @@ public class VoiceToViewService extends Service {
 		
 		startAllTasks();
 		
-		return super.onStartCommand(intent, flags, startId);
-		//return START_STICKY;
+		//return super.onStartCommand(intent, flags, startId);
+		return START_REDELIVER_INTENT;
 	}
 
 	@Override

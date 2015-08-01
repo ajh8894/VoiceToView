@@ -8,6 +8,9 @@ public class Constants {
 	public static final String KIND_SEND = "sender";
 	public static final String KIND_END = "disconnect";
 	
+	// speech
+	public static final String SPEECH_FAIL = "X";
+	
 	// emotion
 	public static final int SAD = 1;
 	public static final int NATURAL = 2;
@@ -22,8 +25,8 @@ public class Constants {
 	public static final String CONNECT_SERVER_IP = "211.189.127.145";
 	public static final int CONNECT_SERVER_PORT = 8894;
 
-	public static final String SVM_SERVER_IP = "211.189.127.145";
-	//public static final String SVM_SERVER_IP = "211.189.127.217";
+	//public static final String SVM_SERVER_IP = "211.189.127.145";
+	public static final String SVM_SERVER_IP = "211.189.127.217";
 	public static final int SVM_SERVER_PORT = 3577;
 	
 	// sqlite option
@@ -46,6 +49,7 @@ public class Constants {
     public static final int RECONNECT = 201;
     public static final int DISCONNECT = 500;
 	public static final int CREATE = 600;
-    public static final int REFRESH = 601;
-    public static final int SWAP = 602;
+	public static final int REMOVE = 601;
+    public static final int REFRESH = 602;
+    public static final int SWAP = 800;
 }

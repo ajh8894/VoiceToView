@@ -43,9 +43,12 @@ public class ModelReceiver extends Thread {
 			Connection.connect(Constants.CONNECT);
 			while(mIsActivated && Connection.socket.isConnected() && !Connection.socket.isClosed()) {
 				Model m = (Model) Connection.ois.readObject();
-				Log.d("Receiver", m.getMessageNum() + " " + m.getEmotionType() + " " + m.getTextResult() + " Model receive succsess");
-				
+				Log.d("Receiver", m.getMessageNum() + " " + m.getEmotionType() + " " + m.getTextResult() + " " + m.getConfidence() + "Model receive succsess");
 				m.setTime(timeFormat.format(new Date()));
+				if(m.getTextResult() != null && m.getTextResult().equals(Constants.SPEECH_FAIL)) {
+					mReceiverHandler.sendEmptyMessage(Constants.REMOVE);
+					continue;
+				}
 				mReceiverQueue.put(m);
 				mReceiverHandler.sendEmptyMessage(Constants.REFRESH);
 				

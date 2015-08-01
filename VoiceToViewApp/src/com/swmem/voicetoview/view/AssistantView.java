@@ -75,8 +75,7 @@ public class AssistantView implements OnClickListener {
 	}
 
 	
-	public void loadContact(ContentResolver contentResolver)
-	{
+	private void loadContact(ContentResolver contentResolver) {
 		String name = null;
 		String number = Connection.header[2].replaceAll("(\\d{3})(\\d{3,4})(\\d{4})", "$1-$2-$3");
 
@@ -183,23 +182,38 @@ public class AssistantView implements OnClickListener {
 			}
 		}
 	}
+	
+	public void modelListFailRemove() {
+		for (Model model : mModelList) {
+			if(model.getMessageNum() == -1) {
+				mModelList.remove(model);
+				mListAdapter.notifyDataSetChanged();
+				break;
+			}
+		}
+	}
 
 	public void modelListAdd(Model m) {
 		if (m != null) {
 			if(m.getMessageNum() == -2) {
 				mModelList.add(m);
+				mListAdapter.notifyDataSetChanged();
 				return;
 			}
 			
 			for (Model model : mModelList) {
 				if (m.getMessageNum() == -1 && model.getMessageNum() == -2) {
 					model.setMessageNum(m.getMessageNum());
+					Model ready = new Model();
+					ready.setMessageNum(-2);
+					mModelList.add(ready);
 					mListAdapter.notifyDataSetChanged();
 					break;
 				} else if (model.getMessageNum() == m.getMessageNum()) {
 					if (m.getTextResult() != null) {
 						if (model.getTextResult() == null) {
 							model.setTextResult(m.getTextResult());
+							model.setConfidence(m.getConfidence());
 							mListAdapter.notifyDataSetChanged();
 							break;
 						}
@@ -216,16 +230,18 @@ public class AssistantView implements OnClickListener {
 						}
 					} 
 				} else if(model.getMessageNum() == -1) {
+					model.setMessageNum(m.getMessageNum());
 					if(m.getEmotionType() != 0) {
+						model.setEmotionType(m.getEmotionType());
+						
 						setCurrentEmotion(m.getEmotionType());
 						Entry emoEntry = mTotalEmotionList.get(m.getEmotionType() - 1);
 						emoEntry.setVal(emoEntry.getVal() + 1);
 						mTotalEmotionChart.notifyDataSetChanged();
+					} else {
+						model.setTextResult(m.getTextResult());
+						model.setConfidence(m.getConfidence());	
 					}
-					mModelList.set(mModelList.indexOf(model), m);
-					Model ready = new Model();
-					ready.setMessageNum(-2);
-					mModelList.add(ready);
 					mListAdapter.notifyDataSetChanged();
 					break;
 				}

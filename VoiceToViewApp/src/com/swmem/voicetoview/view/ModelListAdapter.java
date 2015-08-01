@@ -23,12 +23,10 @@ public class ModelListAdapter extends BaseAdapter {
 	private class ViewHolder {
 		public ViewAnimator emotionSwitching;
 		public ViewAnimator messageSwitching;
-		public ImageView waiting;
 		public ImageView warning;
 		public TextView message;
 		public TextView emotion;
 		public TextView time;
-		
 	}
 
 	public ModelListAdapter(Context context, int layout, List<Model> itemList) {
@@ -68,7 +66,6 @@ public class ModelListAdapter extends BaseAdapter {
 			viewHolder.messageSwitching = (ViewAnimator) convertView.findViewById(R.id.va_message);
 			viewHolder.emotionSwitching = (ViewAnimator) convertView.findViewById(R.id.va_emotion);
 			
-			viewHolder.waiting = (ImageView) viewHolder.messageSwitching.getChildAt(0).findViewById(R.id.iv_warning);
 			viewHolder.warning = (ImageView) viewHolder.messageSwitching.getChildAt(2).findViewById(R.id.iv_warning);
 			viewHolder.message = (TextView) viewHolder.messageSwitching.getChildAt(2).findViewById(R.id.tv_message);
 			viewHolder.emotion = (TextView) viewHolder.emotionSwitching.getChildAt(1);
@@ -84,57 +81,75 @@ public class ModelListAdapter extends BaseAdapter {
 		}
 
 		Model item = getItem(position);
-
+		
 		if (item.getMessageNum() == -2) {
 			viewHolder.emotionSwitching.setVisibility(View.GONE);
 			viewHolder.messageSwitching.setDisplayedChild(0);
+			viewHolder.warning.setVisibility(View.GONE);
+			viewHolder.message.setVisibility(View.GONE);
+			viewHolder.emotion.setVisibility(View.GONE);
+			viewHolder.time.setVisibility(View.GONE);
 		} else if(item.getMessageNum() == -1) {
+			viewHolder.emotionSwitching.setDisplayedChild(0);
 			viewHolder.emotionSwitching.setVisibility(View.VISIBLE);
 			viewHolder.messageSwitching.setDisplayedChild(1);
-			viewHolder.emotionSwitching.setDisplayedChild(0);
+			viewHolder.warning.setVisibility(View.GONE);
+			viewHolder.message.setVisibility(View.GONE);
+			viewHolder.emotion.setVisibility(View.GONE);
+			viewHolder.time.setVisibility(View.GONE);
 		} else {
 			viewHolder.emotionSwitching.setVisibility(View.VISIBLE);
 			
-			if (item.getConfidence() < Constants.CONFIDENCE)
+			if ((item.getConfidence() > Constants.CONFIDENCE) && item.getConfidence() == 0)
 				viewHolder.warning.setVisibility(View.GONE);
 			else
 				viewHolder.warning.setVisibility(View.VISIBLE);
+				
 
 			if (item.getTextResult() != null) {
+				viewHolder.message.setVisibility(View.VISIBLE);
 				viewHolder.message.setText(item.getTextResult());
 				viewHolder.messageSwitching.setDisplayedChild(2);
 			} else {
-				viewHolder.message.setText(null);
+				viewHolder.message.setVisibility(View.GONE);
 				viewHolder.messageSwitching.setDisplayedChild(1);
 			}
 
-			if (item.getTime() != null)
+			if (item.getTime() != null) {
+				viewHolder.time.setVisibility(View.VISIBLE);
 				viewHolder.time.setText(item.getTime());
-			else
-				viewHolder.time.setText(null);
-
+			}
+			else {
+				viewHolder.time.setVisibility(View.GONE);
+			}
+			
 			switch (item.getEmotionType()) {
 			case Constants.SAD:
 				viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_sad);
 				viewHolder.emotion.setText(Constants.STR_SAD);
+				viewHolder.emotion.setVisibility(View.VISIBLE);
 				viewHolder.emotionSwitching.setDisplayedChild(1);
 				break;
 			case Constants.NATURAL:
 				viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_natural);
 				viewHolder.emotion.setText(Constants.STR_NATURAL);
+				viewHolder.emotion.setVisibility(View.VISIBLE);
 				viewHolder.emotionSwitching.setDisplayedChild(1);
 				break;
 			case Constants.ANGRY:
 				viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_angry);
 				viewHolder.emotion.setText(Constants.STR_ANGRY);
+				viewHolder.emotion.setVisibility(View.VISIBLE);
 				viewHolder.emotionSwitching.setDisplayedChild(1);
 				break;
 			case Constants.HAPPY:
 				viewHolder.emotion.setBackgroundResource(R.drawable.model_icon_happy);
 				viewHolder.emotion.setText(Constants.STR_HAPPY);
+				viewHolder.emotion.setVisibility(View.VISIBLE);
 				viewHolder.emotionSwitching.setDisplayedChild(1);
 				break;
 			default:
+				viewHolder.emotion.setVisibility(View.GONE);
 				viewHolder.emotionSwitching.setDisplayedChild(0);
 				break;
 			}

@@ -58,9 +58,9 @@ public class ClientWriter extends Thread {
 							System.out.println(client.getFrom() + " - 1. either junk - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 							continue;
 						} else if (client.getOrder().intValue() == m.getMessageNum()) {
-							if (m.getTextResult() != null
-									&& m.getTextResult().equals(Constants.SPEECH_FAIL)) {
+							if (m.getTextResult() != null && m.getTextResult().equals(Constants.SPEECH_FAIL)) {
 								System.out.println(client.getFrom() + " - 2. speech fail junk - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+								client.sendToClient(m);
 								client.setCompleted(0);
 								client.setOrder(client.getOrder() + 1);
 								continue;

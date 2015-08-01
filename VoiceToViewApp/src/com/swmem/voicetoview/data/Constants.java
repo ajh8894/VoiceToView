@@ -45,6 +45,7 @@ public class Constants {
     public static final int CONNECT = 200;
     public static final int RECONNECT = 201;
     public static final int DISCONNECT = 500;
-    public static final int REFRESH = 600;
-    public static final int SWAP = 601;
+	public static final int CREATE = 600;
+    public static final int REFRESH = 601;
+    public static final int SWAP = 602;
 }

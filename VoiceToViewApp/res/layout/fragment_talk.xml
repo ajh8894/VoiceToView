@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     android:gravity="center"
     android:orientation="vertical"
     tools:context="com.swmem.voicetoview.fragment_talk" >
@@ -10,14 +11,16 @@
         android:id="@+id/layout_hedaer"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp" >
+        android:background="#D8D8D8"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" >
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="fill_parent"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:background="@drawable/talk_border"
             android:gravity="center" >
 
             <TextView
@@ -25,13 +28,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="date"
+                android:text="@string/date"
+                android:textColor="#000000"
                 android:textSize="20sp" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
             android:gravity="center" >
 
@@ -40,7 +44,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="id"
+                android:text="@string/number"
+                android:textColor="#000000"
                 android:textSize="20sp" />
         </RelativeLayout>
     </LinearLayout>
@@ -51,7 +56,8 @@
         android:layout_height="fill_parent"
         android:layout_below="@+id/layout_hedaer"
         android:clickable="false"
-        android:divider="#00000000" >
+        android:divider="#BEBEBE"
+        android:dividerHeight="1dp" >
     </ListView>
 
 </RelativeLayout>

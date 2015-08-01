@@ -1,6 +1,5 @@
 package com.swmem.voicetoview.view;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -37,10 +36,6 @@ public class TalkFragment extends Fragment {
 		mListView = (ListView) view.findViewById(R.id.lv_talk);
 		
 		if (!mType) {
-			view.setBackgroundColor(Color.WHITE);
-			((TextView) view.findViewById(R.id.tv_date)).setText("date");
-			((TextView) view.findViewById(R.id.tv_id)).setText("id");
-			
 			final TalkListAdapter talkListAdapter = new TalkListAdapter(view.getContext(), R.layout.item_talk, Database.selectTalkList());
 			this.mListView.setAdapter(talkListAdapter);
 			this.mListView.setOnItemClickListener(new OnItemClickListener() {
@@ -65,10 +60,10 @@ public class TalkFragment extends Fragment {
 					}
 			});
 		} else {
-			view.setBackgroundColor(Color.WHITE);
 			((TextView) view.findViewById(R.id.tv_date)).setText(mTalk.getDate());
 			((TextView) view.findViewById(R.id.tv_id)).setText(mTalk.getId());
 			
+			this.mListView.setDividerHeight(0);
 			this.mListView.setAdapter(new ModelListAdapter(getActivity(), R.layout.item_model, Database.selectModelList(mTalk.getKey())));
 		}
 		return view;

@@ -50,11 +50,14 @@ public class ClientWriter extends Thread {
 					System.out.println(client.getFrom() + " - current order: " + client.getOrder().intValue() + " completed: " + client.getCompleted().intValue());
 					System.out.println(client.getFrom() + " - take() model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 					if (m != null) {
-						if (client.getOrder().intValue() > m.getMessageNum()) {
+						if (m.getMessageNum() == -1) {
+							System.out.println(client.getFrom() + " - send ready model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+							client.sendToClient(m);
+							continue;
+						} else if (client.getOrder().intValue() > m.getMessageNum()) {
 							System.out.println(client.getFrom() + " - 1. either junk - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 							continue;
-						}
-						if (client.getOrder().intValue() == m.getMessageNum()) {
+						} else if (client.getOrder().intValue() == m.getMessageNum()) {
 							if (m.getTextResult() != null
 									&& m.getTextResult().equals(Constants.SPEECH_FAIL)) {
 								System.out.println(client.getFrom() + " - 2. speech fail junk - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());

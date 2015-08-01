@@ -89,8 +89,12 @@ public class VoiceToViewService extends Service {
 				mModelReceiver.start();
 				break;
 			case Constants.RECONNECT:
+				mAssistantView.modelListRemove();
 				mModelReceiver = new ModelReceiver(mReceiverQueue, this);
 				mModelReceiver.start();
+				break;
+			case Constants.CREATE:
+				mAssistantView.modelListAdd(new Model());
 				break;
 			case Constants.REFRESH:
 				mAssistantView.modelListAdd(mReceiverQueue.poll());

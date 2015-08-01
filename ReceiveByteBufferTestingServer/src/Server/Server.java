@@ -19,7 +19,7 @@ public class Server {
 	
 
 	//PreProcessor Option Value
-	public static boolean FILE_RECORD = false;//파일저장하고싶을경우
+	public static boolean FILE_RECORD = true;//파일저장하고싶을경우
 	public static boolean PLAY_SIGNAL = false;//스피커로 재생할경우
 	
 	//Test value

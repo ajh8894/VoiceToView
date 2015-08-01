@@ -46,11 +46,10 @@ public class PreProcessor {
 		ShortBuffer sbuf = ByteBuffer.wrap(buffers).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
 		audioShorts = new short[sbuf.capacity()];
 		sbuf.get(audioShorts);
-//		System.out.println("원형Signal size : "+audioShorts.length);
-		//앞 묵음제거 (두꺼운부분이 연속되면 녹음시작되게
+		System.out.println("원형Signal size : "+audioShorts.length);
+		//앞 묵음제거 (얇은부분을 지우고 시작)
 		int widthSum = 0,i=1;
 		try {
-			
 			while(widthSum<3500){
 				if((Math.abs(( (double) audioShorts [ i*perDistance ])/ 0x8000)) < 0.08){
 					i++;
@@ -60,12 +59,13 @@ public class PreProcessor {
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			System.out.println("%%%%%%%%%%%전부 묵음들어옴 = STT요청하지않고 'X'만 보냄%%%%%%%%%%"); //i가 인덱스를 초과할경우 
+			e.printStackTrace();
+			System.out.println("[ 묵 음 ] %%%%%%%%%%%전부 묵음들어옴 = STT요청하지않고 'X'만 보냄%%%%%%%%%%"); //i가 인덱스를 초과할경우 
 			return null;
 		}
-//		System.out.println("================================i값: " +i + ", widSum값: "+widthSum);
+		//		System.out.println("================================i값: " +i + ", widSum값: "+widthSum);
 		//뒷부분 8000은 1초이므로 묵음으로 간주하고짤라버리자 
-		int doubleLength =(audioShorts.length/perDistance)-6000/perDistance; 
+		int doubleLength =(audioShorts.length/perDistance)-5000/perDistance; 
 		for  (; i < doubleLength; i++)  { 
 			tempDoubleList.add(( (double) audioShorts [i*perDistance ])/ 0x8000 );
 			//2500을 초과하면 너무 길기때문에 앞에만가지고 감정처리하자.
@@ -75,7 +75,7 @@ public class PreProcessor {
 		if(Server.FILE_RECORD) fileRecording(tempDoubleList);
 
 		System.out.println("harf rate & 묵음제거 Filter후 size : "+ tempDoubleList.size());
-		if(Server.test) StdAudio.play(tempDoubleList);
+		StdAudio.play(tempDoubleList);
 		audioDoubles = new double[tempDoubleList.size()];
 		for(int j=0; j<tempDoubleList.size();j++){
 			audioDoubles[j] = tempDoubleList.get(j);
@@ -133,12 +133,12 @@ public class PreProcessor {
 			if(i==0)features[i]*=1.15;
 			else features[i]*=1.12;
 		}
-	
+
 		//Total power
 		for(int i=0;i<divideNum;i++){
 			totalPower+= (int) features[i];
 		}
-		
+
 		//기계음이입력되면 저주파성분을 나눈 1개만큼 증가시켜서 저주파를 증폭시킴
 		if(Server.PLAY_SIGNAL){
 			double gap =totalPower/(divideNum-1); 
@@ -146,7 +146,7 @@ public class PreProcessor {
 			features[1]+=gap;
 			totalPower+=gap*2;
 		}
-		
+
 		//Scalling & 상대값으로바꿈
 		for(int i=0;i<divideNum;i++){
 			features[i] = features[i]/totalPower;
@@ -155,7 +155,7 @@ public class PreProcessor {
 		DecimalFormat format = new DecimalFormat("0.#######");
 		//		System.out.print("Extra training Set : \n");
 		for(int i=0; i<divideNum;i++){
-//			System.out.print((i+1)+":"+format.format(features[i])+" ");
+			//			System.out.print((i+1)+":"+format.format(features[i])+" ");
 			if(Server.FILE_RECORD) out.append((i+1)+":"+format.format(features[i])+" ");
 			svm_node node = new svm_node();
 			node.index=i+1;
@@ -176,13 +176,13 @@ public class PreProcessor {
 		/**
 		 * 1.  speech signal 추출 및 샘플링
 		 */
-//		System.out.println("1.  speech signal 추출 및 샘플링 시작"+new Date());
-		
+		//		System.out.println("1.  speech signal 추출 및 샘플링 시작"+new Date());
+
 		double[] signals = getSignalData(modelBean.getBuffers(),3);
-		if(signals==null)return null;
-		
+		if(signals==null || signals.length==0)return null;
+
 		new SttAdapter(modelBean).start();
-		
+
 		int sampleNum = signals.length;
 		//		for(int i=0;i<100;i++){
 		//			System.out.print(signals[i]+", ");
@@ -198,7 +198,7 @@ public class PreProcessor {
 		 * ComplexDFT Success!! 
 		 * 
 		 * **/
-//		System.out.println("2. complexFFT 주파수대역으로 변환 시작"+new Date());
+		//		System.out.println("2. complexFFT 주파수대역으로 변환 시작"+new Date());
 		ComplexDFT FFT = new ComplexDFT(signals.length);
 		FFT.transform(TransformDirection.Forward, signals, 0, imageSignal, 0, 1);
 		//		for(int i=0;i<100;i++){
@@ -206,7 +206,7 @@ public class PreProcessor {
 		//		}
 
 		//복소수의 실수 변경 positive signal converting
-//		System.out.println("3. 복소수의 실수 변경 후 positive signal converting 시작"+new Date());
+		//		System.out.println("3. 복소수의 실수 변경 후 positive signal converting 시작"+new Date());
 		for(int i=0;i<sampleNum;i++){
 			signals[i]= Math.sqrt((signals[i] * signals[i]) + (imageSignal[i] * imageSignal[i]));
 		}
@@ -216,7 +216,7 @@ public class PreProcessor {
 		 * 여기서 한가지 방법을 생각했다. 패턴으로 찾는다는것.
 		 * 방법-전체를 비율화시켰다. 결과- 길이에무관
 		 */
-//		System.out.println("4. 트레이닝 셋 생성 시작"+new Date());
+		//		System.out.println("4. 트레이닝 셋 생성 시작"+new Date());
 		return extraSet(signals,6);
 
 	}

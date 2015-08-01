@@ -170,7 +170,6 @@ public class PreProcessor {
 		return x;
 	}
 
-	@SuppressWarnings("deprecation")
 	public svm_node[] printSampleFilesFeatures(Model modelBean){
 
 		/**

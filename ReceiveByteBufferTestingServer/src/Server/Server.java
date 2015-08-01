@@ -1,19 +1,16 @@
 package Server;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import Core.MessageProcessor;
-import Core.PreProcessor;
 
 import com.swmem.voicetoview.data.Model;
 
 
 public class Server {
-	ServerSocket server;
-	PreProcessor preProcessor;
+	private ServerSocket server;
 	public static ObjectOutputStream oosServer;
 	public static String CONNECTION_SERVER_IP = "/211.189.127.145";
 	
@@ -23,7 +20,7 @@ public class Server {
 	public static boolean PLAY_SIGNAL = false;//스피커로 재생할경우
 	
 	//Test value
-	public static boolean test=true;
+	public static boolean test=false;
 	public static ObjectOutputStream oos;
 	public static int count=0;
 	public static int queueCount=0;

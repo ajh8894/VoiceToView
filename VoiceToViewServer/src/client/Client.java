@@ -12,9 +12,10 @@ import data.Constants;
 
 public class Client implements Runnable {
 	private boolean isActivated;
+	private int state;
 	private Socket socket;
-	public ObjectInputStream ois;
-	public ObjectOutputStream oos;
+	private ObjectInputStream ois;
+	private ObjectOutputStream oos;
 	private String type;
 	private String from, to;
 	private Integer order;
@@ -39,6 +40,14 @@ public class Client implements Runnable {
 
 	public void setActivated(boolean isActivated) {
 		this.isActivated = isActivated;
+	}
+
+	public int getState() {
+		return state;
+	}
+
+	public void setState(int state) {
+		this.state = state;
 	}
 
 	public Socket getSocket() {
@@ -69,7 +78,7 @@ public class Client implements Runnable {
 		this.completed = completed;
 	}
 
-	synchronized public BlockingQueue<Model> getSenderQueue() {
+	public BlockingQueue<Model> getSenderQueue() {
 		return senderQueue;
 	}
 
@@ -77,7 +86,7 @@ public class Client implements Runnable {
 		this.senderQueue = senderQueue;
 	}
 
-	synchronized public void putSenderQueue(Model m) {
+	public void putSenderQueue(Model m) {
 		try {
 			this.senderQueue.put(m);
 		} catch (InterruptedException e) {
@@ -137,15 +146,15 @@ public class Client implements Runnable {
 	private void interaction() throws InterruptedException, IOException {
 		if (!Constants.clients.containsKey(to)) { //call sender flow
 			synchronized (this) {
-				System.out.println(from + " - wait");
+				System.out.println(from + " - state waitting");
 				wait(Constants.SENDER_TIMEOUT); //block
-				System.out.println(from + " - wait exit");
+				System.out.println(from + " - state running");
 				checkEachOther(Constants.clients.containsKey(to));
 			}
 		} else { //call receiver flow
 			if (Constants.clients.get(to) != null) {
 				synchronized (Constants.clients.get(to)) {
-					System.out.println(from + "->" + to + " notify!!");
+					System.out.println(from + "->" + to + " notify");
 					Constants.clients.get(to).notify();
 					checkEachOther(Constants.clients.get(to).getSocket().isConnected());
 				}
@@ -161,7 +170,7 @@ public class Client implements Runnable {
 				type = header[0];
 				from = header[1];
 				to = header[2];
-				System.out.println("client connect - id(from): " + from + " type: " + type + " to: " + to);
+				System.out.println("client connect - id(from): " + from + ", type: " + type + ", to: " + to);
 			} else {
 				return;
 			}
@@ -172,16 +181,19 @@ public class Client implements Runnable {
 					Client client = Constants.clients.get(from);
 					client.setActivated(false);
 					
-					synchronized (client) {
-						client.close();
-						client.notify();
+					if (!client.isActivated()) {
+						synchronized (client) {
+							client.close();
+							client.notify();
+						}
 					}
+					
 					if (client.getType().equals(Constants.KIND_RECEIVE)
 							&& client.getClientWriter() != null
 							&& client.getClientWriter().isAlive()) {
 						client.getClientWriter().interrupt();
+						client.setSenderQueue(null);
 					}
-					client.setSenderQueue(null);
 					
 					close();
 					Constants.clients.remove(from, client);
@@ -212,22 +224,22 @@ public class Client implements Runnable {
 							else
 								this.completed = new Integer(0);
 
-							if (client.getClientWriter() != null
-									&& client.getClientWriter().isAlive()) {
+							if (client.getClientWriter() != null && client.getClientWriter().isAlive()) {
 								client.getClientWriter().interrupt();
 							}
 							
-							if (client.getSenderQueue() != null
-									&& !client.getSenderQueue().isEmpty()) {
+							if (client.getSenderQueue() != null && !client.getSenderQueue().isEmpty()) {
 								this.senderQueue = client.getSenderQueue();
 							}
 						}
 						System.out.println(from + " - reconnect");
 						Constants.clients.replace(from, this);
 					} else {
-						synchronized (client) {
-							client.close();
-							client.notify();
+						if (!client.isActivated()) {
+							synchronized (client) {
+								client.close();
+								client.notify();
+							}
 						}
 						System.out.println(from + " - reconnect");
 						Constants.clients.replace(from, this);

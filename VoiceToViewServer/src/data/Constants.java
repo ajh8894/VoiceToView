@@ -15,8 +15,8 @@ public class Constants {
 	public static BlockingQueue<Model> receiverQueue = new ArrayBlockingQueue<Model>(2024);
 	
 	// svm_server
-	//public static final String SVM_SERVER_IP = "211.189.127.145";
-	public static final String SVM_SERVER_IP = "211.189.127.217";
+	public static final String SVM_SERVER_IP = "211.189.127.145";
+	//public static final String SVM_SERVER_IP = "211.189.127.217";
 	public static final int SVM_SERVER_PORT = 3577;
 	
 	// header
@@ -26,11 +26,11 @@ public class Constants {
 	public static final String KIND_SEND = "sender";
 	public static final String KIND_END = "disconnect";
 
-	// error
-	public static final int SENDER_TIMEOUT = 60000 * 3;
-	public static final int MESSAGE_TIMEOUT = 1000 * 30;
-	public static final int MESSAGE_SEND_COMPLETE = 2;
-	public static final int SILENCE = 5;
+	// option
+	public static final int SENDER_TIMEOUT = 1000 * 60 * 2;
+	public static final long RESTORE_TIMEOUT = 1000 * 5;
+	
+    //speech
 	public static final String SPEECH_FAIL = "X";
 	
 	//emotion
@@ -39,6 +39,5 @@ public class Constants {
 	public static final int NATURAL = 2;
 	public static final int ANGRY = 3;
 	public static final int HAPPY = 4;
-	
-
+	public static final int SILENCE = 5;
 }

@@ -23,7 +23,8 @@ public class SVMserverConnector extends Thread {
 
 			while (true) {
 				Model m = (Model) ois.readObject();
-				System.out.println("SVM result: " + m.getMessageNum() + " " + m.getFrom() + " " + m.getTo() + " " + m.getEmotionType() + " " + m.getTextResult());
+				System.out.println("------------------------------------------------------------");
+				System.out.println("SVM result: " + m.getMessageNum() + " " + m.getFrom() + " " + m.getTo() + " " + m.getEmotionType() + " " + m.getTextResult() + " " + m.getConfidence());
 				Constants.receiverQueue.put(m);
 			}
 		} catch (IOException | InterruptedException | ClassNotFoundException e) {

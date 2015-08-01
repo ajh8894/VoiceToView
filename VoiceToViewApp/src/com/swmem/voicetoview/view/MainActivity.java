@@ -41,7 +41,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		// DB create
 		Database.openOrCreateDB(getApplicationContext());
 		mOption = Database.selectUser();
-
+		Log.d(MainActivity.class.getName(), "MODE: " + mOption.getMode() + " GENDER: " + mOption.getGender());
+		
 		// set UI
 		setContentView(R.layout.activity_main);
 
@@ -68,13 +69,15 @@ public class MainActivity extends Activity implements OnClickListener {
 			mModeIV.setImageResource(R.drawable.category_icon_switch_off);
 			mModeTV.setTextColor(Color.parseColor("#747474"));
 			mModeLayout.setSelected(false);
-			header[0] = Constants.KIND_SEND; 
+			mOption.setMode(Constants.VIEW_OFF);
+			header[0] = Constants.KIND_SEND;
 			header[1] = "01086048894"; // from
 			header[2] = "01067108898"; // to
 		} else {
 			mModeIV.setImageResource(R.drawable.category_icon_switch_on);
 			mModeTV.setTextColor(Color.parseColor("#FFFFFF"));
 			mModeLayout.setSelected(true);
+			mOption.setMode(Constants.VIEW_ON);
 			header[0] = Constants.KIND_RECEIVE;
 			header[1] = "01067108898"; // from
 			header[2] = "01086048894"; // to
@@ -116,7 +119,6 @@ public class MainActivity extends Activity implements OnClickListener {
 				header[2] = "01067108898"; // to
 			}
 			Database.updateUser(mOption);
-			Log.d(MainActivity.class.getName(), "MODE: " + mOption.getMode());
 			break;
 		case R.id.layout_gender:
 			if (mOption.getGender() == Constants.MALE) {
@@ -127,7 +129,6 @@ public class MainActivity extends Activity implements OnClickListener {
 				mOption.setGender(Constants.MALE);
 			}
 			Database.updateUser(mOption);
-			Log.d(MainActivity.class.getName(), "GENDER: " + mOption.getGender());
 			break;
 		case R.id.layout_data:
 			startActivity(new Intent(this, TalkActivity.class));
@@ -136,7 +137,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.button1:
 			Intent serviceIntent = new Intent(this, VoiceToViewService.class);
 			serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, header);
-			serviceIntent.putExtra(Constants.SERVICE_EXTRA_GENDER, true);
+			if(mOption.getGender() == Constants.MALE)
+				serviceIntent.putExtra(Constants.SERVICE_EXTRA_GENDER, true);
+			else
+				serviceIntent.putExtra(Constants.SERVICE_EXTRA_GENDER, false);
 			startService(serviceIntent);
 			break;
 		case R.id.button2:

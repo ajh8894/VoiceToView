@@ -1,8 +1,6 @@
 package client;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.swmem.voicetoview.data.Model;
 
@@ -44,17 +42,11 @@ public class ClientWriter extends Thread {
 	public void run() {
 		Model m = null;
 		
-		long start = System.currentTimeMillis();
-		long end = 0;
-		 
 		try {
-			while (client.isActivated() && client.getSocket().isConnected()
-					&& !client.getSocket().isClosed()) {
+			while (client.isActivated() && client.getSocket().isConnected() && !client.getSocket().isClosed()) {
 				m = client.getSenderQueue().take();
-				// Thread.sleep(1500);
-				end = System.currentTimeMillis();
+				//Thread.sleep(1500);
 				if (isAlive()) {
-					System.out.println();
 					System.out.println(client.getFrom() + " - current order: " + client.getOrder().intValue() + " completed: " + client.getCompleted().intValue());
 					System.out.println(client.getFrom() + " - take() model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 					if (m != null) {
@@ -76,34 +68,36 @@ public class ClientWriter extends Thread {
 								continue;
 							} else {
 								if(m.getEmotionType() != Constants.EMOTION_NOT_COMPLETE && m.getEmotionType() != Constants.SILENCE && client.getCompleted() == 0) {
-									System.out.println(client.getFrom() + "- restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
-									if (client != null && client.getSenderQueue() != null)
+									System.out.println(client.getFrom() + "- (1). emotion restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+									if (client != null && client.getSenderQueue() != null) {
 										client.getSenderQueue().put(m);
+										synchronized (this) {
+											wait(Constants.RESTORE_TIMEOUT);
+										}
+									}
 								} else {
 									client.sendToClient(m);
 									if (client.readFromClient()) {
-										System.out.println(client.getFrom() + " - *send model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult() + " " + new SimpleDateFormat("hh:mm:ss a").format(new Date()));
+										System.out.println(client.getFrom() + " - *send model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 										client.setCompleted(client.getCompleted() + 1);
 									}
 								}
 							}
 						} else {
-/*							if (Constants.MESSAGE_TIMEOUT < (end - start) / 1000.0) {
-								System.out.println(client.getFrom() + " - 4. time out - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
-								client.setCompleted(0);
-								client.setOrder(client.getOrder() + 1);
-							}*/
-							
-							System.out.println(client.getFrom() + "- restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
-							if (client != null && client.getSenderQueue() != null)
+							System.out.println(client.getFrom() + "- (2). order restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+							if (client != null && client.getSenderQueue() != null) {
 								client.getSenderQueue().put(m);
+								synchronized (this) {
+									wait(Constants.RESTORE_TIMEOUT);
+								}
+							}
 						}
 
-						if (client.getCompleted().intValue() == Constants.MESSAGE_SEND_COMPLETE) {
+						if (client.getCompleted().intValue() == 2) {
 							System.out.println(client.getFrom() + " - **complete -" + client.getOrder());
 							client.setCompleted(0);
 							client.setOrder(client.getOrder() + 1);
-							start = System.currentTimeMillis();
+							//start = System.currentTimeMillis();
 						}
 					}
 				}
@@ -114,7 +108,7 @@ public class ClientWriter extends Thread {
 				try {
 					System.out.println();
 					System.out.println(client.getFrom() + " - current order: " + client.getOrder().intValue() + " completed: " + client.getCompleted().intValue());
-					System.out.println(client.getFrom() + " - InterruptedException restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+					System.out.println(client.getFrom() + " - (3). InterruptedException restore - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 
 					if (client != null && client.getSenderQueue() != null)
 						client.getSenderQueue().put(m);

@@ -156,14 +156,12 @@ public class VoiceToViewService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "onStartCommand");
-		//Connection.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
-		if(intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER) != null)
-			Connection.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
-		else 
-			Log.e(LOG_TAG, "header null");
+		Connection.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
 		Connection.gender = intent.getBooleanExtra(Constants.SERVICE_EXTRA_GENDER, true); //true: male, false: female
+		
 		if(Connection.header != null)
 			Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2] + " " + Connection.gender);
+		
 		startAllTasks();
 		
 		return super.onStartCommand(intent, flags, startId);
@@ -239,8 +237,7 @@ public class VoiceToViewService extends Service {
 		
 		if (mWindowManager != null) {
 			if (mAssistantView != null) {
-				if (mAssistantView.getModelList() != null
-						&& !mAssistantView.getModelList().isEmpty()) {
+				if (mAssistantView.getModelList() != null && !mAssistantView.getModelList().isEmpty()) {
 					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.KOREA);
 					Database.insertTalk(new Talk(dateFormat.format(new Date()), Connection.header[1]));
 					Database.insertModelList(mAssistantView.getModelList(), Database.selectTalk().getKey());

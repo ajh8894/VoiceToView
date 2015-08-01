@@ -174,16 +174,34 @@ public class AssistantView implements OnClickListener {
 		}
 		mCurEmotionIV.startAnimation(mAnimation);
 	}
+	
+	public void modelListRemove() {
+		for (Model model : mModelList) {
+			if(model.getMessageNum() == -2) {
+				mModelList.remove(model);
+				mListAdapter.notifyDataSetChanged();
+			}
+		}
+	}
 
 	public void modelListAdd(Model m) {
 		if (m != null) {
+			if(m.getMessageNum() == -2) {
+				mModelList.add(m);
+				return;
+			}
+			
 			for (Model model : mModelList) {
-				if (m.getMessageNum() == model.getMessageNum()) {
+				if (m.getMessageNum() == -1 && model.getMessageNum() == -2) {
+					model.setMessageNum(m.getMessageNum());
+					mListAdapter.notifyDataSetChanged();
+					break;
+				} else if (model.getMessageNum() == m.getMessageNum()) {
 					if (m.getTextResult() != null) {
 						if (model.getTextResult() == null) {
 							model.setTextResult(m.getTextResult());
 							mListAdapter.notifyDataSetChanged();
-							return;
+							break;
 						}
 					} else if (m.getEmotionType() != 0) {
 						if (model.getEmotionType() == 0) {
@@ -194,21 +212,24 @@ public class AssistantView implements OnClickListener {
 							emoEntry.setVal(emoEntry.getVal() + 1);
 							mTotalEmotionChart.notifyDataSetChanged();
 							mListAdapter.notifyDataSetChanged();
-							return;
+							break;
 						}
+					} 
+				} else if(model.getMessageNum() == -1) {
+					if(m.getEmotionType() != 0) {
+						setCurrentEmotion(m.getEmotionType());
+						Entry emoEntry = mTotalEmotionList.get(m.getEmotionType() - 1);
+						emoEntry.setVal(emoEntry.getVal() + 1);
+						mTotalEmotionChart.notifyDataSetChanged();
 					}
+					mModelList.set(mModelList.indexOf(model), m);
+					Model ready = new Model();
+					ready.setMessageNum(-2);
+					mModelList.add(ready);
+					mListAdapter.notifyDataSetChanged();
+					break;
 				}
 			}
-
-			if (m.getEmotionType() != 0) {
-				setCurrentEmotion(m.getEmotionType());
-
-				Entry emoEntry = mTotalEmotionList.get(m.getEmotionType() - 1);
-				emoEntry.setVal(emoEntry.getVal() + 1);
-				mTotalEmotionChart.notifyDataSetChanged();
-			}
-			mModelList.add(m);
-			mListAdapter.notifyDataSetChanged();
 		}
 	}
 

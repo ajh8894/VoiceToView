@@ -28,7 +28,6 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
-                android:text="다비치"
                 android:textColor="#FFFFFF"
                 android:textSize="25sp"
                 android:textStyle="bold" />
@@ -39,7 +38,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginLeft="15dp"
-                android:text="010-0000-0000"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -76,7 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:background="@drawable/relativelayout_border"
+            android:background="@drawable/assist_layout_border"
             android:gravity="center" >
 
             <TextView
@@ -96,7 +94,7 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="4"
-            android:background="@drawable/relativelayout_border"
+            android:background="@drawable/assist_layout_border"
             android:gravity="center"
             android:paddingLeft="5dp"
             android:paddingRight="5dp" >
@@ -111,7 +109,7 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:background="@drawable/relativelayout_border"
+            android:background="@drawable/assist_layout_border"
             android:gravity="center" >
 
             <TextView

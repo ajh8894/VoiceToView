@@ -29,6 +29,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ImageView mGenderIV;
 	
 	private TextView mModeTV;
+	private TextView mGenderTV;
 	
 	private Button startBtn;
 	private Button stopBtn;
@@ -54,20 +55,21 @@ public class MainActivity extends Activity implements OnClickListener {
 		mGenderIV = (ImageView) findViewById(R.id.iv_gender);
 		
 		mModeTV = (TextView) findViewById(R.id.tv_mode);
-		
-		startBtn = (Button) findViewById(R.id.button1);
-		stopBtn = (Button) findViewById(R.id.button2);
-		
+		mGenderTV = (TextView) findViewById(R.id.tv_gender);
+
 		mModeLayout.setOnClickListener(this);
 		mGenderLayout.setOnClickListener(this);
 		mDataLayout.setOnClickListener(this);
 		
+		startBtn = (Button) findViewById(R.id.button1);
+		stopBtn = (Button) findViewById(R.id.button2);
 		startBtn.setOnClickListener(this);
 		stopBtn.setOnClickListener(this);
 
 		if (mOption.getMode() == Constants.VIEW_OFF) {
 			mModeIV.setImageResource(R.drawable.category_icon_switch_off);
 			mModeTV.setTextColor(Color.parseColor("#747474"));
+			mModeTV.setText("꺼짐");
 			mModeLayout.setSelected(false);
 			mOption.setMode(Constants.VIEW_OFF);
 			header[0] = Constants.KIND_SEND;
@@ -76,6 +78,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		} else {
 			mModeIV.setImageResource(R.drawable.category_icon_switch_on);
 			mModeTV.setTextColor(Color.parseColor("#FFFFFF"));
+			mModeTV.setText("켜짐");
 			mModeLayout.setSelected(true);
 			mOption.setMode(Constants.VIEW_ON);
 			header[0] = Constants.KIND_RECEIVE;
@@ -85,8 +88,10 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		if (mOption.getGender() == Constants.MALE) {
 			mGenderIV.setImageResource(R.drawable.category_icon_man);
+			mGenderTV.setText("남자");
 		} else {
 			mGenderIV.setImageResource(R.drawable.category_icon_woman);
+			mGenderTV.setText("여자");
 		}
 	}
 
@@ -104,6 +109,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			if (mOption.getMode() == Constants.VIEW_OFF) {
 				mModeIV.setImageResource(R.drawable.category_icon_switch_on);
 				mModeTV.setTextColor(Color.parseColor("#FFFFFF"));
+				mModeTV.setText("켜짐");
 				mModeLayout.setSelected(true);
 				mOption.setMode(Constants.VIEW_ON);
 				header[0] = Constants.KIND_RECEIVE;
@@ -112,6 +118,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			} else {
 				mModeIV.setImageResource(R.drawable.category_icon_switch_off);
 				mModeTV.setTextColor(Color.parseColor("#747474"));
+				mModeTV.setText("꺼짐");
 				mModeLayout.setSelected(false);
 				mOption.setMode(Constants.VIEW_OFF);
 				header[0] = Constants.KIND_SEND;
@@ -123,9 +130,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.layout_gender:
 			if (mOption.getGender() == Constants.MALE) {
 				mGenderIV.setImageResource(R.drawable.category_icon_woman);
+				mGenderTV.setText("여자");
 				mOption.setGender(Constants.FEMALE);
 			} else {
 				mGenderIV.setImageResource(R.drawable.category_icon_man);
+				mGenderTV.setText("남자");
 				mOption.setGender(Constants.MALE);
 			}
 			Database.updateUser(mOption);
@@ -133,7 +142,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.layout_data:
 			startActivity(new Intent(this, TalkActivity.class));
 			break;
-			
 		case R.id.button1:
 			Intent serviceIntent = new Intent(this, VoiceToViewService.class);
 			serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, header);

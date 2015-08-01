@@ -1932,34 +1932,33 @@ containing a value of this type.
         public static final int assist_icon_arrow_close_pressed=0x7f02003e;
         public static final int assist_icon_arrow_open=0x7f02003f;
         public static final int assist_icon_arrow_open_pressed=0x7f020040;
-        public static final int category_button_bg_reset=0x7f020041;
-        public static final int category_button_bg_selected=0x7f020042;
-        public static final int category_button_click=0x7f020043;
-        public static final int category_icon_data=0x7f020044;
-        public static final int category_icon_man=0x7f020045;
-        public static final int category_icon_switch_off=0x7f020046;
-        public static final int category_icon_switch_on=0x7f020047;
-        public static final int category_icon_woman=0x7f020048;
-        public static final int current_emotion_angry=0x7f020049;
-        public static final int current_emotion_happy=0x7f02004a;
-        public static final int current_emotion_natural=0x7f02004b;
-        public static final int current_emotion_sad=0x7f02004c;
-        public static final int hide_button_click=0x7f02004d;
-        public static final int ic_launcher=0x7f02004e;
-        public static final int loading=0x7f02004f;
+        public static final int assist_layout_border=0x7f020041;
+        public static final int category_button_bg_reset=0x7f020042;
+        public static final int category_button_bg_selected=0x7f020043;
+        public static final int category_button_click=0x7f020044;
+        public static final int category_icon_data=0x7f020045;
+        public static final int category_icon_man=0x7f020046;
+        public static final int category_icon_switch_off=0x7f020047;
+        public static final int category_icon_switch_on=0x7f020048;
+        public static final int category_icon_woman=0x7f020049;
+        public static final int current_emotion_angry=0x7f02004a;
+        public static final int current_emotion_happy=0x7f02004b;
+        public static final int current_emotion_natural=0x7f02004c;
+        public static final int current_emotion_sad=0x7f02004d;
+        public static final int hide_button_click=0x7f02004e;
+        public static final int ic_launcher=0x7f02004f;
         public static final int model_boom=0x7f020050;
         public static final int model_icon_angry=0x7f020051;
         public static final int model_icon_happy=0x7f020052;
         public static final int model_icon_natural=0x7f020053;
         public static final int model_icon_sad=0x7f020054;
-        public static final int model_icon_warning=0x7f020055;
-        public static final int model_icon_wating=0x7f020056;
+        public static final int model_icon_waiting=0x7f020055;
+        public static final int model_icon_warning=0x7f020056;
         public static final int notification_template_icon_bg=0x7f020059;
-        public static final int relativelayout_border=0x7f020057;
+        public static final int talk_border=0x7f020057;
         public static final int user_icon=0x7f020058;
     }
     public static final class id {
-        public static final int RelativeLayout1=0x7f090061;
         public static final int action0=0x7f09006b;
         public static final int action_bar=0x7f090040;
         public static final int action_bar_activity_content=0x7f090003;
@@ -2015,12 +2014,13 @@ containing a value of this type.
         public static final int iv_gender=0x7f090055;
         public static final int iv_hide=0x7f09007a;
         public static final int iv_mode=0x7f090052;
+        public static final int iv_waiting=0x7f090063;
         public static final int iv_warning=0x7f090065;
         public static final int layout_data=0x7f090057;
         public static final int layout_gender=0x7f090054;
         public static final int layout_hedaer=0x7f09005d;
         public static final int layout_mode=0x7f090051;
-        public static final int layout_model=0x7f090062;
+        public static final int layout_model=0x7f090061;
         public static final int line1=0x7f090070;
         public static final int line3=0x7f090074;
         public static final int listMode=0x7f09000a;
@@ -2083,7 +2083,7 @@ containing a value of this type.
         public static final int up=0x7f090001;
         public static final int useLogo=0x7f090013;
         public static final int va_emotion=0x7f090067;
-        public static final int va_message=0x7f090063;
+        public static final int va_message=0x7f090062;
         public static final int withText=0x7f09001d;
         public static final int wrap_content=0x7f090009;
     }
@@ -2237,8 +2237,10 @@ containing a value of this type.
         public static final int app_name=0x7f0a0012;
         public static final int current_emotion=0x7f0a0018;
         public static final int data=0x7f0a0016;
+        public static final int date=0x7f0a0019;
         public static final int gender=0x7f0a0015;
         public static final int mode=0x7f0a0014;
+        public static final int number=0x7f0a001a;
         /**  Text to use when the number in a notification info is too large
          (greater than status_bar_notification_info_maxnum, defined in
          values/config.xml) and must be truncated. May need to be localized

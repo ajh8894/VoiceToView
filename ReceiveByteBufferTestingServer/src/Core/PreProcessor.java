@@ -59,7 +59,6 @@ public class PreProcessor {
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			e.printStackTrace();
 			System.out.println("[ 묵 음 ] %%%%%%%%%%%전부 묵음들어옴 = STT요청하지않고 'X'만 보냄%%%%%%%%%%"); //i가 인덱스를 초과할경우 
 			return null;
 		}
@@ -75,7 +74,7 @@ public class PreProcessor {
 		if(Server.FILE_RECORD) fileRecording(tempDoubleList);
 
 		System.out.println("harf rate & 묵음제거 Filter후 size : "+ tempDoubleList.size());
-		StdAudio.play(tempDoubleList);
+//		StdAudio.play(tempDoubleList);
 		audioDoubles = new double[tempDoubleList.size()];
 		for(int j=0; j<tempDoubleList.size();j++){
 			audioDoubles[j] = tempDoubleList.get(j);
@@ -180,6 +179,11 @@ public class PreProcessor {
 		double[] signals = getSignalData(modelBean.getBuffers(),3);
 		if(signals==null || signals.length==0)return null;
 
+		//받았다는 상태전달 후 STT및 이어서 전처리진행
+		Model loadingModel = new Model();
+		loadingModel.setInitValues(modelBean);
+		loadingModel.setMessageNum(-1);
+		if(!Server.test)Server.sendMessageToServer(loadingModel, 3);
 		new SttAdapter(modelBean).start();
 
 		int sampleNum = signals.length;

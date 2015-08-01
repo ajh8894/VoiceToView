@@ -32,11 +32,6 @@ public class MessageProcessor extends Thread {
 			ois = new ObjectInputStream(socket.getInputStream());
 			modelBean  = (Model) ois.readObject();
 			
-			//받았다는 상태전달
-			Model loadingModel = new Model();
-			loadingModel.setInitValues(modelBean);
-			loadingModel.setMessageNum(-1);
-			if(!Server.test)Server.sendMessageToServer(loadingModel, 3);
 			
 			// TODO Auto-generated method stub
 			System.out.println(tempMsgNum+"번째 받은 음성데이터");

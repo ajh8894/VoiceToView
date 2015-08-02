@@ -1,14 +1,14 @@
-VoiceToViewServer/.settings/
-VoiceToViewServer/build/
+VoiceToViewServer/.settings
+VoiceToViewServer/build
 VoiceToViewServer/.classpath
-VoiceToViewServer/bin/
+VoiceToViewServer/bin
 
-VoiceToViewApp/.settings/
-VoiceToViewApp/build/
+VoiceToViewApp/.settings
+VoiceToViewApp/build
 VoiceToViewApp/.classpath
-VoiceToViewApp/bin/
+VoiceToViewApp/bin
 
-ReceiveByteBufferTestingServer/.settings/
-ReceiveByteBufferTestingServer/build/
+ReceiveByteBufferTestingServer/.settings
+ReceiveByteBufferTestingServer/build
 ReceiveByteBufferTestingServer/.classpath
-ReceiveByteBufferTestingServer/bin/
+ReceiveByteBufferTestingServer/bin

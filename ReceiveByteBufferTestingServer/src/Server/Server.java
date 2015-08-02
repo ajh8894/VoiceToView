@@ -16,11 +16,11 @@ public class Server {
 	
 
 	//PreProcessor Option Value
-	public static boolean FILE_RECORD = false;//파일저장하고싶을경우
+	public static boolean FILE_RECORD = true;//파일저장하고싶을경우
 	public static boolean PLAY_SIGNAL = false;//스피커로 재생할경우
 	
 	//Test value
-	public static boolean test=false;
+	public static boolean test=true;
 	public static ObjectOutputStream oos;
 	public static int count=0;
 	public static int queueCount=0;
@@ -36,6 +36,7 @@ public class Server {
 			System.out.println("Server On");
 			while(true){ 
 				Socket socket = server.accept();
+				System.out.println(socket.getInetAddress().toString());
 				if(socket.getInetAddress().toString().equals(CONNECTION_SERVER_IP)){
 					System.out.println("컨넥션 서버가 접속했습니다.");
 					oosServer = new ObjectOutputStream(socket.getOutputStream());

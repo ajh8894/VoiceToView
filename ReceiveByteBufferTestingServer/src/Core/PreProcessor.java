@@ -50,7 +50,7 @@ public class PreProcessor {
 		int widthSum = 0,i=1;
 		try {
 			while(widthSum<2500){
-				if((Math.abs(( (double) audioShorts [ i*perDistance ])/ 0x8000)) < 0.08){
+				if((Math.abs(( (double) audioShorts [ i*perDistance ])/ 0x8000)) < 0.07){
 					i++;
 				}else{
 					widthSum++;
@@ -114,8 +114,6 @@ public class PreProcessor {
 		}
 
 		//8등분하면서 모든값더함.
-		//저주파성분줄임 
-		//고주파성분 강조
 		int term = (int) Math.ceil(length/(double)divideNum);
 		int index=-1;
 		//		int highEmphase = 5;
@@ -126,10 +124,13 @@ public class PreProcessor {
 			}
 			features[index]+=signals[i];
 		}
-		int lowEmphase = 0;
+		
+		//저주파성분줄임 !
+		//고주파성분 강조
+		int lowEmphase = 2;
 		for(int i=0;i<lowEmphase;i++){
-			if(i==0)features[i]*=1.15;
-			else features[i]*=1.12;
+			if(i==0)features[i]*=0.9;
+			else features[i]*=0.88;
 		}
 
 		//Total power
@@ -179,10 +180,10 @@ public class PreProcessor {
 		if(signals==null || signals.length==0)return null;
 
 		//받았다는 상태전달 후 STT및 이어서 전처리진행
-//		Model loadingModel = new Model();
-//		loadingModel.setInitValues(modelBean);
-//		loadingModel.setMessageNum(-1);
-//		if(!Server.test)Server.sendMessageToServer(loadingModel, 3);
+		Model loadingModel = new Model();
+		loadingModel.setInitValues(modelBean);
+		loadingModel.setMessageNum(-1);
+		if(!Server.test)Server.sendMessageToServer(loadingModel, 3);
 		new SttAdapter(modelBean).start();
 
 		int sampleNum = signals.length;

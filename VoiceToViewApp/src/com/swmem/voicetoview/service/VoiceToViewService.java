@@ -2,7 +2,6 @@ package com.swmem.voicetoview.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -243,9 +242,11 @@ public class VoiceToViewService extends Service {
 		
 		if (mWindowManager != null) {
 			if (mAssistantView != null) {
-				if (mAssistantView.getModelList() != null && !mAssistantView.getModelList().isEmpty()) {
-					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd(a:hh:mm)");
-					Database.insertTalk(new Talk(dateFormat.format(new Date()) + "(" + mAssistantView.getModelList().get(0).getTime() + ")", Connection.header[1]));
+				if (mAssistantView.getModelList() != null
+						&& !mAssistantView.getModelList().isEmpty()
+						&& mAssistantView.getModelList().get(0).getTextResult() != null) {
+					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd (a hh:mm)");
+					Database.insertTalk(new Talk(dateFormat.format(new Date()), Connection.header[1]));
 					Database.insertModelList(mAssistantView.getModelList(), Database.selectTalk().getKey());
 				}
 				mWindowManager.removeView(mAssistantView.getView());

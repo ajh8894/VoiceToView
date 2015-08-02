@@ -65,6 +65,7 @@ public class ModelSender extends Thread {
 			Log.e(ModelSender.class.getName(), "IOException");
 			e.printStackTrace();
 			if (m != null) {
+				Log.e(ModelSender.class.getName(), "restore: " + m.getMessageNum() + " " + m.getEmotionType() + " "+ m.getTextResult());
 				try {
 					mSenderQueue.put(m);
 				} catch (InterruptedException e1) {

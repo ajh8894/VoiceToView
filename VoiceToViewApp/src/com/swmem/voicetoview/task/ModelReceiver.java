@@ -38,9 +38,9 @@ public class ModelReceiver extends Thread {
 		super.run();
 		//SimpleDateFormat timeFormat = new SimpleDateFormat("a hh:mm", Locale.KOREA);
 		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
-		mReceiverHandler.sendEmptyMessage(Constants.CREATE);
 		try {
 			Connection.connect(Constants.CONNECT);
+			mReceiverHandler.sendEmptyMessage(Constants.CREATE);
 			while(mIsActivated && Connection.socket.isConnected() && !Connection.socket.isClosed()) {
 				Model m = (Model) Connection.ois.readObject();
 				Log.d("Receiver", m.getMessageNum() + " " + m.getEmotionType() + " " + m.getTextResult() + " " + m.getConfidence() + " Model receive succsess");

@@ -42,9 +42,8 @@ public class TalkFragment extends Fragment {
 		if (!mType) {
 			final List<Talk> talkList = Database.selectTalkList();
 			final TalkListAdapter talkListAdapter = new TalkListAdapter(view.getContext(), R.layout.item_talk, talkList);
-			this.mListView.setAdapter(talkListAdapter);
 			this.mListView.setClickable(true);
-			this.mListView.setSelector(R.drawable.category_button_click);
+			this.mListView.setAdapter(talkListAdapter);
 			this.mListView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -87,6 +86,8 @@ public class TalkFragment extends Fragment {
 					}
 			});
 		} else {
+			((TextView) view.findViewById(R.id.tv_date)).setTextSize(15f);
+			((TextView) view.findViewById(R.id.tv_id)).setTextSize(15f);
 			((TextView) view.findViewById(R.id.tv_date)).setText(mTalk.getDate());
 			((TextView) view.findViewById(R.id.tv_id)).setText(mTalk.getId());
 			

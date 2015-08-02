@@ -15,13 +15,8 @@ public class Constants {
 	public static BlockingQueue<Model> receiverQueue = new ArrayBlockingQueue<Model>(2024);
 	
 	// svm_server
-<<<<<<< HEAD
 	public static final String SVM_SERVER_IP = "211.189.127.145";
 	//public static final String SVM_SERVER_IP = "211.189.127.217";
-=======
-	//public static final String SVM_SERVER_IP = "211.189.127.145";
-	public static final String SVM_SERVER_IP = "localhost";
->>>>>>> a9d61a3829a9be48b59223697e432877e4456e6d
 	public static final int SVM_SERVER_PORT = 3577;
 	
 	// header

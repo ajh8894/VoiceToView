@@ -65,7 +65,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="3"
-        android:background="@drawable/assist_top_bottom_border"
+        android:background="#F8F8F8"
         android:baselineAligned="false"
         android:orientation="horizontal"
         android:weightSum="10" >
@@ -74,7 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:background="@drawable/assist_right_border"
+            android:background="@drawable/assist_border"
             android:gravity="center" >
 
             <TextView
@@ -93,23 +93,23 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:layout_weight="4.5"
+            android:layout_weight="4"
+            android:background="@drawable/assist_border"
+            android:gravity="center"
             android:paddingLeft="3dp"
-            android:paddingRight="3dp"
-            android:background="@drawable/assist_right_border"
-            android:gravity="center" >
+            android:paddingRight="3dp" >
 
             <com.github.mikephil.charting.charts.RadarChart
                 android:id="@+id/chart_emotion"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"/>
+                android:layout_height="fill_parent" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:background="@drawable/assist_right_border"
+            android:background="@drawable/assist_border"
             android:gravity="center" >
 
             <TextView
@@ -129,10 +129,12 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="4"
+            android:background="@drawable/assist_border"
             android:gravity="center" >
 
             <ImageView
                 android:id="@+id/iv_current_emotion"
+                android:focusable="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </RelativeLayout>
@@ -142,6 +144,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="7"
+        android:background="#F8F8F8"
         android:orientation="vertical" >
 
         <!-- 리스트 뷰 : 문자메시지 보여주는 곳 -->
@@ -156,7 +159,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:clickable="false"
-            android:divider="#00000000"
+            android:dividerHeight="0dp"
             android:transcriptMode="alwaysScroll" >
         </ListView>
     </RelativeLayout>

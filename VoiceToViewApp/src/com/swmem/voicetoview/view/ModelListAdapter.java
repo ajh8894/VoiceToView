@@ -64,15 +64,12 @@ public class ModelListAdapter extends BaseAdapter {
 
 			viewHolder = new ViewHolder();
 			viewHolder.messageSwitching = (ViewAnimator) convertView.findViewById(R.id.va_message);
-			viewHolder.emotionSwitching = (ViewAnimator) convertView.findViewById(R.id.va_emotion);
-			
 			viewHolder.warning = (ImageView) viewHolder.messageSwitching.getChildAt(2).findViewById(R.id.iv_warning);
 			viewHolder.message = (TextView) viewHolder.messageSwitching.getChildAt(2).findViewById(R.id.tv_message);
+			
+			viewHolder.emotionSwitching = (ViewAnimator) convertView.findViewById(R.id.va_emotion);
 			viewHolder.emotion = (TextView) viewHolder.emotionSwitching.getChildAt(1);
 			
-			//viewHolder.warning = (ImageView) convertView.findViewById(R.id.iv_warning);
-			//viewHolder.emotion = (TextView) convertView.findViewById(R.id.tv_emotion);
-			//viewHolder.message = (TextView) convertView.findViewById(R.id.tv_message);
 			viewHolder.time = (TextView) convertView.findViewById(R.id.tv_time);
 
 			convertView.setTag(viewHolder);

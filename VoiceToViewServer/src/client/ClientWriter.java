@@ -51,9 +51,11 @@ public class ClientWriter extends Thread {
 					System.out.println(client.getFrom() + " - take() model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 					if (m != null) {
 						if (m.getMessageNum() == -1) {
-							System.out.println(client.getFrom() + " - send ready model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 							client.sendToClient(m);
-							continue;
+							if (client.readFromClient()) {
+								System.out.println(client.getFrom() + " - send ready model - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
+								continue;
+							}
 						} else if (client.getOrder().intValue() > m.getMessageNum()) {
 							System.out.println(client.getFrom() + " - 1. either junk - order: " + m.getMessageNum() + " emotion: " + getEmotion(m.getEmotionType()) + " text: " + m.getTextResult());
 							continue;

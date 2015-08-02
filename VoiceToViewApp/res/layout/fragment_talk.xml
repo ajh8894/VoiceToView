@@ -55,7 +55,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/layout_hedaer"
-        android:clickable="false"
         android:divider="#BEBEBE"
         android:dividerHeight="1dp" >
     </ListView>

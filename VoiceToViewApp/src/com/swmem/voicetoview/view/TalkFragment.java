@@ -1,5 +1,9 @@
 package com.swmem.voicetoview.view;
 
+import java.util.List;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -36,8 +40,11 @@ public class TalkFragment extends Fragment {
 		mListView = (ListView) view.findViewById(R.id.lv_talk);
 		
 		if (!mType) {
-			final TalkListAdapter talkListAdapter = new TalkListAdapter(view.getContext(), R.layout.item_talk, Database.selectTalkList());
+			final List<Talk> talkList = Database.selectTalkList();
+			final TalkListAdapter talkListAdapter = new TalkListAdapter(view.getContext(), R.layout.item_talk, talkList);
 			this.mListView.setAdapter(talkListAdapter);
+			this.mListView.setClickable(true);
+			this.mListView.setSelector(R.drawable.category_button_click);
 			this.mListView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -54,9 +61,29 @@ public class TalkFragment extends Fragment {
 			this.mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 					@Override
 					public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-						Database.deleteTalk(((Talk)parent.getItemAtPosition(position)).getKey());
-						talkListAdapter.notifyDataSetChanged();
-						return false;
+						final AdapterView<?> p = parent;
+						final int pos = position;
+						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+						builder.setMessage("삭제하시겠습니까?")
+						.setCancelable(true)
+						.setPositiveButton("예", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+								Database.deleteTalk(((Talk)p.getItemAtPosition(pos)).getKey());
+								talkList.remove((Talk)p.getItemAtPosition(pos));
+								talkListAdapter.notifyDataSetChanged();
+							}
+						})
+						.setNegativeButton("아니요", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						})
+						.show();
+						
+						return true;
 					}
 			});
 		} else {
@@ -64,6 +91,7 @@ public class TalkFragment extends Fragment {
 			((TextView) view.findViewById(R.id.tv_id)).setText(mTalk.getId());
 			
 			this.mListView.setDividerHeight(0);
+			this.mListView.setClickable(false);
 			this.mListView.setAdapter(new ModelListAdapter(getActivity(), R.layout.item_model, Database.selectModelList(mTalk.getKey())));
 		}
 		return view;

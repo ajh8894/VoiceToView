@@ -94,14 +94,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			mGenderTV.setText("여자");
 		}
 	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Intent serviceIntent = new Intent(this, VoiceToViewService.class);
-		stopService(serviceIntent);
-	}
-
+	
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {

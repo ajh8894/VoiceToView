@@ -23,10 +23,11 @@ public class Constants {
 	
 	// server	
 	public static final String CONNECT_SERVER_IP = "211.189.127.145";
+	//public static final String CONNECT_SERVER_IP = "211.189.127.217";
 	public static final int CONNECT_SERVER_PORT = 8894;
 
-	//public static final String SVM_SERVER_IP = "211.189.127.145";
-	public static final String SVM_SERVER_IP = "211.189.127.217";
+	public static final String SVM_SERVER_IP = "211.189.127.145";
+	//public static final String SVM_SERVER_IP = "211.189.127.217";
 	public static final int SVM_SERVER_PORT = 3577;
 	
 	// sqlite option
@@ -36,7 +37,7 @@ public class Constants {
 	public static final int MALE = 1;
 	
 	// task option
-	public static final float CONFIDENCE = 70;
+	public static final double CONFIDENCE = 0.70;
 	public static final int HIDE_VIEW = 0;
 	public static final int ASSISTANT_VIEW = 1;
 	public static final int MAX_RECORD_TIME = 12;

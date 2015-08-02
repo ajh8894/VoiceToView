@@ -65,7 +65,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="3"
-        android:background="@drawable/assist_border"
+        android:background="@drawable/assist_top_bottom_border"
         android:baselineAligned="false"
         android:orientation="horizontal"
         android:weightSum="10" >
@@ -74,7 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:background="@drawable/assist_layout_border"
+            android:background="@drawable/assist_right_border"
             android:gravity="center" >
 
             <TextView
@@ -93,23 +93,23 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:layout_weight="4"
-            android:background="@drawable/assist_layout_border"
-            android:gravity="center"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp" >
+            android:layout_weight="4.5"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:background="@drawable/assist_right_border"
+            android:gravity="center" >
 
             <com.github.mikephil.charting.charts.RadarChart
                 android:id="@+id/chart_emotion"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent" />
+                android:layout_height="fill_parent"/>
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:background="@drawable/assist_layout_border"
+            android:background="@drawable/assist_right_border"
             android:gravity="center" >
 
             <TextView

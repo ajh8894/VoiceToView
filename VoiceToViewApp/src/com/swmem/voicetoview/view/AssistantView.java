@@ -41,7 +41,10 @@ public class AssistantView implements OnClickListener {
 	private ImageView mCurEmotionIV;
 
 	private RadarChart mTotalEmotionChart;
+	private	RadarDataSet mEmotionSet;
+	private float mTotal;
 	private List<Entry> mTotalEmotionList;
+	private List<Entry> mTotalEmotionScaleList;
 
 	private ListView mListView;
 	private List<Model> mModelList;
@@ -54,8 +57,10 @@ public class AssistantView implements OnClickListener {
 		this.mView = inflater.inflate(R.layout.view_assistant, null);
 		((ImageView) mView.findViewById(R.id.iv_hide)).setOnClickListener(this);
 		this.loadContact(c.getContentResolver());
+
 		this.mTotalEmotionChart = (RadarChart) mView.findViewById(R.id.chart_emotion);
 		this.mCurEmotionIV = (ImageView) mView.findViewById(R.id.iv_current_emotion);
+		this.mTotal = 0;
 		emotionChartsetData();
 
 		this.mListView = (ListView) mView.findViewById(R.id.lv_model);
@@ -89,8 +94,6 @@ public class AssistantView implements OnClickListener {
 			name = cursor.getString(0);
 		
 		cursor.close();
-		
-
 		if(name != null) {
 			((TextView) mView.findViewById(R.id.tv_phonenumber)).setText(number);
 			((TextView) mView.findViewById(R.id.tv_name)).setText(name);
@@ -99,7 +102,6 @@ public class AssistantView implements OnClickListener {
 			((TextView) mView.findViewById(R.id.tv_name)).setText(number);
 		}
 	}
-	
 
 	private void emotionChartsetData() {
 		mTotalEmotionChart.setDescription("");
@@ -111,32 +113,30 @@ public class AssistantView implements OnClickListener {
 		mTotalEmotionChart.setWebLineWidthInner(0.75f);
 		mTotalEmotionChart.setWebAlpha(100);
 
-		mTotalEmotionList = new ArrayList<Entry>();
-		mTotalEmotionList.add(new Entry(0, Constants.SAD));
-		mTotalEmotionList.add(new Entry(0, Constants.NATURAL));
-		mTotalEmotionList.add(new Entry(0, Constants.ANGRY));
-		mTotalEmotionList.add(new Entry(0, Constants.HAPPY));
-
 		String[] xVal = { Constants.STR_SAD, Constants.STR_NATURAL,
 				Constants.STR_ANGRY, Constants.STR_HAPPY };
-
-		RadarDataSet set = new RadarDataSet(mTotalEmotionList, "°¨Á¤");
+		
+		mTotalEmotionList = new ArrayList<Entry>();
+		mTotalEmotionScaleList = new ArrayList<Entry>();
+		for (int i = 0; i < xVal.length; i++) {
+			mTotalEmotionList.add(new Entry(0, i + 1));
+			mTotalEmotionScaleList.add(new Entry(0, i + 1));
+		}
+		mEmotionSet = new RadarDataSet(mTotalEmotionScaleList, "°¨Á¤");
 		// [0 : ÃÊ·Ï / 2 : ÁÖÈ² / 3 : ÆÄ¶û / 4 : »¡°­ ]
-		set.setColor(ColorTemplate.VORDIPLOM_COLORS[0]);
-		set.setDrawFilled(true);
-		set.setLineWidth(2f);
+		mEmotionSet.setDrawFilled(true);
+		mEmotionSet.setLineWidth(2f);
 
-		RadarData radarData = new RadarData(xVal, set);
-		radarData.setValueTextSize(10f);
+		RadarData radarData = new RadarData(xVal, mEmotionSet);
 		radarData.setDrawValues(false);
 
-		mTotalEmotionChart.getXAxis().setTextSize(8f);
+		mTotalEmotionChart.getXAxis().setTextSize(7f);
 		mTotalEmotionChart.getXAxis().setTextColor(Color.parseColor("#000000"));
-
+		
 		YAxis yAxis = mTotalEmotionChart.getYAxis();
 		yAxis.setEnabled(false);
 		yAxis.setLabelCount(4);
-		yAxis.setAxisMaxValue(20);
+		yAxis.setAxisMaxValue(10);
 
 		Legend legend = mTotalEmotionChart.getLegend();
 		legend.setEnabled(false);
@@ -145,6 +145,34 @@ public class AssistantView implements OnClickListener {
 		mTotalEmotionChart.invalidate();
 	}
 
+	private void setDrawable() {
+		int maxColor = -1;
+		float max = -1;
+		for (int i = 0; i < mTotalEmotionList.size(); i++) {
+			mTotalEmotionScaleList.set(i, new Entry((mTotalEmotionList.get(i).getVal() / mTotal) * 10, i + 1));
+			if(max < mTotalEmotionList.get(i).getVal()) {
+				max = mTotalEmotionList.get(i).getVal();
+				switch (i + 1) {
+				case Constants.SAD:
+					maxColor = ColorTemplate.VORDIPLOM_COLORS[3]; // ½½ÇÄ[ÆÄ¶û]
+					break;
+				case Constants.NATURAL:
+					maxColor = Color.parseColor("#747474"); // º¸Åë[È¸»ö]
+					break;
+				case Constants.ANGRY:
+					maxColor = ColorTemplate.VORDIPLOM_COLORS[4]; // È­³²[»¡°­]
+					break;
+				case Constants.HAPPY:
+					maxColor = ColorTemplate.VORDIPLOM_COLORS[2]; // ±â»Ý[ÁÖÈ²]
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		mEmotionSet.setColor(maxColor);
+	}
+	
 	public View getView() {
 		return mView;
 	}
@@ -174,7 +202,7 @@ public class AssistantView implements OnClickListener {
 		mCurEmotionIV.startAnimation(mAnimation);
 	}
 	
-	public void modelListRemove() {
+	public void modelListWaitRemove() {
 		for (Model model : mModelList) {
 			if(model.getMessageNum() == -2) {
 				mModelList.remove(model);
@@ -221,27 +249,25 @@ public class AssistantView implements OnClickListener {
 						if (model.getEmotionType() == 0) {
 							model.setEmotionType(m.getEmotionType());
 							setCurrentEmotion(m.getEmotionType());
-
 							Entry emoEntry = mTotalEmotionList.get(m.getEmotionType() - 1);
 							emoEntry.setVal(emoEntry.getVal() + 1);
+							mTotal++;
+							setDrawable();
 							mTotalEmotionChart.notifyDataSetChanged();
 							mListAdapter.notifyDataSetChanged();
 							break;
 						}
 					} 
 				} else if(model.getMessageNum() == -1) {
-					model.setMessageNum(m.getMessageNum());
 					if(m.getEmotionType() != 0) {
-						model.setEmotionType(m.getEmotionType());
-						
 						setCurrentEmotion(m.getEmotionType());
 						Entry emoEntry = mTotalEmotionList.get(m.getEmotionType() - 1);
 						emoEntry.setVal(emoEntry.getVal() + 1);
+						mTotal++;
+						setDrawable();
 						mTotalEmotionChart.notifyDataSetChanged();
-					} else {
-						model.setTextResult(m.getTextResult());
-						model.setConfidence(m.getConfidence());	
-					}
+					} 
+					mModelList.set(mModelList.indexOf(model), m);
 					mListAdapter.notifyDataSetChanged();
 					break;
 				}

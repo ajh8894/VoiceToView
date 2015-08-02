@@ -89,7 +89,7 @@ public class VoiceToViewService extends Service {
 				mModelReceiver.start();
 				break;
 			case Constants.RECONNECT:
-				mAssistantView.modelListRemove();
+				mAssistantView.modelListWaitRemove();
 				mModelReceiver = new ModelReceiver(mReceiverQueue, this);
 				mModelReceiver.start();
 				break;
@@ -168,9 +168,6 @@ public class VoiceToViewService extends Service {
 		Connection.header = intent.getStringArrayExtra(Constants.SERVICE_EXTRA_HEADER);
 		Connection.gender = intent.getBooleanExtra(Constants.SERVICE_EXTRA_GENDER, true); //true: male, false: female
 		
-		if(Connection.header != null)
-			Log.i(LOG_TAG, Connection.header[0] + " " + Connection.header[1] + " " + Connection.header[2] + " " + Connection.gender);
-		
 		startAllTasks();
 		
 		//return super.onStartCommand(intent, flags, startId);
@@ -247,8 +244,8 @@ public class VoiceToViewService extends Service {
 		if (mWindowManager != null) {
 			if (mAssistantView != null) {
 				if (mAssistantView.getModelList() != null && !mAssistantView.getModelList().isEmpty()) {
-					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.KOREA);
-					Database.insertTalk(new Talk(dateFormat.format(new Date()), Connection.header[1]));
+					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd(a:hh:mm)");
+					Database.insertTalk(new Talk(dateFormat.format(new Date()) + "(" + mAssistantView.getModelList().get(0).getTime() + ")", Connection.header[1]));
 					Database.insertModelList(mAssistantView.getModelList(), Database.selectTalk().getKey());
 				}
 				mWindowManager.removeView(mAssistantView.getView());

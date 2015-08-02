@@ -49,8 +49,8 @@ public class PreProcessor {
 		//앞 묵음제거 (얇은부분을 지우고 시작)
 		int widthSum = 0,i=1;
 		try {
-			while(widthSum<2500){
-				if((Math.abs(( (double) audioShorts [ i*perDistance ])/ 0x8000)) < 0.07){
+			while(widthSum<2000){
+				if((Math.abs(( (double) audioShorts [ i*perDistance ])/ 0x8000)) < 0.03){
 					i++;
 				}else{
 					widthSum++;

@@ -31,10 +31,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView mModeTV;
 	private TextView mGenderTV;
 	
-	private Button startBtn;
+/*	private Button startBtn;
 	private Button stopBtn;
 	private String[] header = new String[3];
-
+*/
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -61,10 +61,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		mGenderLayout.setOnClickListener(this);
 		mDataLayout.setOnClickListener(this);
 		
-		startBtn = (Button) findViewById(R.id.button1);
+/*		startBtn = (Button) findViewById(R.id.button1);
 		stopBtn = (Button) findViewById(R.id.button2);
 		startBtn.setOnClickListener(this);
-		stopBtn.setOnClickListener(this);
+		stopBtn.setOnClickListener(this);*/
 
 		if (mOption.getMode() == Constants.VIEW_OFF) {
 			mModeIV.setImageResource(R.drawable.category_icon_switch_off);
@@ -72,19 +72,19 @@ public class MainActivity extends Activity implements OnClickListener {
 			mModeTV.setText(getResources().getString(R.string.mode_off));
 			mModeLayout.setSelected(false);
 			mOption.setMode(Constants.VIEW_OFF);
-			header[0] = Constants.KIND_SEND;
+/*			header[0] = Constants.KIND_SEND;
 			header[1] = "01086048894"; // from
 			header[2] = "01067108898"; // to
-		} else {
+*/		} else {
 			mModeIV.setImageResource(R.drawable.category_icon_switch_on);
 			mModeTV.setTextColor(Color.parseColor("#FFFFFF"));
 			mModeTV.setText(getResources().getString(R.string.mode_on));
 			mModeLayout.setSelected(true);
 			mOption.setMode(Constants.VIEW_ON);
-			header[0] = Constants.KIND_RECEIVE;
+/*			header[0] = Constants.KIND_RECEIVE;
 			header[1] = "01067108898"; // from
 			header[2] = "01086048894"; // to
-		}
+*/		}
 
 		if (mOption.getGender() == Constants.MALE) {
 			mGenderIV.setImageResource(R.drawable.category_icon_man);
@@ -105,19 +105,19 @@ public class MainActivity extends Activity implements OnClickListener {
 				mModeTV.setText(getResources().getString(R.string.mode_on));
 				mModeLayout.setSelected(true);
 				mOption.setMode(Constants.VIEW_ON);
-				header[0] = Constants.KIND_RECEIVE;
+/*				header[0] = Constants.KIND_RECEIVE;
 				header[1] = "01067108898"; // from
 				header[2] = "01086048894"; // to
-			} else {
+*/			} else {
 				mModeIV.setImageResource(R.drawable.category_icon_switch_off);
 				mModeTV.setTextColor(Color.parseColor("#747474"));
 				mModeTV.setText(getResources().getString(R.string.mode_off));
 				mModeLayout.setSelected(false);
 				mOption.setMode(Constants.VIEW_OFF);
-				header[0] = Constants.KIND_SEND;
+/*				header[0] = Constants.KIND_SEND;
 				header[1] = "01086048894"; // from
 				header[2] = "01067108898"; // to
-			}
+*/			}
 			Database.updateUser(mOption);
 			break;
 		case R.id.layout_gender:
@@ -135,7 +135,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.layout_data:
 			startActivity(new Intent(this, TalkActivity.class));
 			break;
-		case R.id.button1:
+/*		case R.id.button1:
 			Intent serviceIntent = new Intent(this, VoiceToViewService.class);
 			serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, header);
 			if(mOption.getGender() == Constants.MALE)
@@ -147,7 +147,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.button2:
 			Intent serviceIntent1 = new Intent(this, VoiceToViewService.class);
 			stopService(serviceIntent1);
-			break;
+			break;*/
 		default:
 			break;
 		}

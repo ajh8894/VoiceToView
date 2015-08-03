@@ -14,7 +14,7 @@ public class ClientAcceptor extends Thread {
 	public void run() {
 		try {
 			serverSocket = new ServerSocket(Constants.SERVER_PORT);
-
+			
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("client connection accepted");

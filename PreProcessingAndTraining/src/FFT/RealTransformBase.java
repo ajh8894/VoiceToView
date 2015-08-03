@@ -19,7 +19,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *----------------------------------------------------------------------
  */
-package fft;
+package FFT;
 
 /**
  * A base class for DFT agent implementations that transform real data and

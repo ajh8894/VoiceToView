@@ -19,7 +19,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *----------------------------------------------------------------------
  */
-package fft;
+package FFT;
 /**
  * Converts an DFT of real data treated as complex i.e. (real,imag),(real,imag)... to
  * the DFT of real data.

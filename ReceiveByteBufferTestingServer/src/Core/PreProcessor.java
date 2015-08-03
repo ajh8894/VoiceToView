@@ -25,7 +25,7 @@ public class PreProcessor {
 	//	public static String DIRECTORY = "sampleWav/";
 	public String DIRECTORY = "eachWav/";
 	public String modelNameForMan = "train.model";
-	public String modelNameForWomen = "train.model_w";
+	public String modelNameForWomen = "train_w.model";
 	public PreProcessor(int tempMsgNum) {
 		this.tempMsgNum = tempMsgNum;
 		// TODO Auto-generated constructor stub
@@ -50,11 +50,10 @@ public class PreProcessor {
 		int widthSum = 0,i=1;
 		try {
 			while(widthSum<2000){
-				if((Math.abs(( (double) audioShorts [ i*perDistance ])/ 0x8000)) < 0.03){
-					i++;
-				}else{
+				if((Math.abs(( (double) audioShorts [ i*perDistance ])/ 0x8000)) < 0.02){
 					widthSum++;
 				}
+				i++;
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

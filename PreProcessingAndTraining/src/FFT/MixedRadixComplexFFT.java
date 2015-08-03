@@ -21,7 +21,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *----------------------------------------------------------------------
  */
-package fft;
+package FFT;
 
 /**
  * Actor to perform the Discrete Fourier Transform for complex data using

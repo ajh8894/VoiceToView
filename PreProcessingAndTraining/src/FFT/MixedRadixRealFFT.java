@@ -19,7 +19,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *----------------------------------------------------------------------
  */
-package fft;
+package FFT;
 
 /**
  * Computes the mixed radix (2,3 and 5) DFT/FFT for real data.

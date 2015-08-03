@@ -109,7 +109,7 @@ public class SttAdapter extends Thread {
 				// Ignore the first response, it's always empty
 				//				System.out.println(stringReadLine);
 				String textResult=null;;
-				Double confidence=0.0;
+				double confidence=0.0;
 				
 				if(stringReadLine==null){
 					textResult="X";
@@ -118,8 +118,8 @@ public class SttAdapter extends Thread {
 						JSONArray jsonArr= (new JSONObject(stringReadLine)).getJSONArray("result"); //아무말안했을때 널포인터 이따가 예외처리
 						jsonArr = (JSONArray) ((JSONObject) jsonArr.get(0)).get("alternative");
 						textResult = (String) ((JSONObject) jsonArr.get(0)).get("transcript");
-						confidence =  (Double) ((JSONObject) jsonArr.get(0)).get("confidence");
-					} catch (JSONException e) {
+						confidence =  (double) ((JSONObject) jsonArr.get(0)).get("confidence");
+					} catch (Exception e) {
 						// TODO Auto-generated catch block
 					}
 				}

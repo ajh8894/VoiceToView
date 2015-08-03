@@ -8,7 +8,6 @@ import com.swmem.voicetoview.data.Model;
 public class QueueAdapter  extends Thread{
 	public static BlockingQueue<Model> queue;
 
-
 	public QueueAdapter() {
 		// TODO Auto-generated constructor stub
 		queue = new ArrayBlockingQueue<>(1000);

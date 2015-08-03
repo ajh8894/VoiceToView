@@ -5,6 +5,7 @@ public class Driver {
 		Server server = new Server();
 		QueueAdapter queueAdapter = new QueueAdapter();
 		queueAdapter.start();
+		
 		server.startWaiting();
 	}
 }

@@ -48,31 +48,12 @@ public class MessageProcessor extends Thread {
 				svmModel = svm.svm_load_model(preProcessor.modelNameForWomen);
 			}
 			int emotionType=5;
-			if(x!=null){
-				emotionType = (int)svm.svm_predict(svmModel,x);
-			}
-			String emotion=null;
-			switch (emotionType) {
-			case 1:
-				emotion="슬픔";
-				break;
-			case 2:
-				emotion="보통";
-				break;
-			case 3:
-				emotion="화남";
-				break;
-			case 4:
-				emotion="기쁨";
-				break;
-			case 5:
-				//이경우 STT Run이 작동도안하므로 Google에 STT보내지않음. 그래서 X를 여기서 임의로 보내준다.
-				emotion="전체묵음";
+			if(x==null){
 				modelBean.setTextResult("X");
 				Server.sendMessageToServer(this.modelBean,1);
-				break;
+			}else if(x!=null){
+				emotionType = (int)svm.svm_predict(svmModel,x);
 			}
-			//			System.out.println(" (서버에저장될 메시지번호: " + tempMsgNum+")");
 
 			this.modelBean.setEmotionType(emotionType);
 			Server.sendMessageToServer(this.modelBean,2);
@@ -81,8 +62,8 @@ public class MessageProcessor extends Thread {
 			e.printStackTrace();
 		}finally{
 			try {
-				socket.close();
 				ois.close();
+				socket.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

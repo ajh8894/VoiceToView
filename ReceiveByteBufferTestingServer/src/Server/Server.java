@@ -24,8 +24,8 @@ public class Server {
 	//Test value
 	public static int count=0;
 	public static String emotion,text;
-
-
+	
+	
 	public Server() {
 		// TODO Auto-generated constructor stub
 	}

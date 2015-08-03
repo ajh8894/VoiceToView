@@ -91,7 +91,6 @@ public class SttAdapter extends Thread {
 						confidence =  (double) ((JSONObject) jsonArr.get(0)).get("confidence");
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
 				}
 				in.close();

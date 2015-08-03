@@ -22,16 +22,20 @@ public class SttAdapter extends Thread {
 
 	//Google API v2
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2";
-	//	public static final String URL = "https://www.google.com/speech-api/v2/recognize?output=json&lang=ko_kr&key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw&client=chromium&maxresults=6&pfilter=2";
-	public static final String URL = "https://www.google.com/speech-api/v2/recognize?output=json&lang=ko_kr&key=AIzaSyAcalCzUvPmmJ7CZBFOEWx2Z1ZSn4Vs1gg&client=chromium&maxresults=6&pfilter=2";
-
+	//public static final String KEY = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"; // master key
+	
+	//public static final String KEY = "AIzaSyAcalCzUvPmmJ7CZBFOEWx2Z1ZSn4Vs1gg";
+	//public static final String KEY = "AIzaSyCnl6MRydhw_5fLXIdASxkLJzcJh5iX0M4";
+	public static final String KEY = "AIzaSyDVg6hJDJXIWvz-CdylnoCHNN4PaLx3aoc"; // my key
+	public static final String URL = "https://www.google.com/speech-api/v2/recognize?output=json&lang=ko_kr&key=" + KEY + "&client=chromium&maxresults=6&pfilter=2";
+	
 	public SttAdapter(Model model) {
 		this.model = model;
 	}
 
 	@Override
 	public void run() {
-		System.out.println("STT요청시작 메시지번호 : "+model.getMessageNum());
+		System.out.println("STT요청시작 메시지번호 : "+ model.getMessageNum());
 		// InputStream in = null;
 		int resCode = -1;
 
@@ -71,7 +75,6 @@ public class SttAdapter extends Thread {
 			out.close();
 			
 			if (resCode == HttpURLConnection.HTTP_OK) {
-
 				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(),"UTF-8"));
 				String stringReadLine;
 				in.readLine();
@@ -95,7 +98,7 @@ public class SttAdapter extends Thread {
 					}
 				}
 				in.close();
-				con.disconnect();
+				//con.disconnect();
 				model.setTextResult(textResult);
 				model.setConfidence(confidence);
 				Server.sendMessageToServer(model,1);

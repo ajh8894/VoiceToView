@@ -31,12 +31,12 @@ public class MessageProcessor extends Thread {
 		try{
 			ois = new ObjectInputStream(socket.getInputStream());
 			modelBean  = (Model) ois.readObject();
-			
-			
+
+
 			// TODO Auto-generated method stub
 			System.out.println(tempMsgNum+"번째 받은 음성데이터");
 			//1.STT run() 을 샘플추출시 null이 아닌경우에만 보내도록 안으로 옮김
-//			new SttAdapter(modelBean).start();
+			//			new SttAdapter(modelBean).start();
 
 			//2. 이 run()은 작업종료이므로 emotiom Processing이어 진행
 			svm_node[] x= preProcessor.printSampleFilesFeatures(modelBean);
@@ -72,26 +72,20 @@ public class MessageProcessor extends Thread {
 				Server.sendMessageToServer(this.modelBean,1);
 				break;
 			}
-//			System.out.println(" (서버에저장될 메시지번호: " + tempMsgNum+")");
+			//			System.out.println(" (서버에저장될 메시지번호: " + tempMsgNum+")");
 
 			this.modelBean.setEmotionType(emotionType);
-			if(Server.test){
-				Server.sendTargetQueue(emotion, true);
-			}else{
-				Server.sendMessageToServer(this.modelBean,2);
-			}
+			Server.sendMessageToServer(this.modelBean,2);
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
-			if(!Server.test){
-				try {
-					socket.close();
-					ois.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			try {
+				socket.close();
+				ois.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}

@@ -23,11 +23,10 @@ public class Constants {
 	
 	// server	
 	public static final String CONNECT_SERVER_IP = "211.189.127.145";
-	//public static final String CONNECT_SERVER_IP = "211.189.127.217";
 	public static final int CONNECT_SERVER_PORT = 8894;
 
-	//public static final String SVM_SERVER_IP = "211.189.127.145";
-	public static final String SVM_SERVER_IP = "211.189.127.217";
+	public static final String SVM_SERVER_IP = "211.189.127.145";
+	//public static final String SVM_SERVER_IP = "211.189.127.217";
 	public static final int SVM_SERVER_PORT = 3577;
 	
 	// sqlite option

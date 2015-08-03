@@ -1,5 +1,9 @@
 package main;
 
+import task.ClientAcceptor;
+import task.IndividualSorter;
+import task.SVMserverConnector;
+
 
 public class ServerOperator {
 	public static void main(String[] args) {

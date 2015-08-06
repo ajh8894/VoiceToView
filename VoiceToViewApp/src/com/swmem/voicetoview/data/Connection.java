@@ -15,12 +15,12 @@ public class Connection {
 	public static ObjectOutputStream oos;
 	public static ObjectInputStream ois;
 
-	synchronized public static void connect(int type) throws UnknownHostException, IOException {
+	public synchronized static void connect(int type) throws UnknownHostException, IOException {
 		if (socket == null || !socket.isConnected() || socket.isClosed()) {
 			socket = new Socket(Constants.CONNECT_SERVER_IP, Constants.CONNECT_SERVER_PORT);
 			ois = new ObjectInputStream(socket.getInputStream());
 			oos = new ObjectOutputStream(socket.getOutputStream());
-			Log.d(Connection.class.getName(), "connect");
+			Log.d(Connection.class.getName(), "Connect");
 			if(type == Constants.DISCONNECT) {
 				header[0] = Constants.KIND_END;
 			} 
@@ -29,7 +29,7 @@ public class Connection {
 		}
 	}
 
-	synchronized public static void disconnect() {
+	public synchronized static void disconnect() {
 		Log.d(Connection.class.getName(), "disconnect");
 		try {
 			if (ois != null) {

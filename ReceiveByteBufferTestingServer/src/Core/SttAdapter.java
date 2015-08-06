@@ -22,11 +22,10 @@ public class SttAdapter extends Thread {
 
 	//Google API v2
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2";
-	//public static final String KEY = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"; // master key
+	public static final String KEY = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"; // master key
 	
 	//public static final String KEY = "AIzaSyAcalCzUvPmmJ7CZBFOEWx2Z1ZSn4Vs1gg";
-	//public static final String KEY = "AIzaSyCnl6MRydhw_5fLXIdASxkLJzcJh5iX0M4";
-	public static final String KEY = "AIzaSyDVg6hJDJXIWvz-CdylnoCHNN4PaLx3aoc"; // my key
+	//public static final String KEY = "AIzaSyDVg6hJDJXIWvz-CdylnoCHNN4PaLx3aoc"; // my key
 	public static final String URL = "https://www.google.com/speech-api/v2/recognize?output=json&lang=ko_kr&key=" + KEY + "&client=chromium&maxresults=6&pfilter=2";
 	
 	public SttAdapter(Model model) {

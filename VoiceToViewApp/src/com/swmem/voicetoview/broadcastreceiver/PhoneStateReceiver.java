@@ -41,8 +41,8 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                         }
                     }
                     else if(state == TelephonyManager.CALL_STATE_RINGING){
-                        header[1] = telManager.getLine1Number();
-                        header[2] = incomingNumber;
+                        header[1] = telManager.getLine1Number().replace("-", "").replace("+82", "0");
+                        header[2] = incomingNumber.replace("-", "").replace("+82", "0");
                         Log.i(LOG_TAG, "RINGING: " + header[0] + " " + header[1] + " " + header[2]);
                     }
                     else if(state == TelephonyManager.CALL_STATE_OFFHOOK){
@@ -68,7 +68,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
         }, PhoneStateListener.LISTEN_CALL_STATE);
          
         if(intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)){
-            header[1] = telManager.getLine1Number();
+            header[1] = telManager.getLine1Number().replace("-", "").replace("+82", "0");
             header[2] = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             Log.i(LOG_TAG, "OUTGOING_CALL: " + header[0] + " " + header[1] + " " + header[2]);
         }

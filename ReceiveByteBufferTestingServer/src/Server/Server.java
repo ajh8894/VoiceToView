@@ -3,13 +3,10 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
-import com.swmem.voicetoview.data.Model;
 
 import Core.MessageProcessor;
-import Core.SttAdapter;
+
+import com.swmem.voicetoview.data.Model;
 
 
 public class Server {

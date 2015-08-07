@@ -174,27 +174,27 @@ public class Client implements Runnable {
 			} else {
 				return;
 			}
-			
+
 			//client disconnect
 			if(header[0].equals(Constants.KIND_END)) {
 				if(Constants.clients.containsKey(from)) {
 					Client client = Constants.clients.get(from);
 					client.setActivated(false);
-					
+
 					if (!client.isActivated()) {
 						synchronized (client) {
 							client.close();
 							client.notify();
 						}
 					}
-					
+
 					if (client.getType().equals(Constants.KIND_RECEIVE)
 							&& client.getClientWriter() != null
 							&& client.getClientWriter().isAlive()) {
 						client.getClientWriter().interrupt();
 						client.setSenderQueue(null);
 					}
-					
+
 					close();
 					Constants.clients.remove(from, client);
 					System.out.println(from + " - disconnect");

@@ -5,10 +5,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,7 +14,6 @@ import android.widget.TextView;
 import com.swmem.voicetoview.R;
 import com.swmem.voicetoview.data.Constants;
 import com.swmem.voicetoview.data.User;
-import com.swmem.voicetoview.service.VoiceToViewService;
 import com.swmem.voicetoview.util.Database;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -32,10 +29,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView mModeTV;
 	private TextView mGenderTV;
 
-	private Button startBtn;
+/*	private Button startBtn;
 	private Button stopBtn;
 	private Button typeBtn;
-	private String[] header = new String[3];
+	private String[] header = new String[3];*/
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,20 +67,20 @@ public class MainActivity extends Activity implements OnClickListener {
 			mModeLayout.setSelected(false);
 			mOption.setMode(Constants.VIEW_OFF);
 
-			header[0] = Constants.KIND_SEND;
+			/*header[0] = Constants.KIND_SEND;
 			header[1] = "01086048894"; // from
 			header[2] = "01067108898"; // to
-		} else {
+*/		} else {
 			mModeIV.setImageResource(R.drawable.category_icon_switch_on);
 			mModeTV.setTextColor(Color.parseColor("#FFFFFF"));
 			mModeTV.setText(getResources().getString(R.string.mode_on));
 			mModeLayout.setSelected(true);
 			mOption.setMode(Constants.VIEW_ON);
 
-			header[0] = Constants.KIND_RECEIVE;
+		/*	header[0] = Constants.KIND_RECEIVE;
 			header[1] = "01067108898"; // from
 			header[2] = "01086048894"; // to
-		}
+*/		}
 
 		if (mOption.getGender() == Constants.MALE) {
 			mGenderIV.setImageResource(R.drawable.category_icon_man);
@@ -92,7 +89,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			mGenderIV.setImageResource(R.drawable.category_icon_woman);
 			mGenderTV.setText(getResources().getString(R.string.gender_woman));
 		}
-		startBtn = (Button) findViewById(R.id.button1);
+		/*startBtn = (Button) findViewById(R.id.button1);
 		stopBtn = (Button) findViewById(R.id.button2);
 		typeBtn = (Button) findViewById(R.id.button3);
 		startBtn.setOnClickListener(this);
@@ -105,7 +102,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		else {
 			header[0] = Constants.KIND_RECEIVE;
 			typeBtn.setText(header[0]);
-		}
+		}*/
 	}
 
 	@Override
@@ -119,20 +116,20 @@ public class MainActivity extends Activity implements OnClickListener {
 				mModeLayout.setSelected(true);
 				mOption.setMode(Constants.VIEW_ON);
 
-				header[0] = Constants.KIND_RECEIVE;
+				/*header[0] = Constants.KIND_RECEIVE;
 				header[1] = "01067108898"; // from
 				header[2] = "01086048894"; // to
-			} else {
+*/			} else {
 				mModeIV.setImageResource(R.drawable.category_icon_switch_off);
 				mModeTV.setTextColor(Color.parseColor("#747474"));
 				mModeTV.setText(getResources().getString(R.string.mode_off));
 				mModeLayout.setSelected(false);
 				mOption.setMode(Constants.VIEW_OFF);
 
-				header[0] = Constants.KIND_SEND;
+				/*header[0] = Constants.KIND_SEND;
 				header[1] = "01086048894";// from
 				header[2] = "01067108898"; // to
-			}
+*/			}
 			Database.updateUser(mOption);
 			break;
 		case R.id.layout_gender:
@@ -152,7 +149,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			startActivity(new Intent(this, TalkActivity.class));
 			break;
 
-		case R.id.button1:
+/*		case R.id.button1:
 			Intent serviceIntent = new Intent(this, VoiceToViewService.class);
 			serviceIntent.putExtra(Constants.SERVICE_EXTRA_HEADER, header);
 			if (mOption.getGender() == Constants.MALE)
@@ -174,7 +171,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				header[0] = Constants.KIND_RECEIVE;
 				typeBtn.setText(header[0]);
 			}
-			break;
+			break;*/
 		default:
 			break;
 		}

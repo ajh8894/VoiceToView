@@ -22,6 +22,7 @@ public class Constants {
 	public static final String STR_HAPPY = "±â»Ý";
 	
 	// server	
+	//public static final String CONNECT_SERVER_IP = "211.189.127.217";
 	public static final String CONNECT_SERVER_IP = "211.189.127.145";
 	public static final int CONNECT_SERVER_PORT = 8894;
 

@@ -15,7 +15,8 @@ import Core.SttAdapter;
 public class Server {
 	private ServerSocket server;
 	public static ObjectOutputStream oosServer;
-	public static String CONNECTION_SERVER_IP = "/211.189.127.145";
+//	public static String CONNECTION_SERVER_IP = "/211.189.127.145";
+	public static String CONNECTION_SERVER_IP = "/211.189.127.217";
 
 	//PreProcessor Option Value
 	public static boolean FILE_RECORD = false;//파일저장하고싶을경우
